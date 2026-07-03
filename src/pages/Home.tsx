@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import {
-  Shield, Lock, TrendingUp, Zap, Clock, CheckCircle2, Users, Award, ArrowRight, Eye, FileText,
+  Shield, Lock, TrendingUp, Zap, Clock, CheckCircle2, Award, ArrowRight, Eye, FileText,
   ShieldCheck, Globe, MessageSquare, Phone,
 } from 'lucide-react';
 
@@ -60,8 +60,7 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: '1,000+', label: t('res.stat1'), icon: Users },
-    { value: '48h', label: t('res.stat2'), icon: Clock },
+    { value: '1-4 с.', label: t('res.stat2'), icon: Clock },
     { value: '95%', label: t('res.stat3'), icon: Award },
   ];
 
@@ -99,7 +98,7 @@ export default function Home() {
               </Link>
               <Link to="/services" className="outline-btn inline-flex items-center gap-2">{t('hero.cta2')}</Link>
               <a
-                href="tel:+359883277758"
+                href="tel:0883391411"
                 className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5"
                 onClick={() => {
                   if (typeof window.gtag !== 'undefined') {
@@ -111,18 +110,17 @@ export default function Home() {
                 }}
               >
                 <Phone size={15} />
-                <span>+359 883 277 758</span>
+                <span>Обади се</span>
               </a>
             </div>
 
             <div className="flex flex-wrap gap-4">
               {[
-                { num: '1,000+', text: t('hero.stat1') },
                 { num: '95%', text: t('hero.stat2') },
-                { num: '1-4w', text: t('hero.stat3') },
-              ].map((s) => (
-                <div key={s.text} className="flex items-center gap-2 bg-white rounded-full px-4 py-2 border border-slate-300 shadow-sm">
-                  <span className="text-base font-bold gradient-text">{s.num}</span>
+                { text: t('hero.stat3') },
+              ].map((s, idx) => (
+                <div key={idx} className="flex items-center gap-2 bg-white rounded-full px-4 py-2 border border-slate-300 shadow-sm">
+                  {s.num && <span className="text-base font-bold gradient-text">{s.num}</span>}
                   <span className="text-slate-700 text-xs">{s.text}</span>
                 </div>
               ))}

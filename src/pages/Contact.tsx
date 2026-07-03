@@ -263,7 +263,7 @@ export default function Contact() {
 
   const contactInfo = [
     { icon: Mail, label: t('cp.info.email'), value: t('cp.info.emailVal'), href: 'mailto:support@unbansolutions.com' },
-    { icon: Phone, label: t('cp.info.phone'), value: t('cp.info.phoneVal'), href: 'tel:+359883277758' },
+    { icon: Phone, label: t('cp.info.phone'), value: t('cp.info.phoneVal'), href: 'tel:0883391411' },
     { icon: MapPin, label: t('cp.info.address'), value: t('cp.info.addrVal') + '\n' + t('cp.info.addrVal2') },
     { icon: Clock, label: t('cp.info.availability'), value: t('cp.info.availVal') + '\n' + t('cp.info.availVal2') },
   ];
@@ -480,7 +480,7 @@ export default function Contact() {
                   <h3 className="text-slate-900 text-sm font-bold mb-0.5">{t('cp.emergency.title')}</h3>
                   <p className="text-slate-700 text-xs">{t('cp.emergency.desc')}</p>
                 </div>
-                <a href="tel:+359883277758" className="glow-btn flex items-center gap-2 whitespace-nowrap text-xs py-2.5 px-5">
+                <a href="tel:0883391411" className="glow-btn flex items-center gap-2 whitespace-nowrap text-xs py-2.5 px-5">
                   <Phone size={12} /><span>{t('cp.emergency.btn')}</span>
                 </a>
               </div>

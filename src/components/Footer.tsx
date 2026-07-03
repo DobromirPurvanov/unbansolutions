@@ -56,7 +56,7 @@ export default function Footer() {
             <h4 className="font-bold text-sm mb-4">{t('nav.contact')}</h4>
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-slate-400 text-xs"><Mail size={12} /> support@unbansolutions.com</li>
-              <li className="flex items-center gap-2 text-slate-400 text-xs"><Phone size={12} /> +359 883 277 758</li>
+              <li className="flex items-center gap-2 text-slate-400 text-xs"><Phone size={12} /> 0883 391411</li>
               <li className="flex items-start gap-2 text-slate-400 text-xs"><MapPin size={12} className="flex-shrink-0 mt-0.5" /> София, Шипченски Проход 18</li>
             </ul>
           </div>
