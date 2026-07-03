@@ -74,7 +74,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'res.label': 'Резултати',
     'res.title': 'Числа, които ',
     'res.titleSpan': 'имат значение',
-    'res.stat1': 'Възстановени акаунта',
+    'res.stat1': '1,000+ възстановени акаунта',
     'res.stat2': 'Средно време',
     'res.stat3': 'Успеваемост',
 
@@ -410,7 +410,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'res.label': 'Results',
     'res.title': 'Numbers That ',
     'res.titleSpan': 'Matter',
-    'res.stat1': 'Recovered Accounts',
+    'res.stat1': '1,000+ Recovered Accounts',
     'res.stat2': 'Avg. Time',
     'res.stat3': 'Success Rate',
 

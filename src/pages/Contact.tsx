@@ -5,6 +5,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, X, Upload, FileImage, ChevronDown } from 'lucide-react';
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
+    fbq?: (...args: any[]) => void;
+  }
+}
+
 gsap.registerPlugin(ScrollTrigger);
 
 interface FormData {
@@ -142,6 +150,24 @@ export default function Contact() {
       data.append('message', formData.message);
       formData.files.forEach((file) => data.append('attachments', file));
 
+      // GA4 + Meta Pixel - begin form submit
+      if (typeof window.gtag !== 'undefined') {
+        window.gtag('event', 'contact_form_submit', {
+          event_category: 'engagement',
+          event_label: formData.platforms.join(', ') || 'none',
+          platforms_count: formData.platforms.length,
+          issue_type: formData.issue || 'none',
+          has_attachments: formData.files.length > 0,
+          attachments_count: formData.files.length,
+        });
+      }
+      if (typeof window.fbq !== 'undefined') {
+        window.fbq('track', 'Lead', {
+          content_name: 'Contact Form Submit',
+          content_category: formData.issue || 'general',
+        });
+      }
+
       const res = await fetch('/api/contact', {
         method: 'POST',
         body: data,
@@ -153,12 +179,34 @@ export default function Contact() {
         throw new Error(result.error || 'Грешка при изпращане');
       }
 
+      // GA4 + Meta Pixel - form submit success
+      if (typeof window.gtag !== 'undefined') {
+        window.gtag('event', 'contact_form_success', {
+          event_category: 'conversion',
+          event_label: 'contact_submitted',
+          value: 1,
+        });
+      }
+      if (typeof window.fbq !== 'undefined') {
+        window.fbq('track', 'Lead', { content_name: 'Contact Form Success' });
+      }
+
       setIsSubmitted(true);
       setTimeout(() => {
         setIsSubmitted(false);
         setFormData({ name: '', email: '', platforms: [], issue: '', message: '', files: [] });
       }, 4000);
     } catch (err: any) {
+      // GA4 + Meta Pixel - form submit error
+      if (typeof window.gtag !== 'undefined') {
+        window.gtag('event', 'contact_form_error', {
+          event_category: 'error',
+          event_label: err.message || 'unknown_error',
+        });
+      }
+      if (typeof window.fbq !== 'undefined') {
+        window.fbq('trackCustom', 'FormError', { error: err.message || 'unknown' });
+      }
       setSubmitError(err.message || 'Грешка при изпращане. Опитайте отново.');
     } finally {
       setIsSubmitting(false);

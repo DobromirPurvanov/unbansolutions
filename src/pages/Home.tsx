@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import {
   Shield, Lock, TrendingUp, Zap, Clock, CheckCircle2, Users, Award, ArrowRight, Eye, FileText,
-  ShieldCheck, Globe, MessageSquare,
+  ShieldCheck, Globe, MessageSquare, Phone,
 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -60,7 +60,7 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: '5,000+', label: t('res.stat1'), icon: Users },
+    { value: '1,000+', label: t('res.stat1'), icon: Users },
     { value: '48h', label: t('res.stat2'), icon: Clock },
     { value: '95%', label: t('res.stat3'), icon: Award },
   ];
@@ -98,11 +98,26 @@ export default function Home() {
                 <span>{t('hero.cta1')}</span><ArrowRight size={15} />
               </Link>
               <Link to="/services" className="outline-btn inline-flex items-center gap-2">{t('hero.cta2')}</Link>
+              <a
+                href="tel:+359883277758"
+                className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5"
+                onClick={() => {
+                  if (typeof window.gtag !== 'undefined') {
+                    window.gtag('event', 'phone_click', { event_category: 'cta', event_label: 'hero_phone' });
+                  }
+                  if (typeof window.fbq !== 'undefined') {
+                    window.fbq('track', 'Contact', { content_name: 'Phone Call Hero' });
+                  }
+                }}
+              >
+                <Phone size={15} />
+                <span>+359 883 277 758</span>
+              </a>
             </div>
 
             <div className="flex flex-wrap gap-4">
               {[
-                { num: '5,000+', text: t('hero.stat1') },
+                { num: '1,000+', text: t('hero.stat1') },
                 { num: '95%', text: t('hero.stat2') },
                 { num: '1-4w', text: t('hero.stat3') },
               ].map((s) => (
