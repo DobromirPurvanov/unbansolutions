@@ -3,6 +3,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
+import CookieConsent from '@/components/CookieConsent';
 import Home from '@/pages/Home';
 import Services from '@/pages/Services';
 import Pricing from '@/pages/Pricing';
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/payments-and-refunds" element={<PaymentsRefunds />} />
         </Routes>
         <Footer />
+        <CookieConsent />
       </div>
     </LanguageProvider>
   );

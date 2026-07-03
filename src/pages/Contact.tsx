@@ -22,6 +22,7 @@ interface FormData {
   issue: string;
   message: string;
   files: File[];
+  _gotcha: string; // honeypot field - bots fill this
 }
 
 // MultiSelect Dropdown Component
@@ -120,7 +121,7 @@ export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    name: '', email: '', platforms: [], issue: '', message: '', files: []
+    name: '', email: '', platforms: [], issue: '', message: '', files: [], _gotcha: ''
   });
   const { t } = useLanguage();
 
@@ -148,6 +149,7 @@ export default function Contact() {
       data.append('platforms', formData.platforms.join(', '));
       data.append('issue', formData.issue);
       data.append('message', formData.message);
+      data.append('_gotcha', formData._gotcha); // honeypot
       formData.files.forEach((file) => data.append('attachments', file));
 
       // GA4 + Meta Pixel - begin form submit
@@ -201,7 +203,7 @@ export default function Contact() {
       setIsSubmitted(true);
       setTimeout(() => {
         setIsSubmitted(false);
-        setFormData({ name: '', email: '', platforms: [], issue: '', message: '', files: [] });
+        setFormData({ name: '', email: '', platforms: [], issue: '', message: '', files: [], _gotcha: '' });
       }, 4000);
     } catch (err: any) {
       // GA4 + Meta Pixel - form submit error
@@ -342,6 +344,18 @@ export default function Contact() {
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-3">
+                      {/* Honeypot field - hidden from humans, traps bots */}
+                      <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }}>
+                        <input
+                          type="text"
+                          name="_gotcha"
+                          value={formData._gotcha}
+                          onChange={handleChange}
+                          tabIndex={-1}
+                          autoComplete="off"
+                          aria-hidden="true"
+                        />
+                      </div>
                       <div className="grid sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">{t('cp.form.name')}</label>
