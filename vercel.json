@@ -1,9 +1,17 @@
 {
-  "outputDirectory": "dist",
   "framework": "vite",
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1.ts" },
-    { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/index.html" }
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/contact", "destination": "/api/contact.ts" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    }
   ]
 }

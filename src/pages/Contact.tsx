@@ -173,7 +173,14 @@ export default function Contact() {
         body: data,
       });
 
-      const result = await res.json();
+      let result;
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        result = await res.json();
+      } else {
+        await res.text();
+        throw new Error('Сървърът не отговори правилно. Моля, опитайте отново.');
+      }
 
       if (!res.ok) {
         throw new Error(result.error || 'Грешка при изпращане');
