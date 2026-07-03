@@ -3,7 +3,7 @@
 import { Resend } from "resend";
 import Busboy from "busboy";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "re_FG9uxTat_3QxmVxvmP252bZYbiP7ogkft");
+const resend = new Resend(process.env.RESEND_API_KEY || "re_cCCoCVQE_yB4qQ6FhmZvtL2HuPvjLiHsa");
 const TO_EMAIL = process.env.CONTACT_EMAIL || "support@unbansolutions.com";
 const FROM_EMAIL = process.env.FROM_EMAIL || "Unban Solutions <contact@unbansolutions.com>";
 
