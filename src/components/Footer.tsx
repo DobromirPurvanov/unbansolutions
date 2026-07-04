@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Mail, Phone, MapPin, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { Mail, Phone, MapPin, Instagram, Facebook, Linkedin } from 'lucide-react';
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -17,9 +17,9 @@ export default function Footer() {
             </Link>
             <p className="text-slate-400 text-xs leading-relaxed mb-4">{t('foot.desc')}</p>
             <div className="flex items-center gap-3">
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-colors"><Instagram size={14} /></a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-colors"><Twitter size={14} /></a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-colors"><Linkedin size={14} /></a>
+              <a href="https://www.instagram.com/unban.solutions" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500 transition-all" aria-label="Instagram"><Instagram size={14} /></a>
+              <a href="https://www.facebook.com/share/19KmiZmda7/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-all" aria-label="Facebook"><Facebook size={14} /></a>
+              <a href="#" className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-blue-700 transition-all" aria-label="LinkedIn"><Linkedin size={14} /></a>
             </div>
           </div>
 

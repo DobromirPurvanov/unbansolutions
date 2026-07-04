@@ -437,5 +437,17 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // SPA redirect handler for 404 fallback
+      (function() {
+        var redirect = sessionStorage.getItem('spa_redirect');
+        if (redirect) {
+          sessionStorage.removeItem('spa_redirect');
+          if (redirect !== location.pathname + location.search + location.hash) {
+            history.replaceState(null, null, redirect);
+          }
+        }
+      })();
+    </script>
   </body>
 </html>
