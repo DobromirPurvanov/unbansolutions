@@ -274,7 +274,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'cp.form.issue': 'Проблем',
     'cp.form.issueDef': 'Изберете',
     'cp.form.issueO1': 'Баннат акаунт',
-    'cp.form.issueO2': 'Спрен акаунт',
+    'cp.form.issueO2': 'Спрян акаунт',
     'cp.form.issueO3': 'Shadowban',
     'cp.form.issueO4': 'Ограничени функции',
     'cp.form.issueO5': 'Хакнат акаунт',
