@@ -1,15 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import {
   Shield, Lock, TrendingUp, Zap, Clock, CheckCircle2, Award, ArrowRight, Eye, FileText,
   ShieldCheck, Globe, MessageSquare, Phone, Layers,
 } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   const servicesRef = useRef<HTMLElement>(null);
@@ -20,28 +16,44 @@ export default function Home() {
   const isBg = lang === 'bg';
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.hero-content > *', { y: 30, duration: 0.6, stagger: 0.1, delay: 0.2, ease: 'power3.out' });
-      const sections = [servicesRef, processRef, resultsRef, testimonialsRef];
-      sections.forEach((ref) => {
-        gsap.from(ref.current, { y: 40, duration: 0.6, ease: 'power2.out',
-          scrollTrigger: { trigger: ref.current, start: 'top 88%', toggleActions: 'play none none reverse' },
+    // Skip animations on mobile - they hurt performance more than they help
+    const isMobile = window.innerWidth < 768 || 'ontouchstart' in window;
+    if (isMobile) return;
+
+    let ctx: any = null;
+
+    const initAnimations = async () => {
+      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger'),
+      ]);
+      gsap.registerPlugin(ScrollTrigger);
+
+      ctx = gsap.context(() => {
+        gsap.from('.hero-content > *', { y: 30, duration: 0.6, stagger: 0.1, delay: 0.2, ease: 'power3.out' });
+        const sections = [servicesRef, processRef, resultsRef, testimonialsRef];
+        sections.forEach((ref) => {
+          gsap.from(ref.current, { y: 40, duration: 0.6, ease: 'power2.out',
+            scrollTrigger: { trigger: ref.current, start: 'top 88%', toggleActions: 'play none none reverse' },
+          });
+        });
+        gsap.from('.service-card', { y: 30, duration: 0.4, stagger: 0.06, ease: 'power2.out',
+          scrollTrigger: { trigger: servicesRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
+        });
+        gsap.from('.process-step', { y: 20, duration: 0.4, stagger: 0.06, ease: 'power2.out',
+          scrollTrigger: { trigger: processRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
+        });
+        gsap.from('.stat-item', { y: 30, duration: 0.5, stagger: 0.08, ease: 'power2.out',
+          scrollTrigger: { trigger: resultsRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
+        });
+        gsap.from('.testimonial-card', { y: 20, duration: 0.4, stagger: 0.06, ease: 'power2.out',
+          scrollTrigger: { trigger: testimonialsRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
         });
       });
-      gsap.from('.service-card', { y: 30, duration: 0.4, stagger: 0.06, ease: 'power2.out',
-        scrollTrigger: { trigger: servicesRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-      });
-      gsap.from('.process-step', { y: 20, duration: 0.4, stagger: 0.06, ease: 'power2.out',
-        scrollTrigger: { trigger: processRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-      });
-      gsap.from('.stat-item', { y: 30, duration: 0.5, stagger: 0.08, ease: 'power2.out',
-        scrollTrigger: { trigger: resultsRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-      });
-      gsap.from('.testimonial-card', { y: 20, duration: 0.4, stagger: 0.06, ease: 'power2.out',
-        scrollTrigger: { trigger: testimonialsRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-      });
-    });
-    return () => ctx.revert();
+    };
+
+    initAnimations();
+    return () => { if (ctx) ctx.revert(); };
   }, []);
 
   const services = [
@@ -90,7 +102,7 @@ export default function Home() {
       />
       <main>
         {/* HERO */}
-        <section className="relative pt-24 pb-12 bg-gradient-to-br from-blue-50 via-white to-violet-50 overflow-hidden">
+        <section className="relative pt-24 pb-12 bg-gradient-to-br from-blue-50 via-white to-violet-50 overflow-hidden" style={{ minHeight: '70vh' }}>
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-200/30 rounded-full filter blur-[100px]" />
           <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-violet-200/30 rounded-full filter blur-[80px]" />
           <div className="absolute top-1/3 left-1/4 w-[200px] h-[200px] bg-cyan-200/20 rounded-full filter blur-[60px]" />
@@ -231,12 +243,12 @@ export default function Home() {
               <p className="label-mono mb-2">{t('res.label')}</p>
               <h2 className="text-2xl font-bold text-slate-900">{t('res.title')}<span className="gradient-text">{t('res.titleSpan')}</span></h2>
             </div>
-            <div className="grid grid-cols-3 gap-5 max-w-[700px] mx-auto">
+            <div className="grid grid-cols-3 gap-3 sm:gap-5 max-w-[700px] mx-auto">
               {stats.map((s) => (
-                <div key={s.label} className="stat-item text-center glass-card p-8">
-                  <s.icon size={28} className="text-blue-600 mx-auto mb-3" />
-                  <div className="text-[2rem] font-extrabold gradient-text mb-2">{s.value}</div>
-                  <div className="text-slate-600 text-sm font-semibold">{s.label}</div>
+                <div key={s.label} className="stat-item text-center glass-card p-4 sm:p-8">
+                  <s.icon size={24} className="sm:w-7 sm:h-7 text-blue-600 mx-auto mb-2 sm:mb-3" />
+                  <div className="text-xl sm:text-[2rem] font-extrabold gradient-text mb-1 sm:mb-2 leading-tight">{s.value}</div>
+                  <div className="text-slate-600 text-xs sm:text-sm font-semibold">{s.label}</div>
                 </div>
               ))}
             </div>

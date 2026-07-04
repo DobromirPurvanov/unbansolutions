@@ -1,24 +1,28 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import { Shield, Lock, TrendingUp, Eye, FileText, Scale, Users, Building2, Crown, User, ArrowRight } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Services() {
   const ref = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.svc-card', { y: 30, duration: 0.5, stagger: 0.06, ease: 'power2.out',
-        scrollTrigger: { trigger: ref.current, start: 'top 80%', toggleActions: 'play none none reverse' },
+    if (window.innerWidth < 768) return;
+    let ctx: any;
+    const init = async () => {
+      const { default: gsap } = await import('gsap');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(ScrollTrigger);
+      ctx = gsap.context(() => {
+        gsap.from('.svc-card', { y: 30, duration: 0.5, stagger: 0.06, ease: 'power2.out',
+          scrollTrigger: { trigger: ref.current, start: 'top 80%', toggleActions: 'play none none reverse' },
+        });
       });
-    });
-    return () => ctx.revert();
+    };
+    init();
+    return () => { if (ctx) ctx.revert(); };
   }, []);
 
   const services = [

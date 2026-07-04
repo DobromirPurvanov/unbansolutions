@@ -4,45 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Analytics & Tracking - Lazy Loaded -->
-    <script>
-      // Defer non-critical scripts
-      window.addEventListener('load', function() {
-        // Load GA4 after page load
-        var gaScript = document.createElement('script');
-        gaScript.async = true;
-        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-FD6BFR3X5T';
-        document.body.appendChild(gaScript);
-
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('consent', 'default', {
-          analytics_storage: 'denied',
-          ad_storage: 'denied',
-          ad_user_data: 'denied',
-          ad_personalization: 'denied'
-        });
-        gtag('js', new Date());
-        gtag('config', 'G-FD6BFR3X5T', {
-          page_title: document.title,
-          send_page_view: true,
-          cookie_flags: 'SameSite=None;Secure'
-        });
-
-        // Load Meta Pixel after page load
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window, document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '1330505575908646');
-        fbq('track', 'PageView');
-      });
-    </script>
-
     <!-- Primary Meta Tags -->
     <title>Unban Solutions | Възстановяване на Акаунти и Дигитална Защита</title>
     <meta name="title" content="Unban Solutions | Възстановяване на Акаунти и Дигитална Защита" />
@@ -91,9 +52,27 @@
     <!-- Preconnect for fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" /></noscript>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" /></noscript>
+
+    <!-- Critical CSS for Hero LCP -->
+    <style>
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      html{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+      body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;color:#0f172a;overflow-x:hidden;line-height:1.6}
+      #root{min-height:100dvh}
+      h1,h2,h3,h4,h5,h6{font-family:'Inter',sans-serif;letter-spacing:-.02em;line-height:1.1;color:#0f172a}
+      .gradient-text{background:linear-gradient(135deg,#2563EB 0%,#7C3AED 50%,#0891B2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+      .label-mono{font-family:monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:#2563EB;font-weight:600}
+      .glow-btn{background:linear-gradient(135deg,#2563EB 0%,#7C3AED 100%);color:#fff;padding:12px 28px;border-radius:.75rem;font-weight:600;font-size:.85rem;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+      .outline-btn{background:transparent;color:#0f172a;padding:12px 28px;border-radius:.75rem;font-weight:500;font-size:.85rem;border:1.5px solid #94a3b8;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+      .glass-card-hover{background:#fff;border:1.5px solid #94a3b8;border-radius:.75rem;transition:all .3s ease;box-shadow:0 2px 8px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06)}
+      .glass-card{background:#fff;border:1.5px solid #94a3b8;border-radius:.75rem;box-shadow:0 2px 8px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06)}
+      .marquee-left{animation:marquee-left 35s linear infinite}
+      @keyframes marquee-left{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+      @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
+    </style>
     <!-- Preconnect for analytics -->
     <link rel="preconnect" href="https://www.googletagmanager.com" />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -463,5 +442,39 @@
     <noscript>
       <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1330505575908646&ev=PageView&noscript=1" alt="" />
     </noscript>
+
+    <!-- Analytics & Tracking - Lazy Loaded -->
+    <script>
+      window.addEventListener('load', function() {
+        var gaScript = document.createElement('script');
+        gaScript.async = true;
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-FD6BFR3X5T';
+        document.body.appendChild(gaScript);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+          analytics_storage: 'denied',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied'
+        });
+        gtag('js', new Date());
+        gtag('config', 'G-FD6BFR3X5T', {
+          page_title: document.title,
+          send_page_view: true,
+          cookie_flags: 'SameSite=None;Secure'
+        });
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1330505575908646');
+        fbq('track', 'PageView');
+      });
+    </script>
   </body>
 </html>
