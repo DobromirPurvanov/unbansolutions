@@ -1,7 +1,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, Calendar } from 'lucide-react';
+import { ArrowRight, Clock, Instagram, Lock, AlertTriangle, Video, ShieldCheck } from 'lucide-react';
 
 export default function Blog() {
   const { lang } = useLanguage();
@@ -9,115 +9,115 @@ export default function Blog() {
 
   const articles = isBg ? [
     {
-      slug: 'kak-da-vazstanovite-banat-instagram-akaunt',
-      title: 'Как да възстановите баннат Instagram акаунт през 2025',
-      excerpt: 'Пълно ръководство стъпка по стъпка за възстановяване на баннат, изтрит или хакнат Instagram профил. Научете кои са най-честите причини за бан и как да ги избегнете.',
-      date: '15 юни 2025',
-      readTime: '8 мин',
-      category: 'Instagram',
-    },
-    {
-      slug: 'shadowban-v-tiktok-kak-da-razberete-i-premahnete',
-      title: 'Shadowban в TikTok: Как да разберете и премахнете',
-      excerpt: 'Всичко, което трябва да знаете за shadowban в TikTok — симптоми, причини, инструменти за диагностика и доказани методи за възстановяване на видимостта.',
-      date: '10 юни 2025',
-      readTime: '6 мин',
-      category: 'TikTok',
-    },
-    {
-      slug: 'meta-business-suite-ad-account-restriction',
-      title: 'Ограничение на Ad Account в Meta: Причини и решения',
-      excerpt: 'Защо Facebook ограничава рекламни акаунти и как да възстановите достъпа си. Практически съвети за предотвратяване на бъдещи ограничения.',
-      date: '5 юни 2025',
-      readTime: '7 мин',
-      category: 'Meta',
-    },
-    {
-      slug: 'otkradnat-instagram-profil-kak-da-si-go-varnete',
-      title: 'Откраднат Instagram профил — как да си го върнете',
-      excerpt: 'Стъпка по стъпка ръководство за възстановяване на хакнат Instagram акаунт. Какво да правите незабавно и как да защитите профила си за вбъдеще.',
-      date: '28 май 2025',
-      readTime: '10 мин',
-      category: 'Сигурност',
-    },
-    {
-      slug: 'youtube-monetizaciya-problemi-i-resheniya',
-      title: 'YouTube монетизация: Най-чести проблеми и решения',
-      excerpt: 'Как да разрешите проблеми с YouTube монетизацията, Community Guidelines strikes и ограничения на канала. Полезни съвети за създатели.',
-      date: '20 май 2025',
-      readTime: '9 мин',
-      category: 'YouTube',
-    },
-    {
-      slug: 'kak-da-zashitite-digitalniya-si-akaunt',
-      title: 'Как да защитите дигиталния си акаунт от бан и хакерски атаки',
-      excerpt: 'Превантивни мерки за защита на вашите социални мрежи. Двуфакторна автентикация, силни пароли, съвети за сигурност от експертите на Unban Solutions.',
-      date: '15 май 2025',
+      title: 'Как да предпазите Instagram акаунта си от бан',
+      excerpt: 'Научете най-важните правила на Instagram, които трябва да спазвате, за да избегнете банване на профила си. Съвети за сигурно съдържание и съответствие с политиките на платформата.',
       readTime: '5 мин',
-      category: 'Сигурност',
+      icon: Instagram,
+      color: 'bg-pink-100',
+      iconColor: 'text-pink-700',
+    },
+    {
+      title: 'Как работи shadowban в TikTok',
+      excerpt: 'Разберете какво е shadowban, как да разберете дали сте засегнати и какви стъпки да предприемете за възстановяване на видимостта на видеоклиповете си.',
+      readTime: '6 мин',
+      icon: Video,
+      color: 'bg-cyan-100',
+      iconColor: 'text-cyan-700',
+    },
+    {
+      title: 'Сигурност на профила: двуфакторна автентикация',
+      excerpt: 'Защо двуфакторната автентикация е задължителна за всеки, който разчита на социалните мрежи за бизнес. Практическо ръководство за настройка.',
+      readTime: '4 мин',
+      icon: Lock,
+      color: 'bg-violet-100',
+      iconColor: 'text-violet-700',
+    },
+    {
+      title: 'Ad Account ограничения в Meta и как да ги избегнете',
+      excerpt: 'Разберете най-честите причини за ограничаване на рекламни акаунти в Meta и как да защитите своя бизнес рекламен акаунт.',
+      readTime: '7 мин',
+      icon: AlertTriangle,
+      color: 'bg-yellow-100',
+      iconColor: 'text-yellow-700',
+    },
+    {
+      title: 'Права при банване в социалните мрежи',
+      excerpt: 'Какви са вашите права като потребител на социалните мрежи и какво можете да направите, ако смятате, че сте баннати неправилно.',
+      readTime: '8 мин',
+      icon: ShieldCheck,
+      color: 'bg-emerald-100',
+      iconColor: 'text-emerald-700',
+    },
+    {
+      title: 'Как да подготвите обжалване към платформа',
+      excerpt: 'Практически съвети за подготовка на успешно обжалване към Instagram, TikTok, YouTube и други платформи при банване.',
+      readTime: '6 мин',
+      icon: Instagram,
+      color: 'bg-blue-100',
+      iconColor: 'text-blue-700',
     },
   ] : [
     {
-      slug: 'how-to-recover-banned-instagram-account',
-      title: 'How to Recover a Banned Instagram Account in 2025',
-      excerpt: 'Complete step-by-step guide to recovering a banned, deleted, or hacked Instagram profile. Learn the most common ban reasons and how to avoid them.',
-      date: 'June 15, 2025',
-      readTime: '8 min',
-      category: 'Instagram',
-    },
-    {
-      slug: 'tiktok-shadowban-how-to-detect-remove',
-      title: 'TikTok Shadowban: How to Detect and Remove It',
-      excerpt: 'Everything you need to know about TikTok shadowban — symptoms, causes, diagnostic tools, and proven methods to restore visibility.',
-      date: 'June 10, 2025',
-      readTime: '6 min',
-      category: 'TikTok',
-    },
-    {
-      slug: 'meta-ad-account-restriction-fix',
-      title: 'Meta Ad Account Restriction: Causes and Solutions',
-      excerpt: 'Why Facebook restricts ad accounts and how to restore access. Practical tips for preventing future restrictions.',
-      date: 'June 5, 2025',
-      readTime: '7 min',
-      category: 'Meta',
-    },
-    {
-      slug: 'hacked-instagram-account-recovery',
-      title: 'Hacked Instagram Account — How to Get It Back',
-      excerpt: 'Step-by-step guide to recovering a hacked Instagram account. What to do immediately and how to protect your profile in the future.',
-      date: 'May 28, 2025',
-      readTime: '10 min',
-      category: 'Security',
-    },
-    {
-      slug: 'youtube-monetization-issues-fixed',
-      title: 'YouTube Monetization: Common Issues and Fixes',
-      excerpt: 'How to resolve YouTube monetization problems, Community Guidelines strikes, and channel restrictions. Useful tips for creators.',
-      date: 'May 20, 2025',
-      readTime: '9 min',
-      category: 'YouTube',
-    },
-    {
-      slug: 'protect-your-digital-account',
-      title: 'How to Protect Your Digital Account from Bans and Hacks',
-      excerpt: 'Preventive measures to protect your social media accounts. Two-factor authentication, strong passwords, and security tips from Unban Solutions experts.',
-      date: 'May 15, 2025',
+      title: 'How to Protect Your Instagram Account from Banning',
+      excerpt: 'Learn the most important Instagram rules you need to follow to avoid getting your profile banned. Tips for safe content and compliance with platform policies.',
       readTime: '5 min',
-      category: 'Security',
+      icon: Instagram,
+      color: 'bg-pink-100',
+      iconColor: 'text-pink-700',
+    },
+    {
+      title: 'How Shadowban Works on TikTok',
+      excerpt: 'Understand what shadowban is, how to know if you are affected, and what steps to take to restore visibility of your videos.',
+      readTime: '6 min',
+      icon: Video,
+      color: 'bg-cyan-100',
+      iconColor: 'text-cyan-700',
+    },
+    {
+      title: 'Account Security: Two-Factor Authentication',
+      excerpt: 'Why two-factor authentication is essential for anyone who relies on social media for business. Practical setup guide.',
+      readTime: '4 min',
+      icon: Lock,
+      color: 'bg-violet-100',
+      iconColor: 'text-violet-700',
+    },
+    {
+      title: 'Ad Account Restrictions in Meta and How to Avoid Them',
+      excerpt: 'Learn the most common reasons for advertising account restrictions in Meta and how to protect your business ad account.',
+      readTime: '7 min',
+      icon: AlertTriangle,
+      color: 'bg-yellow-100',
+      iconColor: 'text-yellow-700',
+    },
+    {
+      title: 'Your Rights When Banned on Social Media',
+      excerpt: 'What are your rights as a user of social networks and what can you do if you believe you have been wrongly banned.',
+      readTime: '8 min',
+      icon: ShieldCheck,
+      color: 'bg-emerald-100',
+      iconColor: 'text-emerald-700',
+    },
+    {
+      title: 'How to Prepare an Appeal to a Platform',
+      excerpt: 'Practical tips for preparing a successful appeal to Instagram, TikTok, YouTube and other platforms when banned.',
+      readTime: '6 min',
+      icon: Instagram,
+      color: 'bg-blue-100',
+      iconColor: 'text-blue-700',
     },
   ];
 
   return (
     <>
       <SEOMeta
-        title={isBg ? 'Блог | Как да възстановите баннат акаунт | Unban Solutions' : 'Blog | How to Recover Banned Accounts | Unban Solutions'}
+        title={isBg ? 'Блог | Полезни съвети за защита на акаунти | Unban Solutions' : 'Blog | Tips for Account Protection | Unban Solutions'}
         description={isBg
-          ? 'Полезни статии за възстановяване на баннати акаунти в Instagram, TikTok, YouTube, Facebook. Съвети от експертите на Unban Solutions.'
-          : 'Useful articles about recovering banned accounts on Instagram, TikTok, YouTube, Facebook. Tips from Unban Solutions experts.'
+          ? 'Полезни статии за защита на акаунти в Instagram, TikTok, YouTube, Facebook. Как да избегнете бан и да защитите профила си.'
+          : 'Useful articles about account protection on Instagram, TikTok, YouTube, Facebook. How to avoid bans and protect your profile.'
         }
         keywords={isBg
-          ? 'как да възстановя instagram, баннат акаунт решение, shadowban tiktok, хакнат профил, мета ограничение'
-          : 'recover instagram account, banned account fix, tiktok shadowban, hacked profile, meta restriction'
+          ? 'защита акаунт instagram, избегни бан tiktok, двуфакторна автентикация, ad account ограничение, обжалване бан'
+          : 'account protection instagram, avoid tiktok ban, two factor authentication, ad account restriction, ban appeal'
         }
         canonical="https://www.unbansolutions.com/blog"
       />
@@ -133,45 +133,37 @@ export default function Blog() {
             </h1>
             <p className="text-slate-600 text-sm max-w-[500px]">
               {isBg
-                ? 'Експертни съвети за възстановяване на акаунти, защита от shadowban и поддържане на дигиталното ви присъствие.'
-                : 'Expert advice on account recovery, shadowban protection, and maintaining your digital presence.'}
+                ? 'Съвети за защита на вашите акаунти и предотвратяване на проблеми със социалните мрежи.'
+                : 'Tips for protecting your accounts and preventing issues with social networks.'}
             </p>
           </div>
         </section>
 
-        {/* Articles Grid */}
+        {/* Articles Grid - NO links, just informational cards */}
         <section className="py-12 bg-white">
           <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {articles.map((article) => (
-                <article
-                  key={article.slug}
-                  className="glass-card-hover p-5 flex flex-col h-full group"
+              {articles.map((article, idx) => (
+                <div
+                  key={idx}
+                  className="glass-card-hover p-5 flex flex-col h-full"
                 >
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2.5 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-full border border-blue-100">
-                      {article.category}
-                    </span>
-                  </div>
-                  <h2 className="text-slate-900 font-bold text-sm leading-snug mb-2 group-hover:text-blue-700 transition-colors">
-                    {article.title}
-                  </h2>
-                  <p className="text-slate-600 text-xs leading-relaxed mb-4 flex-1">
-                    {article.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                    <div className="flex items-center gap-3 text-slate-500 text-[11px]">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={11} />
-                        {article.date}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={11} />
-                        {article.readTime}
-                      </span>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-10 h-10 rounded-lg ${article.color} flex items-center justify-center`}>
+                      <article.icon size={18} className={article.iconColor} />
+                    </div>
+                    <div className="flex items-center gap-1 text-slate-400 text-[11px]">
+                      <Clock size={10} />
+                      <span>{article.readTime}</span>
                     </div>
                   </div>
-                </article>
+                  <h2 className="text-slate-900 font-bold text-sm leading-snug mb-2">
+                    {article.title}
+                  </h2>
+                  <p className="text-slate-600 text-xs leading-relaxed flex-1">
+                    {article.excerpt}
+                  </p>
+                </div>
               ))}
             </div>
           </div>

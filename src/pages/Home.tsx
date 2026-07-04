@@ -123,7 +123,7 @@ export default function Home() {
                 }}
               >
                 <Phone size={15} />
-                <span>Обади се</span>
+                <span>{t('hero.call')}</span>
               </a>
             </div>
 
