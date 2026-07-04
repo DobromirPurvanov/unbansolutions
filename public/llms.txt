@@ -1,43 +1,48 @@
-# Unban Solutions - Възстановяване на баннати акаунти
+# Unban Solutions
 
-Unban Solutions предлага експертни услуги за възстановяване на баннати акаунти в социалните мрежи, премахване на shadowban, защита на дигиталното присъствие и правни консултации.
+> Expert digital account recovery services. 95% success rate. 1,000+ recovered accounts. Available 24/7.
 
-## Основна информация
+## Overview
 
-- **Сайт**: https://www.unbansolutions.com
-- **Езици**: Български, Английски
-- **Локация**: София, България
-- **Телефон**: 0883 391411
-- **Имейл**: support@unbansolutions.com
+Unban Solutions is a Bulgarian company specializing in digital account recovery for social media platforms. We help individuals, creators, and businesses recover banned, suspended, hacked, or restricted accounts across all major platforms.
 
-## Услуги
+- **Website**: [https://www.unbansolutions.com](https://www.unbansolutions.com)
+- **Phone**: [0883 391411](tel:0883391411)
+- **Email**: [support@unbansolutions.com](mailto:support@unbansolutions.com)
+- **Address**: Sofia, Shipchenski Prohod 18, Bulgaria
+- **Languages**: Bulgarian, English
 
-### Възстановяване на акаунти
-- Баннати, спрени или ограничени акаунти
-- Instagram, TikTok, YouTube, Twitter/X, Facebook, LinkedIn
+## Services
 
-### Премахване на shadowban
-- Диагностика и разрешаване на невидимост
-- Проверка на обхват и видимост
+### [Account Recovery](https://www.unbansolutions.com/services)
+Recovery of banned, suspended, or restricted accounts on Instagram, TikTok, YouTube, Facebook, LinkedIn, and other platforms.
 
-### Откраднати профили
-- Възстановяване на хакнати акаунти
-- Промяна на пароли и възстановяване на достъп
+### [Shadowban Removal](https://www.unbansolutions.com/services)
+Diagnosis and resolution of shadowban issues affecting account visibility and reach.
 
-### Правни обжалвания
-- Професионална подготовка на документи
-- Официални жалби към платформите
+### [Stolen Profile Recovery](https://www.unbansolutions.com/services)
+Recovery of hacked and stolen social media profiles with full restoration of access.
 
-## Ценова информация
+### [Legal Appeals](https://www.unbansolutions.com/services)
+Professional preparation of appeal documents and formal complaints to platforms.
 
-| Услуга | Цена |
-|--------|------|
-| Лек казус | 250 EUR |
-| Тежък казус | 500 EUR |
-| Еднократна консултация | 100 EUR |
+### [One-Time Consultation](https://www.unbansolutions.com/pricing)
+30-minute session with personalized recommendations and written summary. Price: 100 EUR.
 
-## Правна информация
+## Pricing
 
-- [Политика за поверителност](/privacy-policy)
-- [Общи условия](/terms)
-- [Плащания и възстановявания](/payments-and-refunds)
+| Service | Price | Details |
+|---------|-------|---------|
+| Light Case | 250 EUR | Removed post, reduced distribution, shadowban |
+| Heavy Case | 500 EUR | Deleted profile, stolen profile, Ad Account restriction |
+| One-Time Consultation | 100 EUR | 30-min session with written summary |
+
+## Legal
+
+- [Privacy Policy](https://www.unbansolutions.com/privacy-policy)
+- [Terms of Service](https://www.unbansolutions.com/terms)
+- [Payments & Refunds](https://www.unbansolutions.com/payments-and-refunds)
+
+## Blog
+
+- [Blog - Tips for Account Protection](https://www.unbansolutions.com/blog)
