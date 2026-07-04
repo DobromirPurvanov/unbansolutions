@@ -29,7 +29,12 @@ export default function Pricing() {
 
   return (
     <>
-      <SEOMeta title={t('pp.hero.label') + ' | Unban Solutions'} description={t('pp.hero.desc')} />
+      <SEOMeta
+        title={t('pp.hero.label') + ' | Цени за възстановяване на акаунти | Unban Solutions'}
+        description="Прозрачни цени за възстановяване на баннати акаунти. Лек казус 250 EUR, Тежък казус 500 EUR, Консултация 100 EUR. Без скрити такси."
+        keywords="цена възстановяване акаунт, колко струва unban, цена instagram акаунт, консултация shadowban"
+        canonical="https://www.unbansolutions.com/pricing"
+      />
       <main>
         <section className="relative pt-24 pb-10 bg-gradient-to-br from-violet-50 via-white to-blue-50 overflow-hidden">
           <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-violet-200/30 rounded-full filter blur-[80px]" />

@@ -25,6 +25,7 @@ export default function Navbar() {
     { name: t('nav.services'), path: '/services' },
     { name: t('nav.pricing'), path: '/pricing' },
     { name: t('nav.process'), path: '/process' },
+    { name: t('nav.blog'), path: '/blog' },
     { name: t('nav.contact'), path: '/contact' },
   ];
 

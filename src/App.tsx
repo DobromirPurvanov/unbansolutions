@@ -14,6 +14,7 @@ import Register from '@/pages/Register';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import Terms from '@/pages/Terms';
 import PaymentsRefunds from '@/pages/PaymentsRefunds';
+import Blog from '@/pages/Blog';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/payments-and-refunds" element={<PaymentsRefunds />} />
+          <Route path="/blog" element={<Blog />} />
         </Routes>
         <Footer />
         <CookieConsent />

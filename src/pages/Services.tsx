@@ -39,7 +39,12 @@ export default function Services() {
 
   return (
     <>
-      <SEOMeta title={t('sp.hero.label') + ' | Unban Solutions'} description={t('sp.hero.desc')} />
+      <SEOMeta
+        title={t('sp.hero.label') + ' | Възстановяване на акаунти Instagram TikTok YouTube | Unban Solutions'}
+        description={t('sp.hero.desc') + ' Професионални услуги за баннати акаунти, shadowban, откраднати профили. 95% успеваемост.'}
+        keywords="възстановяване акаунт, баннат instagram, shadowban tiktok, откраднат профил, хакнат акаунт, дигитална защита"
+        canonical="https://www.unbansolutions.com/services"
+      />
       <main>
         <section className="relative pt-24 pb-10 bg-gradient-to-br from-blue-50 via-white to-violet-50 overflow-hidden">
           <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-200/30 rounded-full filter blur-[80px]" />

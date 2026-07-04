@@ -289,7 +289,12 @@ export default function Contact() {
 
   return (
     <>
-      <SEOMeta title={t('cp.hero.label') + ' | Unban Solutions'} description={t('cp.hero.desc')} />
+      <SEOMeta
+        title={t('cp.hero.label') + ' | Свържете се с нас | Безплатна оценка | Unban Solutions'}
+        description="Свържете се с Unban Solutions за безплатна оценка на вашия случай. Възстановяване на баннати акаунти в Instagram, TikTok, YouTube, Facebook."
+        keywords="контакт unban solutions, безплатна оценка акаунт, помогнете instagram бан, възстановяване профил"
+        canonical="https://www.unbansolutions.com/contact"
+      />
       <main>
         {/* Hero */}
         <section className="relative pt-24 pb-10 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">

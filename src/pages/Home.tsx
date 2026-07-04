@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import {
   Shield, Lock, TrendingUp, Zap, Clock, CheckCircle2, Award, ArrowRight, Eye, FileText,
-  ShieldCheck, Globe, MessageSquare, Phone,
+  ShieldCheck, Globe, MessageSquare, Phone, Layers,
 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -16,7 +16,8 @@ export default function Home() {
   const processRef = useRef<HTMLElement>(null);
   const resultsRef = useRef<HTMLElement>(null);
   const testimonialsRef = useRef<HTMLElement>(null);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const isBg = lang === 'bg';
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -62,6 +63,7 @@ export default function Home() {
   const stats = [
     { value: '1-4 с.', label: t('res.stat2'), icon: Clock },
     { value: '95%', label: t('res.stat3'), icon: Award },
+    { value: '8+', label: isBg ? 'Платформи' : 'Platforms', icon: Layers },
   ];
 
   const testimonials = [
@@ -74,7 +76,18 @@ export default function Home() {
 
   return (
     <>
-      <SEOMeta title="Unban Solutions | Account Recovery" description={t('hero.desc')} />
+      <SEOMeta
+        title={isBg ? 'Unban Solutions | Възстановяване на баннати акаунти Instagram TikTok YouTube' : 'Unban Solutions | Recover Banned Instagram TikTok YouTube Accounts'}
+        description={isBg
+          ? 'Експертни услуги за възстановяване на баннати акаунти в Instagram, TikTok, YouTube, Facebook. 95% успеваемост. Безплатна консултация. Работим с всички платформи.'
+          : 'Expert account recovery services for Instagram, TikTok, YouTube, Facebook. 95% success rate. Free consultation. We work with all platforms.'
+        }
+        keywords={isBg
+          ? 'възстановяване акаунт instagram, баннат акаунт tiktok, shadowban, откраднат профил, хакнат акаунт, дигитална защита'
+          : 'recover instagram account, banned tiktok account, shadowban removal, hacked account recovery, digital protection'
+        }
+        canonical="https://www.unbansolutions.com/"
+      />
       <main>
         {/* HERO */}
         <section className="relative pt-24 pb-12 bg-gradient-to-br from-blue-50 via-white to-violet-50 overflow-hidden">
@@ -218,12 +231,12 @@ export default function Home() {
               <p className="label-mono mb-2">{t('res.label')}</p>
               <h2 className="text-2xl font-bold text-slate-900">{t('res.title')}<span className="gradient-text">{t('res.titleSpan')}</span></h2>
             </div>
-            <div className="grid grid-cols-3 gap-4 max-w-[600px] mx-auto">
+            <div className="grid grid-cols-3 gap-5 max-w-[700px] mx-auto">
               {stats.map((s) => (
-                <div key={s.label} className="stat-item text-center glass-card p-5">
-                  <s.icon size={22} className="text-blue-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold gradient-text mb-1">{s.value}</div>
-                  <div className="text-slate-700 text-xs font-medium">{s.label}</div>
+                <div key={s.label} className="stat-item text-center glass-card p-8">
+                  <s.icon size={28} className="text-blue-600 mx-auto mb-3" />
+                  <div className="text-[2rem] font-extrabold gradient-text mb-2">{s.value}</div>
+                  <div className="text-slate-600 text-sm font-semibold">{s.label}</div>
                 </div>
               ))}
             </div>

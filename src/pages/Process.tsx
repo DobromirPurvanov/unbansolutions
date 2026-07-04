@@ -37,7 +37,12 @@ export default function Process() {
 
   return (
     <>
-      <SEOMeta title={t('pr.hero.label') + ' | Unban Solutions'} description={t('pr.hero.sub')} />
+      <SEOMeta
+        title={t('pr.hero.label') + ' | Как работим | 4 стъпки за възстановяване | Unban Solutions'}
+        description="4-степенен процес за възстановяване на баннати акаунти. Обработка, жалба, изпращане, следене. 95% успеваемост. Безплатна оценка."
+        keywords="процес възстановяване акаунт, как се възстановява instagram, стъпки shadowban, колко време отнема"
+        canonical="https://www.unbansolutions.com/process"
+      />
       <main>
         <section className="relative pt-24 pb-10 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
           <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-200/30 rounded-full filter blur-[80px]" />
