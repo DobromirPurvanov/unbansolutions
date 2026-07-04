@@ -17,6 +17,7 @@ const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const PaymentsRefunds = lazy(() => import('@/pages/PaymentsRefunds'));
 const Blog = lazy(() => import('@/pages/Blog'));
+const BlogPost = lazy(() => import('@/pages/BlogPost'));
 
 const PageLoader = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
@@ -43,6 +44,7 @@ export default function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/payments-and-refunds" element={<PaymentsRefunds />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
           </Routes>
         </Suspense>
         <Footer />
