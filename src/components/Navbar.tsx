@@ -36,7 +36,7 @@ export default function Navbar() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
         <div className="flex items-center justify-between h-[60px]">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/assets/unbansolutions.png" alt="Unban Solutions" className="h-8 w-auto" />
+            <img src="/assets/unbansolutions.png" alt="Unban Solutions" className="h-8 w-auto" width="32" height="32" loading="eager" fetchPriority="high" />
           </Link>
 
           <div className="hidden md:flex items-center gap-1">

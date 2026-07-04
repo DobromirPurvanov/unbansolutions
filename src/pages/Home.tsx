@@ -112,7 +112,7 @@ export default function Home() {
               <Link to="/services" className="outline-btn inline-flex items-center gap-2">{t('hero.cta2')}</Link>
               <a
                 href="tel:0883391411"
-                className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5"
                 onClick={() => {
                   if (typeof window.gtag !== 'undefined') {
                     window.gtag('event', 'phone_click', { event_category: 'cta', event_label: 'hero_phone' });
