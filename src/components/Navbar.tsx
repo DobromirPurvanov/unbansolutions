@@ -55,8 +55,13 @@ export default function Navbar() {
             </Link>
           </div>
 
-          <button className="md:hidden text-slate-700 hover:text-slate-900 transition-colors p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button
+            className="md:hidden text-slate-700 hover:text-slate-900 transition-colors p-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? 'Затвори меню' : 'Отвори меню'}
+            aria-expanded={isMenuOpen}
+            type="button"
+          >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
