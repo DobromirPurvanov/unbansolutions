@@ -7,10 +7,13 @@ import { buildEmailTemplate } from "./email-template.js";
 // API ключът се чете САМО от environment променлива (Vercel → Settings → Environment Variables).
 // НИКОГА не слагайте ключа директно в кода – репото е публично и GitHub/Resend
 // автоматично деактивират всеки ключ, който бъде комитнат.
-if (!process.env.RESEND_API_KEY) {
+// .trim() маха случайни интервали/нови редове, попаднали при пействането във Vercel.
+const RESEND_API_KEY = (process.env.RESEND_API_KEY || "").trim();
+
+if (!RESEND_API_KEY) {
   console.error("[Contact API] FATAL: RESEND_API_KEY environment variable is not set!");
 }
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(RESEND_API_KEY);
 
 const TO_EMAIL = process.env.CONTACT_EMAIL || "support@unbansolutions.com";
 const FROM_EMAIL = process.env.FROM_EMAIL || "Unban Solutions <noreply@unbansolutions.com>";
@@ -127,11 +130,19 @@ export default async function handler(req, res) {
 
   try {
     // ======== CONFIG CHECK ========
-    if (!process.env.RESEND_API_KEY) {
+    if (!RESEND_API_KEY) {
       return res.status(500).json({
         error: "Server misconfiguration: RESEND_API_KEY is not set in environment variables.",
       });
     }
+
+    // ДИАГНОСТИКА: отпечатък на ключа, който продукцията реално ползва.
+    // Не разкрива целия ключ – само първите 8 символа и дължините.
+    const rawKey = process.env.RESEND_API_KEY || "";
+    console.log(
+      `[Contact API] Key fingerprint: starts=${RESEND_API_KEY.slice(0, 8)}..., trimmedLength=${RESEND_API_KEY.length}, rawLength=${rawKey.length}` +
+      (rawKey.length !== RESEND_API_KEY.length ? " ⚠️ КЛЮЧЪТ СЪДЪРЖАШЕ ПРАЗНИ СИМВОЛИ (оправено с trim)" : "")
+    );
 
     // ======== RATE LIMITING ========
     const clientIp = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(',')[0].trim();
