@@ -172,32 +172,39 @@ export default async function handler(req, res) {
     }
 
     // ======== reCAPTCHA v3 ПРОВЕРКА ========
-    // Токенът идва от фронтенда; проверяваме го при Google.
-    // score < 0.5 или невалиден токен = бот → тихо "успех" без изпращане.
-    // Ако RECAPTCHA_SECRET_KEY липсва във Vercel, проверката се пропуска
-    // (останалите филтри пазят), за да не спре формата от липсваща env променлива.
+    // Има ли токен – проверяваме го при Google (score < 0.5 = бот, тих отказ).
+    // НЯМА ли токен – пропускаме проверката и разчитаме на останалите филтри.
+    // СТРИКТЕН РЕЖИМ: като потвърдите, че badge-ът "protected by reCAPTCHA"
+    // се вижда долу вдясно на страницата с формата, сменете false на true –
+    // тогава и директните API ботове без токен ще отпадат.
+    const REQUIRE_RECAPTCHA_TOKEN = false;
+
     const recaptchaSecret = (process.env.RECAPTCHA_SECRET_KEY || "").trim();
     if (recaptchaSecret) {
       const token = formData._recaptcha;
       if (!token) {
-        console.log(`[Contact API] Bot suspected (no reCAPTCHA token) IP: ${clientIp}`);
-        return res.status(200).json({ success: true, message: "Received" });
-      }
-      try {
-        const verifyRes = await fetch("https://www.google.com/recaptcha/api/siteverify", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({ secret: recaptchaSecret, response: token, remoteip: clientIp }),
-        });
-        const verify = await verifyRes.json();
-        console.log(`[Contact API] reCAPTCHA: success=${verify.success}, score=${verify.score}, action=${verify.action}`);
-        if (!verify.success || (typeof verify.score === "number" && verify.score < 0.5)) {
-          console.log(`[Contact API] Bot suspected (reCAPTCHA score: ${verify.score ?? "n/a"}, errors: ${JSON.stringify(verify["error-codes"] || [])}) IP: ${clientIp}`);
+        console.warn(`[Contact API] Няма reCAPTCHA токен (VITE_RECAPTCHA_SITE_KEY липсва в build-а?) IP: ${clientIp}`);
+        if (REQUIRE_RECAPTCHA_TOKEN) {
           return res.status(200).json({ success: true, message: "Received" });
         }
-      } catch (recaptchaErr) {
-        // Google недостъпен – пропускаме проверката, не наказваме клиента
-        console.error("[Contact API] reCAPTCHA verify failed:", recaptchaErr?.message || recaptchaErr);
+        // Пропускаме проверката – honeypot, линк филтърът и rate limit пазят.
+      } else {
+        try {
+          const verifyRes = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ secret: recaptchaSecret, response: token, remoteip: clientIp }),
+          });
+          const verify = await verifyRes.json();
+          console.log(`[Contact API] reCAPTCHA: success=${verify.success}, score=${verify.score}, action=${verify.action}`);
+          if (!verify.success || (typeof verify.score === "number" && verify.score < 0.5)) {
+            console.log(`[Contact API] Bot suspected (reCAPTCHA score: ${verify.score ?? "n/a"}, errors: ${JSON.stringify(verify["error-codes"] || [])}) IP: ${clientIp}`);
+            return res.status(200).json({ success: true, message: "Received" });
+          }
+        } catch (recaptchaErr) {
+          // Google недостъпен – пропускаме проверката, не наказваме клиента
+          console.error("[Contact API] reCAPTCHA verify failed:", recaptchaErr?.message || recaptchaErr);
+        }
       }
     } else {
       console.warn("[Contact API] RECAPTCHA_SECRET_KEY не е зададен – проверката е пропусната");
