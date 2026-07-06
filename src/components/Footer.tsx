@@ -13,7 +13,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src="/assets/unbansolutions.png" alt="Unban Solutions" className="h-8 w-auto brightness-0 invert" width="32" height="32" loading="lazy" />
+              <img src="/assets/unbansolutions.png" alt="Unban Solutions" className="h-8 w-auto bg-white rounded-md p-0.5" width="32" height="32" loading="lazy" />
             </Link>
             <p className="text-slate-300 text-xs leading-relaxed mb-4">{t('foot.desc')}</p>
             <div className="flex items-center gap-3">
