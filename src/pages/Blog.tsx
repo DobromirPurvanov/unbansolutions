@@ -1,111 +1,23 @@
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, Instagram, Lock, AlertTriangle, Video, ShieldCheck } from 'lucide-react';
+import { loadBlogPosts, type BlogPost } from '@/lib/blog';
+import { ArrowRight, Clock, CalendarDays } from 'lucide-react';
 
 export default function Blog() {
   const { lang } = useLanguage();
   const isBg = lang === 'bg';
 
-  const articles = isBg ? [
-    {
-      title: 'Как да предпазите Instagram акаунта си от бан',
-      excerpt: 'Научете най-важните правила на Instagram, които трябва да спазвате, за да избегнете банване на профила си. Съвети за сигурно съдържание и съответствие с политиките на платформата.',
-      readTime: '5 мин',
-      icon: Instagram,
-      color: 'bg-pink-100',
-      iconColor: 'text-pink-700',
-    },
-    {
-      title: 'Как работи shadowban в TikTok',
-      excerpt: 'Разберете какво е shadowban, как да разберете дали сте засегнати и какви стъпки да предприемете за възстановяване на видимостта на видеоклиповете си.',
-      readTime: '6 мин',
-      icon: Video,
-      color: 'bg-cyan-100',
-      iconColor: 'text-cyan-700',
-    },
-    {
-      title: 'Сигурност на профила: двуфакторна автентикация',
-      excerpt: 'Защо двуфакторната автентикация е задължителна за всеки, който разчита на социалните мрежи за бизнес. Практическо ръководство за настройка.',
-      readTime: '4 мин',
-      icon: Lock,
-      color: 'bg-violet-100',
-      iconColor: 'text-violet-700',
-    },
-    {
-      title: 'Ad Account ограничения в Meta и как да ги избегнете',
-      excerpt: 'Разберете най-честите причини за ограничаване на рекламни акаунти в Meta и как да защитите своя бизнес рекламен акаунт.',
-      readTime: '7 мин',
-      icon: AlertTriangle,
-      color: 'bg-yellow-100',
-      iconColor: 'text-yellow-700',
-    },
-    {
-      title: 'Права при банване в социалните мрежи',
-      excerpt: 'Какви са вашите права като потребител на социалните мрежи и какво можете да направите, ако смятате, че сте баннати неправилно.',
-      readTime: '8 мин',
-      icon: ShieldCheck,
-      color: 'bg-emerald-100',
-      iconColor: 'text-emerald-700',
-    },
-    {
-      title: 'Как да подготвите обжалване към платформа',
-      excerpt: 'Практически съвети за подготовка на успешно обжалване към Instagram, TikTok, YouTube и други платформи при банване.',
-      readTime: '6 мин',
-      icon: Instagram,
-      color: 'bg-blue-100',
-      iconColor: 'text-blue-700',
-    },
-  ] : [
-    {
-      title: 'How to Protect Your Instagram Account from Banning',
-      excerpt: 'Learn the most important Instagram rules you need to follow to avoid getting your profile banned. Tips for safe content and compliance with platform policies.',
-      readTime: '5 min',
-      icon: Instagram,
-      color: 'bg-pink-100',
-      iconColor: 'text-pink-700',
-    },
-    {
-      title: 'How Shadowban Works on TikTok',
-      excerpt: 'Understand what shadowban is, how to know if you are affected, and what steps to take to restore visibility of your videos.',
-      readTime: '6 min',
-      icon: Video,
-      color: 'bg-cyan-100',
-      iconColor: 'text-cyan-700',
-    },
-    {
-      title: 'Account Security: Two-Factor Authentication',
-      excerpt: 'Why two-factor authentication is essential for anyone who relies on social media for business. Practical setup guide.',
-      readTime: '4 min',
-      icon: Lock,
-      color: 'bg-violet-100',
-      iconColor: 'text-violet-700',
-    },
-    {
-      title: 'Ad Account Restrictions in Meta and How to Avoid Them',
-      excerpt: 'Learn the most common reasons for advertising account restrictions in Meta and how to protect your business ad account.',
-      readTime: '7 min',
-      icon: AlertTriangle,
-      color: 'bg-yellow-100',
-      iconColor: 'text-yellow-700',
-    },
-    {
-      title: 'Your Rights When Banned on Social Media',
-      excerpt: 'What are your rights as a user of social networks and what can you do if you believe you have been wrongly banned.',
-      readTime: '8 min',
-      icon: ShieldCheck,
-      color: 'bg-emerald-100',
-      iconColor: 'text-emerald-700',
-    },
-    {
-      title: 'How to Prepare an Appeal to a Platform',
-      excerpt: 'Practical tips for preparing a successful appeal to Instagram, TikTok, YouTube and other platforms when banned.',
-      readTime: '6 min',
-      icon: Instagram,
-      color: 'bg-blue-100',
-      iconColor: 'text-blue-700',
-    },
-  ];
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadBlogPosts().then((data) => {
+      setPosts(data);
+      setLoading(false);
+    });
+  }, []);
 
   return (
     <>
@@ -139,35 +51,83 @@ export default function Blog() {
           </div>
         </section>
 
-        {/* Articles Grid - NO links, just informational cards */}
-        <section className="py-12 bg-white">
-          <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {articles.map((article, idx) => (
-                <div
-                  key={idx}
-                  className="glass-card-hover p-5 flex flex-col h-full"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-10 h-10 rounded-lg ${article.color} flex items-center justify-center`}>
-                      <article.icon size={18} className={article.iconColor} />
-                    </div>
-                    <div className="flex items-center gap-1 text-slate-400 text-[11px]">
-                      <Clock size={10} />
-                      <span>{article.readTime}</span>
-                    </div>
+        {/* Loading State */}
+        {loading && (
+          <section className="py-12 bg-white">
+            <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="glass-card-hover p-5 flex flex-col h-full animate-pulse">
+                    <div className="w-10 h-10 rounded-lg bg-slate-200 mb-3" />
+                    <div className="h-4 bg-slate-200 rounded mb-2 w-3/4" />
+                    <div className="h-3 bg-slate-200 rounded mb-1 w-full" />
+                    <div className="h-3 bg-slate-200 rounded w-2/3" />
                   </div>
-                  <h2 className="text-slate-900 font-bold text-sm leading-snug mb-2">
-                    {article.title}
-                  </h2>
-                  <p className="text-slate-600 text-xs leading-relaxed flex-1">
-                    {article.excerpt}
-                  </p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
+
+        {/* Articles Grid */}
+        {!loading && posts.length > 0 && (
+          <section className="py-12 bg-white">
+            <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {posts.map((post) => (
+                  <Link
+                    key={post.slug}
+                    to={`/blog/${post.slug}`}
+                    className="glass-card-hover p-5 flex flex-col h-full group"
+                  >
+                    {post.coverImage && (
+                      <img
+                        src={post.coverImage}
+                        alt={post.title}
+                        className="w-full h-40 object-cover rounded-lg mb-4"
+                      />
+                    )}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center gap-1 text-slate-400 text-[11px]">
+                        <CalendarDays size={10} />
+                        <span>{new Date(post.date).toLocaleDateString(isBg ? 'bg-BG' : 'en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-slate-400 text-[11px]">
+                        <Clock size={10} />
+                        <span>{post.readTime}</span>
+                      </div>
+                    </div>
+                    <h2 className="text-slate-900 font-bold text-sm leading-snug mb-2 group-hover:text-blue-600 transition-colors">
+                      {post.title}
+                    </h2>
+                    <p className="text-slate-600 text-xs leading-relaxed flex-1">
+                      {post.excerpt}
+                    </p>
+                    <div className="mt-3 inline-flex items-center gap-1 text-blue-600 text-xs font-medium group-hover:gap-2 transition-all">
+                      {isBg ? 'Прочети' : 'Read'}
+                      <ArrowRight size={12} />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Empty State */}
+        {!loading && posts.length === 0 && (
+          <section className="py-12 bg-white">
+            <div className="max-w-[1400px] mx-auto px-6 lg:px-10 text-center">
+              <p className="text-slate-500 text-sm">
+                {isBg ? 'Все още няма публикувани статии.' : 'No articles published yet.'}
+              </p>
+            </div>
+          </section>
+        )}
 
         {/* CTA */}
         <section className="py-10 bg-gradient-to-br from-blue-600 to-violet-700">
