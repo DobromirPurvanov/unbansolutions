@@ -8,8 +8,15 @@ declare global {
     gtag?: (...args: any[]) => void;
     dataLayer?: any[];
     fbq?: (...args: any[]) => void;
+    grecaptcha?: {
+      ready: (cb: () => void) => void;
+      execute: (siteKey: string, opts: { action: string }) => Promise<string>;
+    };
   }
 }
+
+// Публичният site key на reCAPTCHA (идва от Vercel env при build)
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined;
 
 interface FormData {
   name: string;
@@ -139,8 +146,15 @@ export default function Contact() {
   }, []);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // Анти-бот: кога е заредена формата (ботовете пращат мигновено)
-  const [formLoadedAt] = useState(() => Date.now());
+  // reCAPTCHA v3: зареждаме скрипта веднъж при отваряне на страницата
+  useEffect(() => {
+    if (!RECAPTCHA_SITE_KEY || document.querySelector('script[data-recaptcha]')) return;
+    const s = document.createElement('script');
+    s.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+    s.async = true;
+    s.setAttribute('data-recaptcha', '1');
+    document.head.appendChild(s);
+  }, []);
   const [submitError, setSubmitError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -156,7 +170,18 @@ export default function Contact() {
       data.append('issue', formData.issue);
       data.append('message', formData.message);
       data.append('_gotcha', formData._gotcha); // honeypot
-      data.append('_ts', String(formLoadedAt)); // анти-бот времеви печат
+
+      // reCAPTCHA v3 токен (ако скриптът е зареден; иначе бекендът решава)
+      if (RECAPTCHA_SITE_KEY && window.grecaptcha) {
+        try {
+          const token = await new Promise<string>((resolve, reject) => {
+            window.grecaptcha!.ready(() => {
+              window.grecaptcha!.execute(RECAPTCHA_SITE_KEY, { action: 'contact' }).then(resolve).catch(reject);
+            });
+          });
+          data.append('_recaptcha', token);
+        } catch { /* без токен – бекендът ще прецени */ }
+      }
       formData.files.forEach((file) => data.append('attachments', file));
 
       // GA4 + Meta Pixel - begin form submit
