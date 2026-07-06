@@ -122,6 +122,9 @@ export default async function handler(req, res) {
   try {
     // ======== RATE LIMITING ========
     const clientIp = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(',')[0].trim();
+    console.log("[Contact API] Request from IP:", clientIp);
+    console.log("[Contact API] Content-Type:", req.headers["content-type"]);
+    
     const rateCheck = checkRateLimit(clientIp);
     
     if (!rateCheck.allowed) {
@@ -132,7 +135,10 @@ export default async function handler(req, res) {
       });
     }
 
+    console.log("[Contact API] Parsing form...");
     const formData = await parseForm(req);
+    console.log("[Contact API] Form parsed. Fields:", Object.keys(formData).filter(k => k !== 'attachments'));
+    console.log("[Contact API] Attachments:", formData.attachments?.length || 0);
 
     // ======== HONEYPOT CHECK ========
     if (formData._gotcha && formData._gotcha.trim() !== '') {
@@ -187,17 +193,22 @@ export default async function handler(req, res) {
     }));
 
     // ======== SEND EMAIL ========
+    console.log("[Contact API] Sending email...");
+    console.log("[Contact API] From:", FROM_EMAIL);
+    console.log("[Contact API] To:", TO_EMAIL);
+    console.log("[Contact API] ReplyTo:", email);
+    
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [TO_EMAIL],
       replyTo: email,
-      subject: `📬 ${name} — нов запитване от Unban Solutions`,
+      subject: `${name} - novo zapitvane ot Unban Solutions`,
       html,
       attachments: emailAttachments.length > 0 ? emailAttachments : undefined,
     });
 
     if (error) {
-      console.error("Resend error:", JSON.stringify(error, null, 2));
+      console.error("[Contact API] Resend error:", JSON.stringify(error, null, 2));
       return res.status(500).json({ 
         error: "Failed to send email", 
         details: error.message || error.name || JSON.stringify(error),
@@ -205,6 +216,8 @@ export default async function handler(req, res) {
         to: TO_EMAIL
       });
     }
+    
+    console.log("[Contact API] Email sent! ID:", data?.id);
 
     return res.status(200).json({
       success: true,
