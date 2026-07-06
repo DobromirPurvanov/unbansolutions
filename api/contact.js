@@ -4,7 +4,13 @@ import { Resend } from "resend";
 import Busboy from "busboy";
 import { buildEmailTemplate } from "./email-template.js";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "re_cCCoCVQE_yB4qQ6FhmZvtL2HuPvjLiHsa");
+// API ключът се чете САМО от environment променлива (Vercel → Settings → Environment Variables).
+// НИКОГА не слагайте ключа директно в кода – репото е публично и GitHub/Resend
+// автоматично деактивират всеки ключ, който бъде комитнат.
+if (!process.env.RESEND_API_KEY) {
+  console.error("[Contact API] FATAL: RESEND_API_KEY environment variable is not set!");
+}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const TO_EMAIL = process.env.CONTACT_EMAIL || "support@unbansolutions.com";
 const FROM_EMAIL = process.env.FROM_EMAIL || "Unban Solutions <noreply@unbansolutions.com>";
@@ -120,6 +126,13 @@ export default async function handler(req, res) {
   }
 
   try {
+    // ======== CONFIG CHECK ========
+    if (!process.env.RESEND_API_KEY) {
+      return res.status(500).json({
+        error: "Server misconfiguration: RESEND_API_KEY is not set in environment variables.",
+      });
+    }
+
     // ======== RATE LIMITING ========
     const clientIp = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(',')[0].trim();
     console.log("[Contact API] Request from IP:", clientIp);
