@@ -6,8 +6,13 @@ import { buildEmailTemplate } from "./email-template.js";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_cCCoCVQE_yB4qQ6FhmZvtL2HuPvjLiHsa");
 
-const TO_EMAIL = process.env.CONTACT_EMAIL || "support@unbansolutions.com";
+const TO_EMAIL = process.env.CONTACT_EMAIL || "dobotox@gmail.com";
 const FROM_EMAIL = process.env.FROM_EMAIL || "Unban Solutions <onboarding@resend.dev>";
+
+// NOTE: To change TO_EMAIL to support@unbansolutions.com, you need to:
+// 1. Verify unbansolutions.com domain at https://resend.com/domains
+// 2. Add MX/SPF/DKIM DNS records via Superhosting support ticket
+// 3. Then update TO_EMAIL to "support@unbansolutions.com"
 
 // ======== RATE LIMITER ========
 const RATE_LIMIT = 5; // max 5 requests
@@ -197,8 +202,13 @@ export default async function handler(req, res) {
     });
 
     if (error) {
-      console.error("Resend error:", error);
-      return res.status(500).json({ error: "Failed to send email" });
+      console.error("Resend error:", JSON.stringify(error, null, 2));
+      return res.status(500).json({ 
+        error: "Failed to send email", 
+        details: error.message || error.name || JSON.stringify(error),
+        from: FROM_EMAIL,
+        to: TO_EMAIL
+      });
     }
 
     return res.status(200).json({
