@@ -269,3 +269,181 @@ export function buildEmailTemplate({
 </body>
 </html>`;
 }
+
+/**
+ * Авто-отговор до КЛИЕНТА: „Получихме запитването ви".
+ * Същият бранд, но обърнат към човека отсреща.
+ */
+export function buildClientConfirmationTemplate({ name, platforms, issue, message }) {
+  const firstName = escapeHtml((name || "").trim().split(/\s+/)[0] || "");
+  const font = `-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif`;
+  const preheader = `Здравейте${firstName ? ", " + firstName : ""}! Запитването ви е при нас и екипът вече го разглежда.`;
+
+  const steps = [
+    ["1", "Преглед на казуса", "Специалист от екипа анализира ситуацията и платформите ви."],
+    ["2", "Връзка с вас", "Ще се свържем на посочения имейл — обикновено до 24 часа."],
+    ["3", "План за действие", "Получавате конкретни стъпки за възстановяване и защита."],
+  ]
+    .map(
+      ([n, title, text]) => `
+      <tr>
+        <td width="44" valign="top" style="padding:0 0 18px 0;">
+          <table cellpadding="0" cellspacing="0" role="presentation"><tr>
+            <td align="center" bgcolor="#EFF6FF" style="width:32px;height:32px;border-radius:999px;background-color:#EFF6FF;border:1px solid #BFDBFE;font-family:${font};font-size:14px;font-weight:800;color:#2563EB;">${n}</td>
+          </tr></table>
+        </td>
+        <td valign="top" style="padding:0 0 18px 0;">
+          <div style="font-family:${font};font-size:15px;font-weight:800;color:#0F172A;padding:5px 0 3px 0;">${title}</div>
+          <div style="font-family:${font};font-size:13px;line-height:1.6;color:#64748B;">${text}</div>
+        </td>
+      </tr>`
+    )
+    .join("");
+
+  const summaryBlock =
+    message && message.trim()
+      ? `
+      <tr>
+        <td style="padding:0 32px 26px 32px;">
+          <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+            <tr>
+              <td bgcolor="#F8FAFC" style="background-color:#F8FAFC;border-left:4px solid #2563EB;border-radius:0 12px 12px 0;padding:18px 22px;">
+                <div style="font-family:${font};font-size:11px;font-weight:800;letter-spacing:0.14em;color:#64748B;text-transform:uppercase;padding-bottom:8px;">
+                  Вашето запитване${issue ? " · " + escapeHtml(issue) : ""}${platforms ? " · " + escapeHtml(platforms) : ""}
+                </div>
+                <div style="font-family:${font};font-size:14px;line-height:1.7;color:#334155;white-space:pre-wrap;">${escapeHtml(message)}</div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>`
+      : "";
+
+  return `<!DOCTYPE html>
+<html lang="bg" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Получихме запитването ви — Unban Solutions</title>
+</head>
+<body style="margin:0;padding:0;background-color:#EDF1F7;-webkit-text-size-adjust:100%;">
+
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#EDF1F7;">
+    ${preheader}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+  </div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" bgcolor="#EDF1F7" style="background-color:#EDF1F7;">
+    <tr>
+      <td align="center" style="padding:32px 12px;">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;max-width:600px;">
+
+          <!-- HERO -->
+          <tr>
+            <td bgcolor="#0F172A" style="background-color:#0F172A;border-radius:16px 16px 0 0;padding:0;">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td height="5" bgcolor="#7C3AED" style="height:5px;line-height:5px;font-size:5px;border-radius:16px 16px 0 0;background-color:#7C3AED;background-image:linear-gradient(90deg,#2563EB 0%,#7C3AED 50%,#0891B2 100%);">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding:36px 32px 32px 32px;">
+                    <div style="font-family:${font};font-size:13px;font-weight:800;letter-spacing:0.22em;color:#94A3B8;text-transform:uppercase;padding-bottom:18px;">
+                      UNBAN&nbsp;SOLUTIONS
+                    </div>
+                    <div style="padding-bottom:16px;">
+                      <span style="display:inline-block;padding:7px 18px;border-radius:999px;background-color:#059669;font-family:${font};font-size:12px;font-weight:800;letter-spacing:0.12em;color:#FFFFFF;text-transform:uppercase;">
+                      ✓ Заявката е приета
+                      </span>
+                    </div>
+                    <div style="font-family:${font};font-size:26px;line-height:1.3;font-weight:800;color:#FFFFFF;">
+                      Получихме запитването ви
+                    </div>
+                    <div style="font-family:${font};font-size:14px;color:#94A3B8;padding-top:10px;">
+                      Екипът ни вече го разглежда
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ТЯЛО -->
+          <tr>
+            <td bgcolor="#FFFFFF" style="background-color:#FFFFFF;">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+
+                <tr>
+                  <td style="padding:30px 32px 22px 32px;">
+                    <div style="font-family:${font};font-size:17px;font-weight:800;color:#0F172A;padding-bottom:10px;">
+                      Здравейте${firstName ? ", " + firstName : ""}! 👋
+                    </div>
+                    <div style="font-family:${font};font-size:14px;line-height:1.75;color:#475569;">
+                      Благодарим, че се обърнахте към нас. Запитването ви е регистрирано и специалист от екипа вече работи по него. Ето какво следва:
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Стъпки -->
+                <tr>
+                  <td style="padding:0 32px 10px 32px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                      ${steps}
+                    </table>
+                  </td>
+                </tr>
+
+                ${summaryBlock}
+
+                <!-- Спешен контакт -->
+                <tr>
+                  <td style="padding:0 32px 30px 32px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td bgcolor="#F1F5F9" align="center" style="background-color:#F1F5F9;border-radius:12px;padding:18px 20px;">
+                          <div style="font-family:${font};font-size:13px;color:#475569;padding-bottom:6px;">
+                            Спешен случай? Работим <strong>24/7</strong> за критични ситуации:
+                          </div>
+                          <a href="tel:+359883391411" style="font-family:${font};font-size:17px;font-weight:800;color:#2563EB;text-decoration:none;">📞 0883 391 411</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td bgcolor="#0F172A" style="background-color:#0F172A;border-radius:0 0 16px 16px;padding:26px 32px;" align="center">
+              <div style="font-family:${font};font-size:16px;font-weight:800;color:#FFFFFF;padding-bottom:6px;">
+                Unban <span style="color:#A78BFA;">Solutions</span>
+              </div>
+              <div style="font-family:${font};font-size:12px;color:#64748B;padding-bottom:14px;">
+                Възстановяване на акаунти · Дигитална защита · Правни консултации
+              </div>
+              <div style="font-family:${font};font-size:12px;">
+                <a href="https://unbansolutions.com" style="color:#94A3B8;text-decoration:none;">unbansolutions.com</a>
+                <span style="color:#334155;">&nbsp;·&nbsp;</span>
+                <a href="mailto:support@unbansolutions.com" style="color:#94A3B8;text-decoration:none;">support@unbansolutions.com</a>
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding:18px 20px 0 20px;">
+              <div style="font-family:${font};font-size:11px;color:#94A3B8;">
+                Това е автоматично потвърждение — можете да отговорите директно на този имейл.
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>`;
+}

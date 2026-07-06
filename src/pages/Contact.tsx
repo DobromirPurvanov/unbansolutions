@@ -139,6 +139,8 @@ export default function Contact() {
   }, []);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Анти-бот: кога е заредена формата (ботовете пращат мигновено)
+  const [formLoadedAt] = useState(() => Date.now());
   const [submitError, setSubmitError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -154,6 +156,7 @@ export default function Contact() {
       data.append('issue', formData.issue);
       data.append('message', formData.message);
       data.append('_gotcha', formData._gotcha); // honeypot
+      data.append('_ts', String(formLoadedAt)); // анти-бот времеви печат
       formData.files.forEach((file) => data.append('attachments', file));
 
       // GA4 + Meta Pixel - begin form submit
@@ -389,7 +392,7 @@ export default function Contact() {
                           <select name="issue" value={formData.issue} onChange={handleChange} required className="form-input bg-transparent">
                             <option value="" className="bg-white">{t('cp.form.issueDef')}</option>
                             {issueOptions.map((i) => (
-                              <option key={i} value={i.toLowerCase().replace(/ /g, '')} className="bg-white">{i}</option>
+                              <option key={i} value={i} className="bg-white">{i}</option>
                             ))}
                           </select>
                         </div>

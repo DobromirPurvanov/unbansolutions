@@ -2,7 +2,7 @@
 
 import { Resend } from "resend";
 import Busboy from "busboy";
-import { buildEmailTemplate } from "./email-template.js";
+import { buildEmailTemplate, buildClientConfirmationTemplate } from "./email-template.js";
 
 // API ключът се чете САМО от environment променлива (Vercel → Settings → Environment Variables).
 // НИКОГА не слагайте ключа директно в кода – репото е публично и GitHub/Resend
@@ -171,6 +171,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "Received" });
     }
 
+    // ======== ВРЕМЕВИ КАПАН (анти-бот) ========
+    // Човек попълва формата поне няколко секунди. Ботовете пращат мигновено
+    // или удрят API-то директно, без да заредят страницата (тогава _ts липсва).
+    // И в двата случая: тихо "успех", без реално изпращане.
+    const formTs = parseInt(formData._ts, 10);
+    const fillTime = Date.now() - formTs;
+    if (!formTs || Number.isNaN(formTs) || fillTime < 3000) {
+      console.log(`[Contact API] Bot suspected (fill: ${Number.isNaN(fillTime) ? "no _ts" : fillTime + "ms"}) IP: ${clientIp}`);
+      return res.status(200).json({ success: true, message: "Received" });
+    }
+
     const name = sanitizeInput(formData.name);
     const email = sanitizeInput(formData.email);
     const platforms = sanitizeInput(formData.platforms);
@@ -185,6 +196,26 @@ export default async function handler(req, res) {
     
     if (!email || !validateEmail(email)) {
       return res.status(400).json({ error: "Valid email is required" });
+    }
+
+    // ======== ЕДНОКРАТНИ (DISPOSABLE) ИМЕЙЛИ ========
+    const DISPOSABLE_DOMAINS = [
+      "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com",
+      "temp-mail.org", "yopmail.com", "sharklasers.com", "trashmail.com",
+      "getnada.com", "maildrop.cc", "fakeinbox.com", "dispostable.com",
+    ];
+    const emailDomain = email.split("@")[1]?.toLowerCase() || "";
+    if (DISPOSABLE_DOMAINS.includes(emailDomain)) {
+      return res.status(400).json({ error: "Моля, използвайте реален имейл адрес, за да можем да се свържем с вас." });
+    }
+
+    // ======== ЛИНК СПАМ ФИЛТЪР ========
+    // Клиент може да пейстне линк-два към профила си – това е ок.
+    // Съобщение с 4+ линка или HTML/BBCode линкове е почти сигурно спам: тих отказ.
+    const linkCount = ((message || "").match(/https?:\/\/|www\./gi) || []).length;
+    if (linkCount > 3 || /\[url=|<a\s+href/i.test(message || "")) {
+      console.log(`[Contact API] Spam dropped (links: ${linkCount}) IP: ${clientIp}`);
+      return res.status(200).json({ success: true, message: "Received" });
     }
     
     if (!message || message.length < 10) {
@@ -226,7 +257,7 @@ export default async function handler(req, res) {
       from: FROM_EMAIL,
       to: [TO_EMAIL],
       replyTo: email,
-      subject: `${name} - novo zapitvane ot Unban Solutions`,
+      subject: `Ново запитване от ${name}${platforms ? " · " + platforms : ""}`,
       html,
       attachments: emailAttachments.length > 0 ? emailAttachments : undefined,
     });
@@ -242,6 +273,26 @@ export default async function handler(req, res) {
     }
     
     console.log("[Contact API] Email sent! ID:", data?.id);
+
+    // ======== АВТО-ОТГОВОР ДО КЛИЕНТА ========
+    // Потвърждение „Получихме запитването ви". Ако то се провали,
+    // НЕ проваляме заявката – известието до екипа вече е изпратено.
+    try {
+      const confirmation = await resend.emails.send({
+        from: FROM_EMAIL,
+        to: [email],
+        replyTo: "support@unbansolutions.com",
+        subject: "Получихме запитването ви — Unban Solutions",
+        html: buildClientConfirmationTemplate({ name, platforms, issue, message }),
+      });
+      if (confirmation.error) {
+        console.error("[Contact API] Client confirmation error:", JSON.stringify(confirmation.error));
+      } else {
+        console.log("[Contact API] Client confirmation sent! ID:", confirmation.data?.id);
+      }
+    } catch (confirmErr) {
+      console.error("[Contact API] Client confirmation failed:", confirmErr?.message || confirmErr);
+    }
 
     return res.status(200).json({
       success: true,
