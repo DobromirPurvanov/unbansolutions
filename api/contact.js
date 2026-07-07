@@ -15,8 +15,12 @@ if (!RESEND_API_KEY) {
 }
 const resend = new Resend(RESEND_API_KEY);
 
-const TO_EMAIL = process.env.CONTACT_EMAIL || "support@unbansolutions.com";
-const FROM_EMAIL = process.env.FROM_EMAIL || "Unban Solutions <noreply@unbansolutions.com>";
+// Получатели на известията – ФИКСИРАНИ в кода, БЕЗ env променливи
+// (env четенето докара плейсхолдър катастрофата). Gmail-ът е резерва,
+// която гарантира, че запитване никога не потъва само в support@.
+// Ако Крис иска да получава и той: добавете адреса му като трети елемент.
+const TO_EMAILS = ["Dobromirpurvanov@gmail.com", "support@unbansolutions.com"];
+const FROM_EMAIL = "Unban Solutions <noreply@unbansolutions.com>";
 
 // ======== RATE LIMITER ========
 const RATE_LIMIT = 5; // max 5 requests
@@ -198,8 +202,13 @@ export default async function handler(req, res) {
           const verify = await verifyRes.json();
           console.log(`[Contact API] reCAPTCHA: success=${verify.success}, score=${verify.score}, action=${verify.action}`);
           if (!verify.success || (typeof verify.score === "number" && verify.score < 0.5)) {
-            console.log(`[Contact API] Bot suspected (reCAPTCHA score: ${verify.score ?? "n/a"}, errors: ${JSON.stringify(verify["error-codes"] || [])}) IP: ${clientIp}`);
-            return res.status(200).json({ success: true, message: "Received" });
+            console.log(`[Contact API] Нисък reCAPTCHA рейтинг (score: ${verify.score ?? "n/a"}, errors: ${JSON.stringify(verify["error-codes"] || [])}) IP: ${clientIp}`);
+            // В мек режим (REQUIRE_RECAPTCHA_TOKEN=false) само записваме и пускаме –
+            // бързите повторни тестове на реален човек получават нисък score и не
+            // бива да изчезват тихо. В строг режим (true) ботовете се режат тук.
+            if (REQUIRE_RECAPTCHA_TOKEN) {
+              return res.status(200).json({ success: true, message: "Received" });
+            }
           }
         } catch (recaptchaErr) {
           // Google недостъпен – пропускаме проверката, не наказваме клиента
@@ -286,12 +295,12 @@ export default async function handler(req, res) {
     // ======== SEND EMAIL ========
     console.log("[Contact API] Sending email...");
     console.log("[Contact API] From:", FROM_EMAIL);
-    console.log("[Contact API] To:", TO_EMAIL);
+    console.log("[Contact API] To:", TO_EMAILS.join(", "));
     console.log("[Contact API] ReplyTo:", email);
     
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
-      to: [TO_EMAIL],
+      to: TO_EMAILS,
       replyTo: email,
       subject: `Ново запитване от ${name}${platforms ? " · " + platforms : ""}`,
       html,
@@ -304,7 +313,7 @@ export default async function handler(req, res) {
         error: "Failed to send email", 
         details: error.message || error.name || JSON.stringify(error),
         from: FROM_EMAIL,
-        to: TO_EMAIL
+        to: TO_EMAILS.join(", ")
       });
     }
     
