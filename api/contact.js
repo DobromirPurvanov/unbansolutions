@@ -16,10 +16,13 @@ if (!RESEND_API_KEY) {
 const resend = new Resend(RESEND_API_KEY);
 
 // Получатели на известията – ФИКСИРАНИ в кода, БЕЗ env променливи
-// (env четенето докара плейсхолдър катастрофата). Gmail-ът е резерва,
-// която гарантира, че запитване никога не потъва само в support@.
-// Ако Крис иска да получава и той: добавете адреса му като трети елемент.
-const TO_EMAILS = ["Dobromirpurvanov@gmail.com", "support@unbansolutions.com"];
+// (env четенето докара плейсхолдър катастрофата). Всяко запитване пристига
+// и в трите кутии едновременно – загуба на мейл вече е невъзможна.
+const TO_EMAILS = [
+  "Dobromirpurvanov@gmail.com",
+  "support@unbansolutions.com",
+  "adsjustpablo@gmail.com",
+];
 const FROM_EMAIL = "Unban Solutions <noreply@unbansolutions.com>";
 
 // ======== RATE LIMITER ========
