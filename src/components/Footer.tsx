@@ -55,9 +55,9 @@ export default function Footer() {
           <div>
             <h3 className="font-bold text-sm mb-4">{t('nav.contact')}</h3>
             <ul className="space-y-2">
-              <li className="flex items-center gap-2 text-slate-300 text-xs"><Mail size={12} /> support@unbansolutions.com</li>
-              <li className="flex items-center gap-2 text-slate-300 text-xs"><Phone size={12} /> 0883 391411</li>
-              <li className="flex items-start gap-2 text-slate-300 text-xs"><MapPin size={12} className="flex-shrink-0 mt-0.5" /> София, Шипченски Проход 18</li>
+              <li className="flex items-center gap-2 text-slate-300 text-xs"><Mail size={12} /> <a href="mailto:support@unbansolutions.com" className="hover:text-white transition-colors">support@unbansolutions.com</a></li>
+              <li className="flex items-center gap-2 text-slate-300 text-xs"><Phone size={12} /> <a href="tel:+359883391411" className="hover:text-white transition-colors">0883 391411</a></li>
+              <li className="flex items-start gap-2 text-slate-300 text-xs"><MapPin size={12} className="flex-shrink-0 mt-0.5" /> <a href="https://maps.google.com/?q=София,+Шипченски+Проход+18" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">София, Шипченски Проход 18</a></li>
             </ul>
           </div>
         </div>

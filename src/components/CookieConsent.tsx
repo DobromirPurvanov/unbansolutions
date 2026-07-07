@@ -22,8 +22,18 @@ export default function CookieConsent() {
       timestamp: Date.now(),
     }));
     setIsVisible(false);
-    // Enable GA4 and Meta Pixel
-    if (window.gtag) window.gtag('consent', 'update', { analytics_storage: 'granted' });
+    // Enable GA4 and Meta Pixel – с fallback дефиниция на gtag,
+    // за да не се загуби съгласието при race condition
+    window.dataLayer = window.dataLayer || [];
+    if (!window.gtag) {
+      window.gtag = function () { window.dataLayer!.push(arguments); };
+    }
+    window.gtag('consent', 'update', {
+      analytics_storage: 'granted',
+      ad_storage: 'granted',
+      ad_user_data: 'granted',
+      ad_personalization: 'granted',
+    });
     if (window.fbq) window.fbq('track', 'PageView');
   };
 
