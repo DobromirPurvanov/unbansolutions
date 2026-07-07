@@ -173,16 +173,28 @@ export default function Contact() {
       data.append('message', formData.message);
       data.append('_gotcha', formData._gotcha); // honeypot
 
-      // reCAPTCHA v3 токен (ако скриптът е зареден; иначе бекендът решава)
+      // reCAPTCHA v3 токен – с 5с таймаут и пълна защита от грешки.
+      // Какъвто и проблем да има с ключа/скрипта, формата ПРОДЪЛЖАВА без токен
+      // (бекендът е в мек режим и пропуска), вместо да виси на "Изпращане...".
       if (RECAPTCHA_SITE_KEY && window.grecaptcha) {
         try {
-          const token = await new Promise<string>((resolve, reject) => {
-            window.grecaptcha!.ready(() => {
-              window.grecaptcha!.execute(RECAPTCHA_SITE_KEY, { action: 'contact' }).then(resolve).catch(reject);
-            });
-          });
+          const token = await Promise.race([
+            new Promise<string>((resolve, reject) => {
+              try {
+                window.grecaptcha!.ready(() => {
+                  try {
+                    window.grecaptcha!.execute(RECAPTCHA_SITE_KEY, { action: 'contact' }).then(resolve).catch(reject);
+                  } catch (e) { reject(e); }
+                });
+              } catch (e) { reject(e); }
+            }),
+            new Promise<string>((_, reject) => setTimeout(() => reject(new Error('recaptcha timeout')), 5000)),
+          ]);
           data.append('_recaptcha', token);
-        } catch { /* без токен – бекендът ще прецени */ }
+        } catch (e) {
+          console.warn('reCAPTCHA пропусната:', e);
+          /* без токен – бекендът ще прецени */
+        }
       }
       formData.files.forEach((file) => data.append('attachments', file));
 
