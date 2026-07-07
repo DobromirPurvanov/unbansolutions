@@ -45,6 +45,7 @@ function renderPills(str, color, bg, border) {
 export function buildEmailTemplate({
   name,
   email,
+  phone,
   platforms,
   issue,
   message,
@@ -55,6 +56,8 @@ export function buildEmailTemplate({
 }) {
   const safeName = escapeHtml(name);
   const safeEmail = escapeHtml(email);
+  const safePhone = escapeHtml(phone || "");
+  const phoneHref = (phone || "").replace(/[^\d+]/g, "");
   const firstName = escapeHtml((name || "").trim().split(/\s+/)[0] || "клиента");
   const date = formatDate(timestamp);
   const preheader = `Ново запитване от ${safeName} · ${escapeHtml(platforms || "без платформа")} · ${escapeHtml(issue || "общ въпрос")}`;
@@ -149,6 +152,7 @@ export function buildEmailTemplate({
                       ${safeName}
                     </div>
                     <a href="mailto:${safeEmail}" style="font-family:${font};font-size:15px;color:#2563EB;text-decoration:none;font-weight:600;">${safeEmail}</a>
+                    ${safePhone ? `<br><a href="tel:${phoneHref}" style="font-family:${font};font-size:15px;color:#2563EB;text-decoration:none;font-weight:600;">&#128222; ${safePhone}</a>` : ""}
                   </td>
                 </tr>
 

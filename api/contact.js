@@ -212,6 +212,7 @@ export default async function handler(req, res) {
 
     const name = sanitizeInput(formData.name);
     const email = sanitizeInput(formData.email);
+    const phone = sanitizeInput(formData.phone);
     const platforms = sanitizeInput(formData.platforms);
     const issue = sanitizeInput(formData.issue);
     const message = sanitizeInput(formData.message);
@@ -224,6 +225,12 @@ export default async function handler(req, res) {
     
     if (!email || !validateEmail(email)) {
       return res.status(400).json({ error: "Valid email is required" });
+    }
+
+    // Телефонът е задължителен: 6–15 цифри (покрива 088..., +359..., чужди номера)
+    const phoneDigits = (phone || "").replace(/\D/g, "");
+    if (!phone || phoneDigits.length < 6 || phoneDigits.length > 15) {
+      return res.status(400).json({ error: "Моля, въведете валиден телефонен номер." });
     }
 
     // ======== ЕДНОКРАТНИ (DISPOSABLE) ИМЕЙЛИ ========
@@ -261,6 +268,7 @@ export default async function handler(req, res) {
     const html = buildEmailTemplate({
       name,
       email,
+      phone,
       platforms,
       issue,
       message,

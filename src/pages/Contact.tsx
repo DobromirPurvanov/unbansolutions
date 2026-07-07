@@ -21,6 +21,7 @@ const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | u
 interface FormData {
   name: string;
   email: string;
+  phone: string;
   platforms: string[];
   issue: string;
   message: string;
@@ -166,6 +167,7 @@ export default function Contact() {
       const data = new FormData();
       data.append('name', formData.name);
       data.append('email', formData.email);
+      data.append('phone', formData.phone);
       data.append('platforms', formData.platforms.join(', '));
       data.append('issue', formData.issue);
       data.append('message', formData.message);
@@ -402,6 +404,10 @@ export default function Contact() {
                           <label className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">{t('cp.form.email')}</label>
                           <input type="email" name="email" value={formData.email} onChange={handleChange} required className="form-input" placeholder={t('cp.form.emailPh')} />
                         </div>
+                      </div>
+                      <div>
+                        <label className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">{t('cp.form.phone')}</label>
+                        <input type="tel" name="phone" inputMode="tel" value={formData.phone} onChange={handleChange} required className="form-input" placeholder={t('cp.form.phonePh')} />
                       </div>
                       <div className="grid sm:grid-cols-2 gap-3">
                         {/* Platform Multi-Select */}
