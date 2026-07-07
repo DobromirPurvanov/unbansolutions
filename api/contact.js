@@ -128,6 +128,41 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // ======== ДИАГНОСТИКА ========
+  // Отваря се в браузъра: /api/contact?diag=unban2026
+  // Показва версията, ключа, получателите И праща истински тестов мейл.
+  if (req.method === "GET") {
+    let diagToken = "";
+    try { diagToken = new URL(req.url, "http://x").searchParams.get("diag") || ""; } catch (e) {}
+    if (diagToken === "unban2026") {
+      const key = (process.env.RESEND_API_KEY || "").trim();
+      const out = {
+        версия: "diag-v1 / деплой от " + new Date().toISOString(),
+        resend_ключ: key ? key.slice(0, 8) + "… (" + key.length + " знака)" : "❌ ЛИПСВА ВЪВ VERCEL",
+        recaptcha_secret: (process.env.RECAPTCHA_SECRET_KEY || "").trim() ? "има" : "няма (мек режим)",
+        получатели: TO_EMAILS,
+        подател: FROM_EMAIL,
+      };
+      if (key) {
+        try {
+          const { data, error } = await resend.emails.send({
+            from: FROM_EMAIL,
+            to: TO_EMAILS,
+            subject: "🔧 ДИАГНОСТИКА — " + new Date().toLocaleString("bg-BG", { timeZone: "Europe/Sofia" }),
+            html: "<p>Тестов мейл от диагностиката на unbansolutions.com.<br>Ако четете това – изпращането и доставката работят.</p>",
+          });
+          out.тестов_мейл = error
+            ? { грешка: error.message || error.name || JSON.stringify(error) }
+            : { изпратен: true, id: data?.id, бележка: "Проверете Gmail (и Spam) + support@ кутията" };
+        } catch (e) {
+          out.тестов_мейл = { crash: e?.message || String(e) };
+        }
+      }
+      return res.status(200).json(out);
+    }
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
