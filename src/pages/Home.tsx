@@ -102,7 +102,7 @@ export default function Home() {
       />
       <main>
         {/* HERO */}
-        <section className="relative pt-24 pb-12 bg-gradient-to-br from-blue-50 via-white to-violet-50 overflow-hidden" style={{ minHeight: '70vh' }}>
+        <section className="relative pt-24 pb-16 bg-gradient-to-br from-blue-50 via-white to-violet-50 overflow-hidden">
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-200/30 rounded-full filter blur-[100px]" />
           <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-violet-200/30 rounded-full filter blur-[80px]" />
           <div className="absolute top-1/3 left-1/4 w-[200px] h-[200px] bg-cyan-200/20 rounded-full filter blur-[60px]" />
