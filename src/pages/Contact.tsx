@@ -125,7 +125,7 @@ export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    name: '', email: '', platforms: [], issue: '', message: '', files: [], _gotcha: ''
+    name: '', email: '', phone: '', platforms: [], issue: '', message: '', files: [], _gotcha: ''
   });
   const { t } = useLanguage();
 
@@ -237,7 +237,7 @@ export default function Contact() {
       setIsSubmitted(true);
       setTimeout(() => {
         setIsSubmitted(false);
-        setFormData({ name: '', email: '', platforms: [], issue: '', message: '', files: [], _gotcha: '' });
+        setFormData({ name: '', email: '', phone: '', platforms: [], issue: '', message: '', files: [], _gotcha: '' });
       }, 4000);
     } catch (err: any) {
       // GA4 + Meta Pixel - form submit error
