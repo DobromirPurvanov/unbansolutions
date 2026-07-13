@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -13,6 +14,7 @@ const Process = lazy(() => import('@/pages/Process'));
 const Contact = lazy(() => import('@/pages/Contact'));
 const Login = lazy(() => import('@/pages/Login'));
 const Register = lazy(() => import('@/pages/Register'));
+const Portal = lazy(() => import('@/pages/Portal'));
 const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const PaymentsRefunds = lazy(() => import('@/pages/PaymentsRefunds'));
@@ -27,6 +29,7 @@ const PageLoader = () => (
 export default function App() {
   return (
     <LanguageProvider>
+      <AuthProvider>
       <div className="min-h-[100dvh] bg-white text-slate-900">
         <ScrollToTop />
         <Navbar />
@@ -39,6 +42,7 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/portal" element={<Portal />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/payments-and-refunds" element={<PaymentsRefunds />} />
@@ -48,6 +52,7 @@ export default function App() {
         <Footer />
         <CookieConsent />
       </div>
+    </AuthProvider>
     </LanguageProvider>
   );
 }

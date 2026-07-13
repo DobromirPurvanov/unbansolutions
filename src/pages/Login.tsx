@@ -1,13 +1,42 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import { LogIn } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
-  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); };
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (!supabase) {
+      setError(t('auth.notConfigured'));
+      return;
+    }
+    setLoading(true);
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: formData.email.trim(),
+      password: formData.password,
+    });
+    setLoading(false);
+    if (authError) {
+      setError(
+        authError.message.includes('Invalid login credentials')
+          ? t('auth.wrongCredentials')
+          : authError.message.includes('Email not confirmed')
+            ? t('auth.emailNotConfirmed')
+            : t('auth.genericError')
+      );
+      return;
+    }
+    navigate('/portal');
+  };
 
   return (
     <>
@@ -33,7 +62,12 @@ export default function Login() {
                 <label className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">{t('lp.password')}</label>
                 <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required className="form-input" placeholder={t('lp.passwordPh')} />
               </div>
-              <button type="submit" className="w-full glow-btn text-xs py-2.5">{t('lp.submit')}</button>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-red-700 text-xs">{error}</div>
+              )}
+              <button type="submit" disabled={loading} className="w-full glow-btn text-xs py-2.5 disabled:opacity-60">
+                {loading ? t('auth.loading') : t('lp.submit')}
+              </button>
             </form>
           </div>
           <p className="text-center text-slate-700 text-xs mt-6">{t('lp.noAccount')} <Link to="/register" className="text-blue-700 hover:text-blue-900 transition-colors font-bold">{t('lp.register')}</Link></p>
