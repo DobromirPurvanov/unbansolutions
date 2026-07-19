@@ -26,6 +26,7 @@ for (const filename of await readdir(blogDirectory)) {
   const raw = await readFile(path.join(blogDirectory, filename), 'utf8');
   const { data, content } = matter(raw);
   const slug = filename.slice(0, -3);
+  const articleContent = content.replace(/^\s*#\s+[^\r\n]+(?:\r?\n)*/, '');
   const words = content.trim().split(/\s+/).filter(Boolean).length;
   const excerpt = data.excerpt || `${content.slice(0, 150)}…`;
   posts.push({
@@ -36,7 +37,7 @@ for (const filename of await readdir(blogDirectory)) {
     date: data.date || new Date().toISOString().slice(0, 10),
     readTime: data.readTime || `${Math.max(1, Math.ceil(words / 200))} мин`,
     content,
-    html: await marked.parse(content, { renderer }),
+    html: await marked.parse(articleContent, { renderer }),
     coverImage: data.coverImage,
     tags: Array.isArray(data.tags) ? data.tags : [],
   });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -7,6 +7,8 @@ import LanguageSwitcher from './LanguageSwitcher';
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const { t, lang } = useLanguage();
   const isBg = lang === 'bg';
@@ -22,15 +24,45 @@ export default function Navbar() {
     if (!isMenuOpen) return;
 
     const previousOverflow = document.body.style.overflow;
+    const desktopQuery = window.matchMedia('(min-width: 768px)');
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsMenuOpen(false);
+      if (event.key === 'Escape') {
+        setIsMenuOpen(false);
+        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = Array.from(
+        mobileMenuRef.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') || [],
+      ).filter((element) => element.tabIndex !== -1);
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    const handleDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setIsMenuOpen(false);
     };
 
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
+    desktopQuery.addEventListener('change', handleDesktop);
+    const focusFrame = window.requestAnimationFrame(() => {
+      mobileMenuRef.current?.querySelector<HTMLElement>('a[href]')?.focus();
+    });
     return () => {
+      window.cancelAnimationFrame(focusFrame);
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', handleKeyDown);
+      desktopQuery.removeEventListener('change', handleDesktop);
     };
   }, [isMenuOpen]);
 
@@ -93,6 +125,7 @@ export default function Navbar() {
           <div className="flex items-center gap-1 md:hidden">
             <LanguageSwitcher />
             <button
+              ref={menuButtonRef}
               type="button"
               className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-blue-600"
               onClick={() => setIsMenuOpen((open) => !open)}
@@ -112,11 +145,12 @@ export default function Navbar() {
         <>
           <button
             type="button"
+            tabIndex={-1}
             className="fixed inset-x-0 bottom-0 top-[68px] -z-10 bg-slate-950/25 md:hidden"
             onClick={() => setIsMenuOpen(false)}
             aria-label={isBg ? 'Затвори менюто' : 'Close navigation'}
           />
-          <div id="mobile-navigation" className="border-t border-slate-200 bg-white p-4 shadow-xl md:hidden">
+          <div ref={mobileMenuRef} id="mobile-navigation" className="border-t border-slate-200 bg-white p-4 shadow-xl md:hidden">
             <div className="mx-auto max-w-md">
               <Link
                 to="/contact"

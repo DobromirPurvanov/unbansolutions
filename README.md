@@ -26,12 +26,14 @@ Useful commands:
 - Unknown paths are served by the static `404.html`; there is no wildcard SPA rewrite that turns them into soft 404s.
 - Google Analytics and Meta Pixel load only after explicit consent. Consent can be withdrawn from the footer or Privacy Policy.
 - The contact endpoint accepts same-origin multipart requests, validates fields and file signatures, enforces size/rate limits and reads the Resend key only from the environment.
+- Contact messages are delivered only to `CONTACT_EMAIL`; the endpoint does not send an automatic reply to the submitter.
+- The former empty Supabase account shell (`/login`, `/register` and `/portal`) is intentionally retired; legacy URLs redirect to the contact funnel.
 
 ## Required Vercel environment
 
 Configure `RESEND_API_KEY` as a server-only secret. For a rate limit shared by all serverless instances, also configure `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` and a random `RATE_LIMIT_SALT`; the endpoint keeps a local safety limit if Redis is unavailable. `CONTACT_EMAIL`, `FROM_EMAIL` and `SITE_URL` may override their documented defaults. Analytics IDs are public and may be overridden with the `VITE_` variables in `.env.example`.
 
-After removing the previously embedded Resend key, rotate that key in Resend before the next deployment.
+Two Resend keys were embedded in earlier, already-published commits. Revoke both historical keys in Resend and configure a newly generated key before the next deployment. Rewriting Git history is optional cleanup and does not replace key revocation.
 
 ## Content rules
 

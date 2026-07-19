@@ -17,7 +17,7 @@ export default function Pricing() {
       price: '100 EUR',
       icon: MessageSquareText,
       features: [t('pp.p3.f1'), t('pp.p3.f2'), t('pp.p3.f3'), t('pp.p3.f4'), t('pp.p3.f5'), t('pp.p3.f6')],
-      href: '/contact?issue=other',
+      issue: 'other',
       featured: false,
     },
     {
@@ -29,7 +29,7 @@ export default function Pricing() {
       price: '250 EUR',
       icon: SearchCheck,
       features: [t('pp.p1.f1'), t('pp.p1.f2'), t('pp.p1.f3'), t('pp.p1.f4')],
-      href: '/contact?issue=restricted',
+      issue: 'restricted',
       featured: true,
     },
     {
@@ -41,7 +41,7 @@ export default function Pricing() {
       price: '500 EUR',
       icon: ShieldCheck,
       features: [t('pp.p2.f1'), t('pp.p2.f2'), t('pp.p2.f3'), t('pp.p2.f4'), t('pp.p2.f5'), t('pp.p2.f6')],
-      href: '/contact?issue=banned',
+      issue: '',
       featured: false,
     },
   ];
@@ -112,7 +112,7 @@ export default function Pricing() {
                     ))}
                   </ul>
 
-                  <Link to={plan.href} className={plan.featured ? 'primary-cta mt-7 w-full' : 'secondary-cta mt-7 w-full'}>
+                  <Link to="/contact" state={plan.issue ? { issue: plan.issue } : undefined} className={plan.featured ? 'primary-cta mt-7 w-full' : 'secondary-cta mt-7 w-full'}>
                     {isBg ? 'Изпрати казус за оценка' : 'Send a Case for Assessment'}
                     <ArrowRight size={17} aria-hidden="true" />
                   </Link>

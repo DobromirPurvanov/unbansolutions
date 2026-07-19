@@ -87,17 +87,17 @@ export default function Blog() {
                         className="w-full h-40 object-cover rounded-lg mb-4"
                       />
                     )}
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="flex items-center gap-1 text-slate-400 text-[11px]">
-                        <CalendarDays size={10} />
+                    <div className="mb-3 flex flex-wrap items-center gap-3 text-xs text-slate-600">
+                      <div className="flex items-center gap-1">
+                        <CalendarDays size={12} aria-hidden="true" />
                         <span>{new Date(post.date).toLocaleDateString(isBg ? 'bg-BG' : 'en-US', {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',
                         })}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-slate-400 text-[11px]">
-                        <Clock size={10} />
+                      <div className="flex items-center gap-1">
+                        <Clock size={12} aria-hidden="true" />
                         <span>{post.readTime}</span>
                       </div>
                     </div>

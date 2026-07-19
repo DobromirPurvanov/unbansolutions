@@ -13,6 +13,12 @@ export function sanitizeText(input, maxLength = 5000) {
   return input.trim().slice(0, maxLength);
 }
 
+export function sanitizeHeader(input, maxLength = 200) {
+  return sanitizeText(input, maxLength)
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/\s{2,}/g, ' ');
+}
+
 export function checkRateLimit(ip, now = Date.now()) {
   if (rateLimitStore.size > 2_000) {
     for (const [key, value] of rateLimitStore) {

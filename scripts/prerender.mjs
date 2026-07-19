@@ -75,7 +75,7 @@ function render(route) {
     .replace(/<meta name="twitter:description" content="[^"]*"\s*\/>/, `<meta name="twitter:description" content="${description}" />`);
   if (route.schema) {
     const json = JSON.stringify(route.schema).replaceAll('<', '\\u003c');
-    html = html.replace('</head>', `    <script id="page-schema" type="application/ld+json">${json}</script>\n  </head>`);
+    html = html.replace('</head>', `    <script id="route-schema" type="application/ld+json">${json}</script>\n  </head>`);
   }
   return html;
 }

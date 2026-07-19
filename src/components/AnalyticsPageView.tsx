@@ -8,10 +8,10 @@ export default function AnalyticsPageView() {
   useEffect(() => {
     applyConsent();
     const timer = window.setTimeout(() => {
-      trackPageView(`${location.pathname}${location.search}`, document.title);
+      trackPageView(location.pathname, document.title);
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [location.pathname, location.search]);
+  }, [location.pathname]);
 
   return null;
 }

@@ -1,21 +1,29 @@
 import Busboy from 'busboy';
 import { createHash } from 'node:crypto';
 import { buildEmailTemplate } from './email-template.js';
-import { RATE_LIMIT, checkRateLimit, sanitizeText, validateEmail } from './contact-utils.js';
+import { RATE_LIMIT, checkRateLimit, sanitizeHeader, sanitizeText, validateEmail } from './contact-utils.js';
 
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'support@unbansolutions.com';
-const FROM_EMAIL = process.env.FROM_EMAIL || 'Unban Solutions <noreply@unbansolutions.com>';
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL?.trim() || 'support@unbansolutions.com';
+const FROM_EMAIL = process.env.FROM_EMAIL?.trim() || 'Unban Solutions <noreply@unbansolutions.com>';
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024;
 const MAX_TOTAL_FILE_SIZE = 4 * 1024 * 1024;
 const MAX_FILES = 3;
 const MAX_BODY_SIZE = Math.floor(4.25 * 1024 * 1024);
+const MAX_FIELD_SIZE = 20_000;
 const ALLOWED_TYPES = new Set([
   'image/jpeg',
   'image/png',
   'image/gif',
   'image/webp',
   'application/pdf',
+]);
+const SAFE_FILE_EXTENSIONS = new Map([
+  ['image/jpeg', '.jpg'],
+  ['image/png', '.png'],
+  ['image/gif', '.gif'],
+  ['image/webp', '.webp'],
+  ['application/pdf', '.pdf'],
 ]);
 const ALLOWED_FIELDS = new Set(['name', 'email', 'platforms', 'issue', 'message', '_gotcha']);
 
@@ -31,6 +39,13 @@ function cleanFilename(input) {
     .replace(/[\\/\0-\x1f\x7f]/g, '-')
     .replace(/\.{2,}/g, '.');
   return filename || 'attachment';
+}
+
+function normalizeFilename(input, mimeType) {
+  const extension = SAFE_FILE_EXTENSIONS.get(mimeType) || '';
+  const cleaned = cleanFilename(input);
+  const withoutExtension = cleaned.replace(/\.[^.]*$/, '').replace(/[. ]+$/g, '') || 'attachment';
+  return `${withoutExtension.slice(0, Math.max(1, 120 - extension.length))}${extension}`;
 }
 
 function hasValidSignature(buffer, mimeType) {
@@ -49,12 +64,12 @@ function getClientIp(req) {
 }
 
 async function checkDistributedRateLimit(ip) {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
   if (!url || !token) return null;
 
   const keyHash = createHash('sha256')
-    .update(`${process.env.RATE_LIMIT_SALT || process.env.SITE_URL || 'unban-solutions'}:${ip}`)
+    .update(`${process.env.RATE_LIMIT_SALT?.trim() || process.env.SITE_URL?.trim() || 'unban-solutions'}:${ip}`)
     .digest('hex')
     .slice(0, 32);
   const key = `contact-rate:${keyHash}`;
@@ -92,14 +107,14 @@ function isAllowedOrigin(req) {
   try {
     const originHost = new URL(origin).host;
     const requestHost = sanitizeText(req.headers.host, 255);
-    const canonicalHost = new URL(process.env.SITE_URL || 'https://www.unbansolutions.com').host;
+    const canonicalHost = new URL(process.env.SITE_URL?.trim() || 'https://www.unbansolutions.com').host;
     return originHost === requestHost || originHost === canonicalHost || originHost === 'unbansolutions.com';
   } catch {
     return false;
   }
 }
 
-function parseForm(req) {
+export function parseForm(req) {
   return new Promise((resolve, reject) => {
     const contentType = req.headers['content-type'] || '';
     if (!contentType.toLowerCase().startsWith('multipart/form-data')) {
@@ -121,7 +136,7 @@ function parseForm(req) {
           files: MAX_FILES,
           fileSize: MAX_FILE_SIZE,
           fields: ALLOWED_FIELDS.size,
-          fieldSize: 5000,
+          fieldSize: MAX_FIELD_SIZE,
           parts: ALLOWED_FIELDS.size + MAX_FILES,
         },
       });
@@ -141,7 +156,7 @@ function parseForm(req) {
 
     busboy.on('file', (_fieldname, file, info) => {
       const mimeType = sanitizeText(info.mimeType, 100).toLowerCase();
-      const filename = cleanFilename(info.filename);
+      const filename = normalizeFilename(info.filename, mimeType);
       const chunks = [];
       let fileSize = 0;
 
@@ -168,11 +183,15 @@ function parseForm(req) {
           fail(new ClientError(400, `Съдържанието на файла ${filename} не отговаря на типа му.`));
           return;
         }
-        attachments.push({ filename, content: buffer.toString('base64') });
+        attachments.push({ filename, content: buffer.toString('base64'), contentType: mimeType });
       });
     });
 
-    busboy.on('field', (fieldname, value) => {
+    busboy.on('field', (fieldname, value, info) => {
+      if (info.valueTruncated) {
+        fail(new ClientError(413, 'Текстът във формата е твърде дълъг.'));
+        return;
+      }
       if (ALLOWED_FIELDS.has(fieldname)) data[fieldname] = value;
     });
     busboy.on('filesLimit', () => fail(new ClientError(413, `Можете да прикачите до ${MAX_FILES} файла.`)));
@@ -225,7 +244,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true });
     }
 
-    const name = sanitizeText(formData.name, 120);
+    const name = sanitizeHeader(formData.name, 120);
     const email = sanitizeText(formData.email, 254).toLowerCase();
     const platforms = sanitizeText(formData.platforms, 300);
     const issue = sanitizeText(formData.issue, 200);
@@ -236,7 +255,7 @@ export default async function handler(req, res) {
     if (!validateEmail(email)) throw new ClientError(400, 'Моля, въведете валиден имейл адрес.');
     if (message.length < 10) throw new ClientError(400, 'Съобщението трябва да е поне 10 символа.');
 
-    const apiKey = process.env.RESEND_API_KEY;
+    const apiKey = process.env.RESEND_API_KEY?.trim();
     if (!apiKey) {
       console.error('[Contact API] RESEND_API_KEY is not configured.');
       return res.status(503).json({ error: 'Формата временно не е достъпна. Моля, свържете се по телефон или имейл.' });

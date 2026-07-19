@@ -21,12 +21,12 @@ export default function Services() {
   const isBg = lang === 'bg';
 
   const services = [
-    { icon: Shield, title: t('sp.s1.title'), desc: t('sp.s1.desc'), features: [t('sp.s1.f1'), t('sp.s1.f2'), t('sp.s1.f3'), t('sp.s1.f4')], href: '/contact?issue=banned' },
-    { icon: Lock, title: t('sp.s2.title'), desc: t('sp.s2.desc'), features: [t('sp.s2.f1'), t('sp.s2.f2'), t('sp.s2.f3'), t('sp.s2.f4')], href: '/contact?issue=shadowban' },
-    { icon: Eye, title: t('sp.s3.title'), desc: t('sp.s3.desc'), features: [t('sp.s3.f1'), t('sp.s3.f2'), t('sp.s3.f3'), t('sp.s3.f4')], href: '/contact?issue=hacked' },
-    { icon: TrendingUp, title: t('sp.s4.title'), desc: t('sp.s4.desc'), features: [t('sp.s4.f1'), t('sp.s4.f2'), t('sp.s4.f3'), t('sp.s4.f4')], href: '/contact?issue=other' },
-    { icon: FileText, title: t('sp.s5.title'), desc: t('sp.s5.desc'), features: [t('sp.s5.f1'), t('sp.s5.f2'), t('sp.s5.f3'), t('sp.s5.f4')], href: '/contact?issue=restricted' },
-    { icon: Scale, title: t('sp.s6.title'), desc: t('sp.s6.desc'), features: [t('sp.s6.f1'), t('sp.s6.f2'), t('sp.s6.f3'), t('sp.s6.f4')], href: '/contact?issue=other' },
+    { icon: Shield, title: t('sp.s1.title'), desc: t('sp.s1.desc'), features: [t('sp.s1.f1'), t('sp.s1.f2'), t('sp.s1.f3'), t('sp.s1.f4')], issue: 'banned' },
+    { icon: Lock, title: t('sp.s2.title'), desc: t('sp.s2.desc'), features: [t('sp.s2.f1'), t('sp.s2.f2'), t('sp.s2.f3'), t('sp.s2.f4')], issue: 'shadowban' },
+    { icon: Eye, title: t('sp.s3.title'), desc: t('sp.s3.desc'), features: [t('sp.s3.f1'), t('sp.s3.f2'), t('sp.s3.f3'), t('sp.s3.f4')], issue: 'hacked' },
+    { icon: TrendingUp, title: t('sp.s4.title'), desc: t('sp.s4.desc'), features: [t('sp.s4.f1'), t('sp.s4.f2'), t('sp.s4.f3'), t('sp.s4.f4')], issue: 'other' },
+    { icon: FileText, title: t('sp.s5.title'), desc: t('sp.s5.desc'), features: [t('sp.s5.f1'), t('sp.s5.f2'), t('sp.s5.f3'), t('sp.s5.f4')], issue: 'restricted' },
+    { icon: Scale, title: t('sp.s6.title'), desc: t('sp.s6.desc'), features: [t('sp.s6.f1'), t('sp.s6.f2'), t('sp.s6.f3'), t('sp.s6.f4')], issue: 'other' },
   ];
 
   const audiences = [
@@ -80,7 +80,7 @@ export default function Services() {
                       </li>
                     ))}
                   </ul>
-                  <Link to={service.href} className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-900">
+                  <Link to="/contact" state={{ issue: service.issue }} className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-900">
                     {isBg ? 'Оцени този казус' : 'Assess this case'} <ArrowRight size={16} aria-hidden="true" />
                   </Link>
                 </article>

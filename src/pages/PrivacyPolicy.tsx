@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
     },
     {
       title: '4. Получатели и услуги на трети страни',
-      content: <p>Данни могат да се обработват от доставчиците, необходими за работата на сайта и комуникацията: Vercel (хостинг) и Resend (изпращане на имейл). Google Analytics и Meta Pixel се зареждат само след изрично съгласие. Когато доставчик обработва данни извън ЕИП, се прилагат наличните по закон механизми за трансфер.</p>,
+      content: <p>Данни могат да се обработват от доставчиците, необходими за работата на сайта и комуникацията: Vercel (хостинг), Resend (изпращане на имейл) и, когато е конфигуриран, Upstash (псевдонимизиран хеш на IP адреса за разпределена защита от злоупотреби с 15-минутен срок). Google Analytics и Meta Pixel се зареждат само след изрично съгласие. Когато доставчик обработва данни извън ЕИП, се прилагат наличните по закон механизми за трансфер.</p>,
     },
     {
       title: '5. Срокове за съхранение',
@@ -50,7 +50,7 @@ export default function PrivacyPolicy() {
     },
     {
       title: '4. Recipients and third-party services',
-      content: <p>Data may be processed by providers needed to run the website and communications: Vercel (hosting) and Resend (email delivery). Google Analytics and Meta Pixel load only after explicit consent. Where a provider processes data outside the EEA, legally available transfer mechanisms are used.</p>,
+      content: <p>Data may be processed by providers needed to run the website and communications: Vercel (hosting), Resend (email delivery) and, when configured, Upstash (a pseudonymised IP-address hash for distributed abuse protection with a 15-minute lifetime). Google Analytics and Meta Pixel load only after explicit consent. Where a provider processes data outside the EEA, legally available transfer mechanisms are used.</p>,
     },
     {
       title: '5. Retention',

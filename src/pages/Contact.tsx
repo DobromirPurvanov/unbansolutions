@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -39,16 +39,28 @@ interface SelectOption {
 const ISSUE_VALUES = ['banned', 'suspended', 'shadowban', 'restricted', 'hacked', 'other'];
 const PLATFORM_VALUES = ['instagram', 'tiktok', 'youtube', 'x', 'facebook', 'linkedin', 'other'];
 
+function getEnglishSubmitError(status: number) {
+  if (status === 400) return 'Please check the fields and attachments, then try again.';
+  if (status === 403) return 'This request could not be verified. Please refresh the page and try again.';
+  if (status === 413) return 'The selected files are too large.';
+  if (status === 415) return 'The submitted form or attachment format is not supported.';
+  if (status === 429) return 'Too many attempts. Please wait a moment and try again.';
+  if (status === 502) return 'The email service could not send your message. Please try again or call us.';
+  if (status === 503) return 'The form is temporarily unavailable. Please contact us by phone or email.';
+  return 'Unable to send your case. Please try again.';
+}
+
 export default function Contact() {
   const { t, lang } = useLanguage();
   const isBg = lang === 'bg';
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const stepHeadingRef = useRef<HTMLHeadingElement>(null);
   const hasTrackedStart = useRef(false);
 
-  const requestedIssue = searchParams.get('issue') || '';
-  const requestedPlatform = searchParams.get('platform') || '';
+  const routeState = location.state as { issue?: string; platform?: string } | null;
+  const requestedIssue = routeState?.issue || '';
+  const requestedPlatform = routeState?.platform || '';
   const [formStep, setFormStep] = useState<1 | 2>(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,7 +99,7 @@ export default function Contact() {
 
   const contactInfo = [
     { icon: Mail, label: t('cp.info.email'), value: t('cp.info.emailVal'), href: 'mailto:support@unbansolutions.com' },
-    { icon: Phone, label: t('cp.info.phone'), value: t('cp.info.phoneVal'), href: 'tel:0883391411' },
+    { icon: Phone, label: t('cp.info.phone'), value: t('cp.info.phoneVal'), href: 'tel:+359883391411' },
     { icon: MapPin, label: t('cp.info.address'), value: `${t('cp.info.addrVal')}\n${t('cp.info.addrVal2')}` },
     { icon: Clock, label: t('cp.info.availability'), value: `${t('cp.info.availVal')}\n${t('cp.info.availVal2')}` },
   ];
@@ -95,7 +107,7 @@ export default function Contact() {
   const markFormStarted = () => {
     if (hasTrackedStart.current) return;
     hasTrackedStart.current = true;
-    trackEvent('contact_form_started', { source: requestedIssue ? 'prefilled_case' : 'contact_page' });
+    trackEvent('contact_form_started');
   };
 
   const focusStepHeading = () => {
@@ -115,11 +127,7 @@ export default function Contact() {
 
     setStepError('');
     setFormStep(2);
-    trackEvent('contact_form_step_completed', {
-      step: 1,
-      platforms_count: formData.platforms.length,
-      issue_type: formData.issue,
-    });
+    trackEvent('contact_form_step_completed', { step: 1 });
     focusStepHeading();
   };
 
@@ -185,14 +193,10 @@ export default function Contact() {
       }
 
       if (!response.ok) {
-        throw new Error(result.error || (isBg ? 'Грешка при изпращане.' : 'Unable to send your case.'));
+        throw new Error(isBg ? (result.error || 'Грешка при изпращане.') : getEnglishSubmitError(response.status));
       }
 
-      trackEvent('contact_form_submitted', {
-        platforms_count: formData.platforms.length,
-        issue_type: formData.issue,
-        has_attachments: formData.files.length > 0,
-      }, 'Lead');
+      trackEvent('contact_form_submitted', {}, 'Lead');
       setIsSubmitted(true);
       focusStepHeading();
     } catch (error: unknown) {
@@ -553,7 +557,10 @@ export default function Contact() {
                                 type="file"
                                 multiple
                                 accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
-                                onChange={(event) => addFiles(event.target.files)}
+                                onChange={(event) => {
+                                  addFiles(event.target.files);
+                                  event.currentTarget.value = '';
+                                }}
                                 className="sr-only"
                                 tabIndex={-1}
                               />

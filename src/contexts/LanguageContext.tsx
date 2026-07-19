@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 
 type Lang = 'bg' | 'en';
 
@@ -19,9 +19,6 @@ const translations: Record<Lang, Record<string, string>> = {
     'nav.contact': 'Контакти',
     'nav.help': 'Изпрати казус',
     'hero.call': 'Обади се',
-    'nav.login': 'Вход',
-    'nav.register': 'Регистрация',
-    'nav.logout': 'Изход',
     'nav.lang': 'EN',
 
     // Hero
@@ -77,20 +74,6 @@ const translations: Record<Lang, Record<string, string>> = {
     'res.titleSpan': 'параметри',
     'res.stat2': 'Обичаен първи отговор',
     'res.stat3': 'Поддържани платформи',
-
-    // Testimonials
-    'test.label': 'Отзиви',
-    'test.title': 'Доверието на ',
-    'test.titleSpan': 'клиенти',
-    'test.q1': 'Възстановиха акаунта на марката ни за 72 часа. Невероятни!',
-    'test.n1': 'Мария Петрова',
-    'test.t1': 'Маркетинг директор',
-    'test.q2': 'След месеци разочарование, възстановиха акаунта ми.',
-    'test.n2': 'Иван Стоянов',
-    'test.t2': 'Създател на съдържание',
-    'test.q3': 'Професионални, бързи и дискретни. Препоръчвам!',
-    'test.n3': 'Гергана Димитрова',
-    'test.t3': 'Собственик на онлайн магазин',
 
     // CTA
     'cta.title': 'Разкажете ни какво се е случило',
@@ -256,7 +239,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'cp.info.address': 'Адрес',
     'cp.info.availability': 'Наличност',
     'cp.info.emailVal': 'support@unbansolutions.com',
-    'cp.info.phoneVal': '0883 391411',
+    'cp.info.phoneVal': '+359 883 391 411',
     'cp.info.addrVal': 'София',
     'cp.info.addrVal2': 'Шипченски Проход 18',
     'cp.info.availVal': 'Онлайн форма',
@@ -296,32 +279,6 @@ const translations: Record<Lang, Record<string, string>> = {
     'cp.emergency.desc': 'Приоритетно обслужване (може да включва допълнителни такси)',
     'cp.emergency.btn': 'Позвъни сега',
 
-    // Login
-    'lp.title': 'Добре дошли',
-    'lp.subtitle': 'Вход в клиентския портал',
-    'lp.email': 'Имейл',
-    'lp.emailPh': 'ваш@имейл.com',
-    'lp.password': 'Парола',
-    'lp.passwordPh': 'Парола',
-    'lp.submit': 'Вход',
-    'lp.noAccount': 'Нямате акаунт?',
-    'lp.register': 'Създайте',
-
-    // Register
-    'rp.title': 'Създай акаунт',
-    'rp.subtitle': 'Клиентски портал',
-    'rp.name': 'Име',
-    'rp.namePh': 'Вашето име',
-    'rp.email': 'Имейл',
-    'rp.emailPh': 'ваш@имейл.com',
-    'rp.password': 'Парола',
-    'rp.passwordPh': 'Парола',
-    'rp.confirm': 'Потвърди парола',
-    'rp.confirmPh': 'Потвърди',
-    'rp.submit': 'Създай',
-    'rp.hasAccount': 'Имате акаунт?',
-    'rp.login': 'Вход',
-
     // Legal pages
     'leg.privacy': 'Политика за ',
     'leg.privacySpan': 'поверителност',
@@ -356,9 +313,6 @@ const translations: Record<Lang, Record<string, string>> = {
     'nav.contact': 'Contact',
     'nav.help': 'Send a Case',
     'hero.call': 'Call us',
-    'nav.login': 'Login',
-    'nav.register': 'Register',
-    'nav.logout': 'Logout',
     'nav.lang': 'BG',
 
     // Hero
@@ -414,20 +368,6 @@ const translations: Record<Lang, Record<string, string>> = {
     'res.titleSpan': 'parameters',
     'res.stat2': 'Typical first response',
     'res.stat3': 'Supported platforms',
-
-    // Testimonials
-    'test.label': 'Testimonials',
-    'test.title': 'Built Around ',
-    'test.titleSpan': 'Clients',
-    'test.q1': 'They recovered our brand account in 72 hours. Incredible!',
-    'test.n1': 'Maria Petrova',
-    'test.t1': 'Marketing Director',
-    'test.q2': 'After months of frustration, they recovered my account.',
-    'test.n2': 'Ivan Stoyanov',
-    'test.t2': 'Content Creator',
-    'test.q3': 'Professional, fast, and discreet. Highly recommend!',
-    'test.n3': 'Gergana Dimitrova',
-    'test.t3': 'Online Store Owner',
 
     // CTA
     'cta.title': 'Tell Us What Happened',
@@ -593,7 +533,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'cp.info.address': 'Address',
     'cp.info.availability': 'Availability',
     'cp.info.emailVal': 'support@unbansolutions.com',
-    'cp.info.phoneVal': '0883 391411',
+    'cp.info.phoneVal': '+359 883 391 411',
     'cp.info.addrVal': 'Sofia',
     'cp.info.addrVal2': 'Shipchenski Prohod 18',
     'cp.info.availVal': 'Online form',
@@ -633,32 +573,6 @@ const translations: Record<Lang, Record<string, string>> = {
     'cp.emergency.desc': 'Priority handling (may include additional fees)',
     'cp.emergency.btn': 'Call Now',
 
-    // Login
-    'lp.title': 'Welcome',
-    'lp.subtitle': 'Client Portal Login',
-    'lp.email': 'Email',
-    'lp.emailPh': 'your@email.com',
-    'lp.password': 'Password',
-    'lp.passwordPh': 'Password',
-    'lp.submit': 'Login',
-    'lp.noAccount': "Don't have an account?",
-    'lp.register': 'Sign Up',
-
-    // Register
-    'rp.title': 'Create Account',
-    'rp.subtitle': 'Client Portal',
-    'rp.name': 'Name',
-    'rp.namePh': 'Your name',
-    'rp.email': 'Email',
-    'rp.emailPh': 'your@email.com',
-    'rp.password': 'Password',
-    'rp.passwordPh': 'Password',
-    'rp.confirm': 'Confirm Password',
-    'rp.confirmPh': 'Confirm',
-    'rp.submit': 'Create Account',
-    'rp.hasAccount': 'Already have an account?',
-    'rp.login': 'Login',
-
     // Legal pages
     'leg.privacy': 'Privacy ',
     'leg.privacySpan': 'Policy',
@@ -689,14 +603,24 @@ const LanguageContext = createContext<LangCtx | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(() => {
-    const saved = localStorage.getItem('lang') as Lang;
-    return saved === 'en' ? 'en' : 'bg';
+    try {
+      return localStorage.getItem('lang') === 'en' ? 'en' : 'bg';
+    } catch {
+      return 'bg';
+    }
   });
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
-    localStorage.setItem('lang', l);
-    document.documentElement.lang = l;
+    try {
+      localStorage.setItem('lang', l);
+    } catch {
+      // The language still changes for this page when storage is unavailable.
+    }
   }, []);
 
   const t = useCallback((key: string): string => {

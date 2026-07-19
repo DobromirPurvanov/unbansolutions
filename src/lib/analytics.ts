@@ -71,16 +71,23 @@ export function saveConsent(analytics: boolean, marketing: boolean) {
 }
 
 function loadGoogleAnalytics() {
-  if (!GA_ID || document.getElementById('unban-ga-script')) return;
+  if (!GA_ID) return;
 
   const browserWindow = getBrowserWindow();
   browserWindow.dataLayer = browserWindow.dataLayer || [];
   browserWindow.gtag = browserWindow.gtag || ((...args: unknown[]) => browserWindow.dataLayer?.push(args));
-  browserWindow.gtag('consent', 'default', {
+  const grantedConsent = {
     analytics_storage: 'granted',
     ad_storage: 'denied',
     ad_user_data: 'denied',
     ad_personalization: 'denied',
+  };
+  if (document.getElementById('unban-ga-script')) {
+    browserWindow.gtag('consent', 'update', grantedConsent);
+    return;
+  }
+  browserWindow.gtag('consent', 'default', {
+    ...grantedConsent,
   });
   browserWindow.gtag('js', new Date());
   browserWindow.gtag('config', GA_ID, {
@@ -97,7 +104,7 @@ function loadGoogleAnalytics() {
 }
 
 function loadMetaPixel() {
-  if (!META_PIXEL_ID || document.getElementById('unban-meta-pixel')) return;
+  if (!META_PIXEL_ID) return;
 
   const browserWindow = getBrowserWindow();
   if (!browserWindow.fbq) {
@@ -112,6 +119,7 @@ function loadMetaPixel() {
   }
 
   browserWindow.fbq('consent', 'grant');
+  if (document.getElementById('unban-meta-pixel')) return;
   browserWindow.fbq('init', META_PIXEL_ID);
   const script = document.createElement('script');
   script.id = 'unban-meta-pixel';

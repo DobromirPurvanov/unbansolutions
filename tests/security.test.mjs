@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import test from 'node:test';
-import contactHandler from '../api/contact.js';
-import { checkRateLimit, sanitizeText, validateEmail } from '../api/contact-utils.js';
+import contactHandler, { parseForm } from '../api/contact.js';
+import { checkRateLimit, sanitizeHeader, sanitizeText, validateEmail } from '../api/contact-utils.js';
 import { buildEmailTemplate, escapeHtml } from '../api/email-template.js';
 
 test('email validation accepts normal addresses and rejects header injection', () => {
@@ -16,6 +16,11 @@ test('text sanitization trims and applies the requested length limit', () => {
   assert.equal(sanitizeText('  hello  ', 20), 'hello');
   assert.equal(sanitizeText('123456', 4), '1234');
   assert.equal(sanitizeText(null, 10), '');
+});
+
+test('email header values cannot inject additional headers', () => {
+  assert.equal(sanitizeHeader('Client\r\nBcc: attacker@example.com'), 'Client Bcc: attacker@example.com');
+  assert.equal(sanitizeHeader('  Client   Name  '), 'Client Name');
 });
 
 test('email template escapes all user-controlled HTML', () => {
@@ -49,7 +54,43 @@ test('rate limiter rejects the sixth request in one window', () => {
 test('server source contains no embedded Resend API key', async () => {
   const source = await readFile(new URL('../api/contact.js', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /re_[A-Za-z0-9]{20,}/);
-  assert.match(source, /process\.env\.RESEND_API_KEY/);
+  assert.match(source, /process\.env\.RESEND_API_KEY\?\.trim\(\)/);
+});
+
+test('analytics receives generic funnel events without case metadata', async () => {
+  const contact = await readFile(new URL('../src/pages/Contact.tsx', import.meta.url), 'utf8');
+  const pageViews = await readFile(new URL('../src/components/AnalyticsPageView.tsx', import.meta.url), 'utf8');
+  const cookieConsent = await readFile(new URL('../src/components/CookieConsent.tsx', import.meta.url), 'utf8');
+  const analytics = await readFile(new URL('../src/lib/analytics.ts', import.meta.url), 'utf8');
+  const entry = await readFile(new URL('../src/main.tsx', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(contact, /issue_type|platforms_count|has_attachments/);
+  assert.doesNotMatch(pageViews, /location\.search/);
+  assert.doesNotMatch(cookieConsent, /location\.search/);
+  assert.match(entry, /searchParams\.delete\('issue'\)/);
+  assert.match(entry, /searchParams\.delete\('platform'\)/);
+  assert.match(analytics, /getElementById\('unban-ga-script'\)[\s\S]*gtag\('consent', 'update', grantedConsent\)/);
+  assert.ok(
+    analytics.indexOf("browserWindow.fbq('consent', 'grant')")
+      < analytics.indexOf("getElementById('unban-meta-pixel')"),
+  );
+
+  for (const relativePath of ['../src/pages/Home.tsx', '../src/pages/Services.tsx', '../src/pages/Pricing.tsx']) {
+    const source = await readFile(new URL(relativePath, import.meta.url), 'utf8');
+    assert.doesNotMatch(source, /\/contact\?(?:issue|platform)=/);
+  }
+});
+
+test('blog output has one page heading and explicit article typography', async () => {
+  const generated = await readFile(new URL('../src/generated/blog-posts.ts', import.meta.url), 'utf8');
+  const styles = await readFile(new URL('../src/index.css', import.meta.url), 'utf8');
+  const prerender = await readFile(new URL('../scripts/prerender.mjs', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(generated, /"html": "\\u003ch1>/);
+  assert.match(styles, /\.prose-blog h2/);
+  assert.match(styles, /\.prose-blog ul/);
+  assert.match(prerender, /id="route-schema"/);
+  assert.doesNotMatch(prerender, /id="page-schema"/);
 });
 
 test('sitemap article URLs exactly match the markdown slugs', async () => {
@@ -108,6 +149,33 @@ test('contact endpoint rejects a spoofed image by file signature', async () => {
   await contactHandler(request, response);
   assert.equal(response.statusCode, 400);
   assert.match(response.body.error, /не отговаря на типа му/);
+});
+
+test('attachment filenames and content types follow the verified MIME type', async () => {
+  const request = multipartRequest([
+    'Content-Disposition: form-data; name="name"\r\n\r\nTest Client',
+    'Content-Disposition: form-data; name="email"\r\n\r\nclient@example.com',
+    'Content-Disposition: form-data; name="message"\r\n\r\nThis is a sufficiently long test message.',
+    'Content-Disposition: form-data; name="attachments"; filename="active.html"\r\nContent-Type: image/gif\r\n\r\nGIF89a-safe-test',
+  ]);
+  const parsed = await parseForm(request);
+  assert.equal(parsed.attachments.length, 1);
+  assert.equal(parsed.attachments[0].filename, 'active.gif');
+  assert.equal(parsed.attachments[0].contentType, 'image/gif');
+});
+
+test('multipart text preserves 5,000 Cyrillic characters and rejects truncation', async () => {
+  const validMessage = 'я'.repeat(5_000);
+  const validRequest = multipartRequest([
+    `Content-Disposition: form-data; name="message"\r\n\r\n${validMessage}`,
+  ]);
+  const parsed = await parseForm(validRequest);
+  assert.equal(parsed.message, validMessage);
+
+  const oversizedRequest = multipartRequest([
+    `Content-Disposition: form-data; name="message"\r\n\r\n${'a'.repeat(20_001)}`,
+  ]);
+  await assert.rejects(parseForm(oversizedRequest), (error) => error.status === 413);
 });
 
 test('contact endpoint fails safely when the email provider key is absent', async () => {

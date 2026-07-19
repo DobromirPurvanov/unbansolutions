@@ -25,19 +25,19 @@ export default function Home() {
       icon: Ban,
       title: isBg ? 'Спрян или изтрит профил' : 'Suspended or deleted account',
       text: isBg ? 'Оценка на ограничението и възможните официални канали.' : 'Assessment of the restriction and available official channels.',
-      href: '/contact?issue=banned',
+      issue: 'banned',
     },
     {
       icon: KeyRound,
       title: isBg ? 'Хакнат или откраднат профил' : 'Hacked or stolen account',
       text: isBg ? 'Подреждане на доказателствата и стъпките за възстановяване.' : 'Organising the evidence and recovery steps.',
-      href: '/contact?issue=hacked',
+      issue: 'hacked',
     },
     {
       icon: EyeOff,
       title: isBg ? 'Shadowban или ограничения' : 'Shadowban or restrictions',
       text: isBg ? 'Преглед на видимостта, функциите и приложимите правила.' : 'Review of visibility, features and relevant policies.',
-      href: '/contact?issue=shadowban',
+      issue: 'shadowban',
     },
   ];
 
@@ -158,8 +158,9 @@ export default function Home() {
               <div className="mt-4 space-y-2.5">
                 {commonCases.map((item) => (
                   <Link
-                    key={item.href}
-                    to={item.href}
+                    key={item.issue}
+                    to="/contact"
+                    state={{ issue: item.issue }}
                     className="group flex min-h-16 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition-colors duration-200 hover:border-blue-300 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                   >
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-700 shadow-sm ring-1 ring-slate-200">
@@ -215,7 +216,7 @@ export default function Home() {
 
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               {commonCases.map((item) => (
-                <Link key={item.href} to={item.href} className="case-card group">
+                <Link key={item.issue} to="/contact" state={{ issue: item.issue }} className="case-card group">
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
                     <item.icon size={22} aria-hidden="true" />
                   </span>

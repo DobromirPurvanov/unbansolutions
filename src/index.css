@@ -208,6 +208,123 @@
   textarea.form-input {
     min-height: 132px;
   }
+
+  .prose-blog {
+    color: #334155;
+    font-size: 1rem;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+  }
+
+  .prose-blog > :first-child {
+    margin-top: 0;
+  }
+
+  .prose-blog > :last-child {
+    margin-bottom: 0;
+  }
+
+  .prose-blog h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: clamp(1.5rem, 4vw, 1.875rem);
+    font-weight: 800;
+    line-height: 1.25;
+    color: #0f172a;
+  }
+
+  .prose-blog h3 {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #0f172a;
+  }
+
+  .prose-blog p,
+  .prose-blog ul,
+  .prose-blog ol,
+  .prose-blog blockquote,
+  .prose-blog pre {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .prose-blog ul,
+  .prose-blog ol {
+    padding-left: 1.5rem;
+  }
+
+  .prose-blog ul {
+    list-style: disc;
+  }
+
+  .prose-blog ol {
+    list-style: decimal;
+  }
+
+  .prose-blog li {
+    margin-top: 0.4rem;
+    padding-left: 0.25rem;
+  }
+
+  .prose-blog li::marker {
+    color: #1d4ed8;
+    font-weight: 700;
+  }
+
+  .prose-blog a {
+    color: #1d4ed8;
+    font-weight: 650;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .prose-blog a:hover {
+    color: #1e3a8a;
+  }
+
+  .prose-blog strong {
+    color: #0f172a;
+    font-weight: 750;
+  }
+
+  .prose-blog blockquote {
+    border-left: 4px solid #60a5fa;
+    background: #eff6ff;
+    padding: 1rem 1.25rem;
+    color: #1e3a8a;
+  }
+
+  .prose-blog hr {
+    margin: 2.5rem 0;
+    border: 0;
+    border-top: 1px solid #cbd5e1;
+  }
+
+  .prose-blog code {
+    border-radius: 0.25rem;
+    background: #f1f5f9;
+    padding: 0.125rem 0.3rem;
+    color: #0f172a;
+    font-size: 0.9em;
+  }
+
+  .prose-blog pre {
+    overflow-x: auto;
+    border-radius: 0.75rem;
+    background: #0f172a;
+    padding: 1rem;
+    color: #e2e8f0;
+  }
+
+  .prose-blog pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+  }
 }
 
 @media (hover: hover) {

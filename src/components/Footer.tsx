@@ -14,7 +14,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-2 lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src="/assets/unbansolutions.png" alt="Unban Solutions" className="h-8 w-auto bg-white rounded-md p-0.5" width="32" height="32" loading="lazy" />
+              <img src="/assets/unbansolutions.png" alt="Unban Solutions" className="h-8 w-auto bg-white rounded-md p-0.5" width="250" height="92" loading="lazy" />
             </Link>
             <p className="mb-4 max-w-sm text-sm leading-6 text-slate-300">{t('foot.desc')}</p>
             <div className="flex items-center gap-3">
@@ -56,7 +56,7 @@ export default function Footer() {
             <h3 className="font-bold text-sm mb-4">{t('nav.contact')}</h3>
             <ul className="space-y-2">
               <li><a href="mailto:support@unbansolutions.com" className="flex min-h-8 items-center gap-2 text-sm text-slate-300 hover:text-white"><Mail size={14} /> support@unbansolutions.com</a></li>
-              <li><a href="tel:0883391411" className="flex min-h-8 items-center gap-2 text-sm text-slate-300 hover:text-white"><Phone size={14} /> 0883 391411</a></li>
+              <li><a href="tel:+359883391411" className="flex min-h-8 items-center gap-2 text-sm text-slate-300 hover:text-white"><Phone size={14} /> +359 883 391 411</a></li>
               <li className="flex items-start gap-2 text-sm leading-6 text-slate-300"><MapPin size={14} className="mt-1 flex-shrink-0" /> София, Шипченски Проход 18</li>
             </ul>
           </div>

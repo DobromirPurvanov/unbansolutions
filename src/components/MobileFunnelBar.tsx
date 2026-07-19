@@ -22,7 +22,7 @@ export default function MobileFunnelBar() {
       >
         <div className="mx-auto flex max-w-md items-center gap-2">
           <a
-            href="tel:0883391411"
+            href="tel:+359883391411"
             className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-800"
             aria-label={isBg ? 'Обадете се' : 'Call us'}
             onClick={() => trackEvent('phone_cta_clicked', { location: 'mobile_funnel_bar' }, 'Contact')}

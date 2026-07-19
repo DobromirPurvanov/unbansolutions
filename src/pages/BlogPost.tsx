@@ -38,7 +38,7 @@ export default function BlogPost() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" role="status" aria-label={isBg ? 'Зареждане' : 'Loading'} />
       </div>
     );
   }
@@ -89,7 +89,7 @@ export default function BlogPost() {
               {post.title}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-slate-500 text-xs">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
               <div className="flex items-center gap-1">
                 <CalendarDays size={12} />
                 <span>{new Date(post.date).toLocaleDateString(isBg ? 'bg-BG' : 'en-US', {
