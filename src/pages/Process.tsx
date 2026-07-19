@@ -1,121 +1,94 @@
-import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRight, CheckCircle2, ClipboardList, Clock3, Rocket, Search, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
-import { Search, ClipboardList, Rocket, Shield, Clock, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function Process() {
-  const ref = useRef<HTMLDivElement>(null);
   const { t, lang } = useLanguage();
   const isBg = lang === 'bg';
 
-  useEffect(() => {
-    if (window.innerWidth < 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let ctx: { revert: () => void } | undefined;
-    const init = async () => {
-      const { default: gsap } = await import('gsap');
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
-      gsap.registerPlugin(ScrollTrigger);
-      ctx = gsap.context(() => {
-        gsap.from('.process-card', { y: 30, duration: 0.5, stagger: 0.1, ease: 'power2.out',
-          scrollTrigger: { trigger: ref.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-        });
-      });
-    };
-    init();
-    return () => { if (ctx) ctx.revert(); };
-  }, []);
-
   const steps = [
-    { icon: Search, num: t('pr.step1.num'), title: t('pr.step1.title'), desc: t('pr.step1.desc'), details: [t('pr.step1.d1'), t('pr.step1.d2'), t('pr.step1.d3'), t('pr.step1.d4')], time: t('pr.step1.time'), color: 'bg-blue-100' },
-    { icon: ClipboardList, num: t('pr.step2.num'), title: t('pr.step2.title'), desc: t('pr.step2.desc'), details: [t('pr.step2.d1'), t('pr.step2.d2'), t('pr.step2.d3'), t('pr.step2.d4')], time: t('pr.step2.time'), color: 'bg-violet-100' },
-    { icon: Rocket, num: t('pr.step3.num'), title: t('pr.step3.title'), desc: t('pr.step3.desc'), details: [t('pr.step3.d1'), t('pr.step3.d2'), t('pr.step3.d3'), t('pr.step3.d4')], time: t('pr.step3.time'), color: 'bg-cyan-100' },
-    { icon: Shield, num: t('pr.step4.num'), title: t('pr.step4.title'), desc: t('pr.step4.desc'), details: [t('pr.step4.d1'), t('pr.step4.d2'), t('pr.step4.d3'), t('pr.step4.d4')], time: t('pr.step4.time'), color: 'bg-blue-100' },
-  ];
-
-  const timeline = [
-    { stage: t('pr.step1.title'), duration: t('pr.step1.time'), color: '#2563EB' },
-    { stage: t('pr.step2.title'), duration: t('pr.step2.time'), color: '#7C3AED' },
-    { stage: t('pr.step3.title'), duration: t('pr.step3.time'), color: '#0891B2' },
-    { stage: t('pr.step4.title'), duration: t('pr.step4.time'), color: '#60A5FA' },
+    { icon: Search, num: t('pr.step1.num'), title: t('pr.step1.title'), desc: t('pr.step1.desc'), details: [t('pr.step1.d1'), t('pr.step1.d2'), t('pr.step1.d3'), t('pr.step1.d4')], time: t('pr.step1.time') },
+    { icon: ClipboardList, num: t('pr.step2.num'), title: t('pr.step2.title'), desc: t('pr.step2.desc'), details: [t('pr.step2.d1'), t('pr.step2.d2'), t('pr.step2.d3'), t('pr.step2.d4')], time: t('pr.step2.time') },
+    { icon: Rocket, num: t('pr.step3.num'), title: t('pr.step3.title'), desc: t('pr.step3.desc'), details: [t('pr.step3.d1'), t('pr.step3.d2'), t('pr.step3.d3'), t('pr.step3.d4')], time: t('pr.step3.time') },
+    { icon: Shield, num: t('pr.step4.num'), title: t('pr.step4.title'), desc: t('pr.step4.desc'), details: [t('pr.step4.d1'), t('pr.step4.d2'), t('pr.step4.d3'), t('pr.step4.d4')], time: t('pr.step4.time') },
   ];
 
   return (
     <>
       <SEOMeta
         title={isBg ? 'Как протича работата по вашия казус | Unban Solutions' : 'How we handle your case | Unban Solutions'}
-        description={isBg ? 'От първоначалната оценка и събирането на доказателства до подаването на обжалване и проследяването на отговора по вашия казус.' : 'From initial assessment and evidence collection to appeal submission and follow-up on the platform response.'}
+        description={isBg
+          ? 'От първоначалната оценка и събирането на доказателства до подаването на обжалване и проследяването на отговора по вашия казус.'
+          : 'From initial assessment and evidence collection to appeal submission and follow-up on the platform response.'}
         keywords="процес възстановяване акаунт, как се възстановява instagram, стъпки shadowban, колко време отнема"
         canonical="https://www.unbansolutions.com/process"
       />
+
       <main>
-        <section className="relative pt-24 pb-10 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
-          <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-200/30 rounded-full filter blur-[80px]" />
-          <div className="relative max-w-[1400px] mx-auto px-6 lg:px-10">
-            <p className="label-mono mb-2">{t('pr.hero.label')}</p>
-            <h1 className="text-[clamp(1.8rem,4vw,3rem)] font-bold text-slate-900 mb-3">{t('pr.hero.title')}<span className="gradient-text">{t('pr.hero.titleSpan')}</span> {t('pr.hero.desc')}</h1>
-            <p className="text-slate-700 text-sm max-w-[450px]">{t('pr.hero.sub')}</p>
+        <section className="border-b border-slate-200 bg-slate-50 pt-24 pb-10 sm:pt-28 sm:pb-14">
+          <div className="mx-auto max-w-5xl px-5 sm:px-6">
+            <p className="section-kicker">{t('pr.hero.label')}</p>
+            <h1 className="mt-3 max-w-4xl text-[clamp(2.3rem,7vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-slate-950">
+              {isBg ? 'От първоначална оценка до ' : 'From initial assessment to '}<span className="text-blue-700">{isBg ? 'проследяване на казуса' : 'case follow-up'}</span>
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">
+              {isBg
+                ? 'Всяка стъпка има ясна цел. Точният обхват и срок зависят от случая и от отговорите на платформата.'
+                : 'Every step has a clear purpose. The exact scope and timing depend on the case and the platform responses.'}
+            </p>
           </div>
         </section>
 
-        <section className="py-5 border-y border-slate-200 bg-slate-50">
-          <div className="max-w-[700px] mx-auto px-6">
-            <div className="flex flex-wrap justify-center items-center gap-2">
-              {timeline.map((item, idx) => (
-                <div key={item.stage} className="flex items-center gap-2">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-slate-300 shadow-sm">
-                    <div className="w-2 h-2 rounded-full" style={{ background: item.color, boxShadow: `0 0 6px ${item.color}` }} />
-                    <p className="text-slate-800 text-[11px] font-bold">{item.stage}</p>
-                  </div>
-                  {idx < timeline.length - 1 && <ArrowRight size={10} className="text-slate-500" />}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section ref={ref} className="py-10 lg:py-14 bg-gradient-to-b from-white to-slate-50">
-          <div className="max-w-[800px] mx-auto px-6 lg:px-10">
-            <div className="space-y-4">
+        <section className="bg-white py-12 sm:py-20">
+          <div className="mx-auto max-w-4xl px-5 sm:px-6">
+            <ol className="relative space-y-5 before:absolute before:bottom-8 before:left-9 before:top-8 before:w-px before:bg-slate-200 sm:before:left-12">
               {steps.map((step) => (
-                <div key={step.num} className="process-card glass-card-hover p-5">
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      <div className={`w-10 h-10 rounded-xl ${step.color} flex items-center justify-center`}>
-                        <step.icon size={18} className="text-blue-800" />
-                      </div>
+                <li key={step.num} className="relative rounded-3xl border border-slate-200 bg-white p-5 pl-20 shadow-[0_12px_35px_rgba(15,23,42,0.06)] sm:p-7 sm:pl-24">
+                  <span className="absolute left-3 top-5 z-10 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-700 text-white shadow-[0_0_0_6px_white] sm:left-4 sm:top-7 sm:h-16 sm:w-16">
+                    <step.icon size={22} aria-hidden="true" />
+                  </span>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-sm font-bold tracking-[0.14em] text-blue-700">{step.num}</p>
+                      <h2 className="mt-1 text-xl font-bold text-slate-950 sm:text-2xl">{step.title}</h2>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-blue-700 text-[10px] font-mono font-bold">{step.num}</span>
-                        <h3 className="text-slate-900 text-sm font-bold">{step.title}</h3>
-                      </div>
-                      <p className="text-slate-700 text-xs leading-relaxed mb-2">{step.desc}</p>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1">
-                        {step.details.map((d) => (
-                          <span key={d} className="text-slate-700 text-[11px] flex items-center gap-1">
-                            <CheckCircle2 size={9} className="text-blue-600" />{d}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-1 mt-2">
-                        <Clock size={10} className="text-blue-700" />
-                        <span className="text-blue-700 text-[10px] font-bold">{step.time}</span>
-                      </div>
-                    </div>
+                    <span className="inline-flex min-h-9 items-center gap-2 self-start rounded-full bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700">
+                      <Clock3 size={15} aria-hidden="true" /> {step.time}
+                    </span>
                   </div>
-                </div>
+
+                  <p className="mt-3 text-base leading-7 text-slate-600">{step.desc}</p>
+                  <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                    {step.details.map((detail) => (
+                      <span key={detail} className="flex items-start gap-2 text-sm leading-6 text-slate-700">
+                        <CheckCircle2 size={16} className="mt-1 shrink-0 text-blue-700" aria-hidden="true" />
+                        {detail}
+                      </span>
+                    ))}
+                  </div>
+                </li>
               ))}
+            </ol>
+
+            <div className="mt-7 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950 sm:p-5 sm:text-base">
+              {isBg
+                ? 'Посочените срокове са ориентировъчни. Решението и времето за отговор на платформата не са под контрола на Unban Solutions.'
+                : 'The listed timeframes are indicative. The platform decision and response time are outside the control of Unban Solutions.'}
             </div>
           </div>
         </section>
 
-        <section className="py-10 lg:py-14 relative overflow-hidden bg-gradient-to-br from-blue-600 to-purple-600">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] bg-white/10 rounded-full filter blur-[60px]" />
-          <div className="relative max-w-[500px] mx-auto px-6 text-center">
-            <h2 className="text-xl font-bold text-white mb-2">{t('pr.cta.title')}<span className="text-blue-200">{t('pr.cta.titleSpan')}</span>?</h2>
-            <p className="text-blue-100 text-sm mb-5">{t('pr.cta.desc')}</p>
-            <Link to="/contact" className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors shadow-lg"><span>{t('pr.cta.btn')}</span><ArrowRight size={14} /></Link>
+        <section className="bg-slate-950 py-12 text-white sm:py-16">
+          <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-6 px-5 sm:px-6 lg:flex-row lg:items-center">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-bold text-white">{isBg ? 'Първата стъпка е кратка оценка' : 'The first step is a short assessment'}</h2>
+              <p className="mt-3 text-base leading-7 text-slate-300">{t('pr.cta.desc')}</p>
+            </div>
+            <Link to="/contact" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-base font-bold text-slate-950 hover:bg-slate-100 sm:w-auto">
+              {t('pr.cta.btn')} <ArrowRight size={18} aria-hidden="true" />
+            </Link>
           </div>
         </section>
       </main>

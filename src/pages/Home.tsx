@@ -1,95 +1,86 @@
-import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  ArrowRight,
+  Ban,
+  CheckCircle2,
+  ChevronRight,
+  Clock3,
+  EyeOff,
+  FileCheck2,
+  KeyRound,
+  LockKeyhole,
+  MessageSquareText,
+  SearchCheck,
+  ShieldCheck,
+} from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
-import {
-  Shield, Lock, TrendingUp, Zap, Clock, CheckCircle2, ArrowRight, Eye, FileText,
-  ShieldCheck, Globe, MessageSquare, Phone, Layers,
-} from 'lucide-react';
-import { trackEvent } from '@/lib/analytics';
 
 export default function Home() {
-  const servicesRef = useRef<HTMLElement>(null);
-  const processRef = useRef<HTMLElement>(null);
-  const resultsRef = useRef<HTMLElement>(null);
-  const testimonialsRef = useRef<HTMLElement>(null);
   const { t, lang } = useLanguage();
   const isBg = lang === 'bg';
 
-  useEffect(() => {
-    // Skip animations on mobile - they hurt performance more than they help
-    const isMobile = window.innerWidth < 768 || 'ontouchstart' in window || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (isMobile) return;
-
-    let ctx: { revert: () => void } | null = null;
-
-    const initAnimations = async () => {
-      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
-        import('gsap'),
-        import('gsap/ScrollTrigger'),
-      ]);
-      gsap.registerPlugin(ScrollTrigger);
-
-      ctx = gsap.context(() => {
-        gsap.from('.hero-content > *', { y: 30, duration: 0.6, stagger: 0.1, delay: 0.2, ease: 'power3.out' });
-        const sections = [servicesRef, processRef, resultsRef, testimonialsRef];
-        sections.forEach((ref) => {
-          gsap.from(ref.current, { y: 40, duration: 0.6, ease: 'power2.out',
-            scrollTrigger: { trigger: ref.current, start: 'top 88%', toggleActions: 'play none none reverse' },
-          });
-        });
-        gsap.from('.service-card', { y: 30, duration: 0.4, stagger: 0.06, ease: 'power2.out',
-          scrollTrigger: { trigger: servicesRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-        });
-        gsap.from('.process-step', { y: 20, duration: 0.4, stagger: 0.06, ease: 'power2.out',
-          scrollTrigger: { trigger: processRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-        });
-        gsap.from('.stat-item', { y: 30, duration: 0.5, stagger: 0.08, ease: 'power2.out',
-          scrollTrigger: { trigger: resultsRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-        });
-        gsap.from('.testimonial-card', { y: 20, duration: 0.4, stagger: 0.06, ease: 'power2.out',
-          scrollTrigger: { trigger: testimonialsRef.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-        });
-      });
-    };
-
-    initAnimations();
-    return () => { if (ctx) ctx.revert(); };
-  }, []);
-
-  const services = [
-    { icon: Shield, title: t('svc.s1.title'), desc: t('svc.s1.desc'), color: 'bg-blue-100' },
-    { icon: Lock, title: t('svc.s2.title'), desc: t('svc.s2.desc'), color: 'bg-violet-100' },
-    { icon: TrendingUp, title: t('svc.s3.title'), desc: t('svc.s3.desc'), color: 'bg-cyan-100' },
-    { icon: Zap, title: t('svc.s4.title'), desc: t('svc.s4.desc'), color: 'bg-blue-100' },
-    { icon: Eye, title: t('svc.s5.title'), desc: t('svc.s5.desc'), color: 'bg-violet-100' },
-    { icon: FileText, title: t('svc.s6.title'), desc: t('svc.s6.desc'), color: 'bg-cyan-100' },
+  const commonCases = [
+    {
+      icon: Ban,
+      title: isBg ? 'Спрян или изтрит профил' : 'Suspended or deleted account',
+      text: isBg ? 'Оценка на ограничението и възможните официални канали.' : 'Assessment of the restriction and available official channels.',
+      href: '/contact?issue=banned',
+    },
+    {
+      icon: KeyRound,
+      title: isBg ? 'Хакнат или откраднат профил' : 'Hacked or stolen account',
+      text: isBg ? 'Подреждане на доказателствата и стъпките за възстановяване.' : 'Organising the evidence and recovery steps.',
+      href: '/contact?issue=hacked',
+    },
+    {
+      icon: EyeOff,
+      title: isBg ? 'Shadowban или ограничения' : 'Shadowban or restrictions',
+      text: isBg ? 'Преглед на видимостта, функциите и приложимите правила.' : 'Review of visibility, features and relevant policies.',
+      href: '/contact?issue=shadowban',
+    },
   ];
 
   const steps = [
-    { num: '01', title: t('proc.step1'), desc: t('proc.step1desc'), icon: Shield },
-    { num: '02', title: t('proc.step2'), desc: t('proc.step2desc'), icon: Zap },
-    { num: '03', title: t('proc.step3'), desc: t('proc.step3desc'), icon: TrendingUp },
-    { num: '04', title: t('proc.step4'), desc: t('proc.step4desc'), icon: Lock },
-  ];
-
-  const stats = [
-    { value: '24 ч.', label: t('res.stat2'), icon: Clock },
-    { value: '8+', label: t('res.stat3'), icon: Layers },
-    { value: '4', label: isBg ? 'Стъпки в процеса' : 'Process steps', icon: ShieldCheck },
+    {
+      num: '01',
+      icon: MessageSquareText,
+      title: isBg ? 'Изпращате казуса' : 'Send your case',
+      text: isBg ? 'Посочвате платформата, проблема и наличните известия.' : 'Tell us the platform, issue and any notices you have.',
+    },
+    {
+      num: '02',
+      icon: SearchCheck,
+      title: isBg ? 'Получавате оценка' : 'Receive an assessment',
+      text: isBg ? 'Преглеждаме информацията и обясняваме реалистичните опции.' : 'We review the information and explain the realistic options.',
+    },
+    {
+      num: '03',
+      icon: FileCheck2,
+      title: isBg ? 'Действаме по план' : 'Proceed with a plan',
+      text: isBg ? 'След писмена оферта подготвяме и проследяваме официалните действия.' : 'After a written offer, we prepare and follow the official actions.',
+    },
   ];
 
   const commitments = [
-    { title: isBg ? 'Реалистична оценка' : 'Realistic assessment', text: isBg ? 'Казваме какво може да се направи и къде има ограничения.' : 'We explain what can be done and where the limitations are.' },
-    { title: isBg ? 'Документиран процес' : 'Documented process', text: isBg ? 'Подготвяме аргументи и доказателства според конкретния случай.' : 'We prepare arguments and evidence for the specific case.' },
-    { title: isBg ? 'Поверителна комуникация' : 'Confidential communication', text: isBg ? 'Изискваме само информацията, необходима за оценка и работа.' : 'We request only the information needed to assess and handle the case.' },
+    {
+      icon: Clock3,
+      title: isBg ? 'Първи отговор до 24 часа' : 'First response within 24 hours',
+      text: isBg ? 'Получавате първоначална оценка и ясна следваща стъпка.' : 'You receive an initial assessment and a clear next step.',
+    },
+    {
+      icon: LockKeyhole,
+      title: isBg ? 'Без пароли и кодове' : 'No passwords or codes',
+      text: isBg ? 'Никога не искаме парола или код за двуфакторна защита.' : 'We never ask for a password or two-factor authentication code.',
+    },
+    {
+      icon: ShieldCheck,
+      title: isBg ? 'Реалистична комуникация' : 'Realistic communication',
+      text: isBg ? 'Не обещаваме решение, което зависи от самата платформа.' : 'We do not promise an outcome controlled by the platform.',
+    },
   ];
 
-  const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter / X', 'Facebook', 'LinkedIn', 'Snapchat', 'Pinterest'];
-  const heroHighlights: Array<{ num?: string; text: string }> = [
-    { text: t('hero.stat2') },
-    { text: t('hero.stat3') },
-  ];
+  const platforms = ['Instagram', 'TikTok', 'Facebook', 'YouTube', 'X', 'LinkedIn', 'Snapchat', 'Pinterest'];
 
   return (
     <>
@@ -105,190 +96,203 @@ export default function Home() {
         }
         canonical="https://www.unbansolutions.com/"
       />
+
       <main>
-        {/* HERO */}
-        <section className="relative pt-24 pb-12 bg-gradient-to-br from-blue-50 via-white to-violet-50 overflow-hidden" style={{ minHeight: '70vh' }}>
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-200/30 rounded-full filter blur-[100px]" />
-          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-violet-200/30 rounded-full filter blur-[80px]" />
-          <div className="absolute top-1/3 left-1/4 w-[200px] h-[200px] bg-cyan-200/20 rounded-full filter blur-[60px]" />
-          <div className="absolute inset-0 opacity-[0.4]" style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, #94a3b8 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }} />
-
-          <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-10 hero-content">
-            <h1 className="text-[clamp(2rem,5.5vw,3.8rem)] font-extrabold leading-[1.1] text-slate-900 mb-4">
-              {t('hero.title')}
-              <span className="gradient-text">{t('hero.titleSpan')}</span>
-            </h1>
-            <p className="text-slate-700 text-base max-w-[480px] mb-6">{t('hero.desc')}</p>
-            <div className="flex flex-wrap gap-3 mb-8">
-              <Link to="/contact" className="glow-btn inline-flex items-center gap-2">
-                <span>{t('hero.cta1')}</span><ArrowRight size={15} />
-              </Link>
-              <Link to="/services" className="outline-btn inline-flex items-center gap-2">{t('hero.cta2')}</Link>
-              <a
-                href="tel:0883391411"
-                className="min-h-11 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5"
-                onClick={() => {
-                  trackEvent('phone_cta_clicked', { location: 'hero' }, 'Contact');
-                }}
-              >
-                <Phone size={15} />
-                <span>{t('hero.call')}</span>
-              </a>
-            </div>
-
-            <div className="flex flex-wrap gap-4">
-              {heroHighlights.map((s, idx) => (
-                <div key={idx} className="flex items-center gap-2 bg-white rounded-full px-4 py-2 border border-slate-300 shadow-sm">
-                  {s.num && <span className="text-base font-bold gradient-text">{s.num}</span>}
-                  <span className="text-slate-700 text-xs">{s.text}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap gap-4 mt-5">
-              {[
-                { icon: ShieldCheck, text: t('hero.badge1') },
-                { icon: Globe, text: t('hero.badge2') },
-                { icon: MessageSquare, text: t('hero.badge3') },
-              ].map((item) => (
-                <div key={item.text} className="flex items-center gap-2 text-slate-700 text-xs">
-                  <item.icon size={14} className="text-blue-600" />
-                  {item.text}
-                </div>
-              ))}
-            </div>
+        <section className="relative overflow-hidden border-b border-slate-200 bg-slate-50 pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-32 lg:pb-20">
+          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+            <div className="absolute -right-24 top-8 h-72 w-72 rounded-full bg-sky-200/45 blur-3xl" />
+            <div className="absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-blue-100/70 blur-3xl" />
           </div>
-        </section>
 
-        {/* MARQUEE */}
-        <section className="py-4 bg-slate-50 border-y border-slate-200 overflow-hidden">
-          <div className="relative">
-            <div className="marquee-left flex items-center gap-16 whitespace-nowrap">
-              {[...Array(2)].map((_, si) => (
-                <div key={si} className="flex items-center gap-16">
-                  {platforms.map((p) => (
-                    <span key={`${si}-${p}`} className="text-slate-500 text-sm font-medium select-none">{p}</span>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* SERVICES */}
-        <section ref={servicesRef} className="py-12 bg-white relative">
-          <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-8">
-              <div>
-                <p className="label-mono mb-2">{t('svc.label')}</p>
-                <h2 className="text-2xl font-bold text-slate-900">{t('svc.title')}<span className="gradient-text">{t('svc.titleSpan')}</span></h2>
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14">
+            <div>
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-800 shadow-sm">
+                <ShieldCheck size={17} aria-hidden="true" />
+                {isBg ? 'Професионално съдействие за дигитални профили' : 'Professional support for digital accounts'}
               </div>
-              <Link to="/services" className="text-blue-700 text-sm font-medium flex items-center gap-1 hover:text-blue-500">{t('svc.all')} <ArrowRight size={14} /></Link>
+
+              <h1 className="max-w-3xl text-[clamp(2.35rem,8vw,4.5rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-slate-950">
+                {t('hero.title')}
+                <span className="text-blue-700">{t('hero.titleSpan')}</span>
+              </h1>
+
+              <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
+                {t('hero.desc')}
+              </p>
+
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Link to="/contact" className="primary-cta w-full sm:w-auto">
+                  {t('hero.cta1')}
+                  <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+                <a href="#how-it-works" className="secondary-cta w-full sm:w-auto">
+                  {t('hero.cta2')}
+                </a>
+              </div>
+
+              <ul className="mt-7 grid gap-3 text-sm text-slate-700 sm:grid-cols-2" aria-label={isBg ? 'Важна информация' : 'Important information'}>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-blue-700" aria-hidden="true" />
+                  {t('hero.stat2')}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-blue-700" aria-hidden="true" />
+                  {t('hero.stat3')}
+                </li>
+              </ul>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
-              {services.map((s) => (
-                <div key={s.title} className="service-card glass-card-hover p-5 group cursor-default flex flex-col h-full">
-                  <div className={`w-10 h-10 rounded-lg ${s.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                    <s.icon size={18} className="text-blue-800" />
-                  </div>
-                  <h3 className="text-slate-900 font-bold text-sm mb-1">{s.title}</h3>
-                  <p className="text-slate-700 text-xs leading-relaxed flex-1">{s.desc}</p>
+
+            <aside className="rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_24px_70px_rgba(15,23,42,0.12)] sm:p-6" aria-labelledby="case-start-title">
+              <div className="flex items-start justify-between gap-4 border-b border-slate-200 pb-5">
+                <div>
+                  <p className="text-sm font-semibold text-blue-700">{isBg ? 'Кратка първоначална оценка' : 'Quick initial assessment'}</p>
+                  <h2 id="case-start-title" className="mt-1 text-xl font-bold text-slate-950 sm:text-2xl">
+                    {isBg ? 'Започнете от проблема' : 'Start with the issue'}
+                  </h2>
                 </div>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                  <SearchCheck size={22} aria-hidden="true" />
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2.5">
+                {commonCases.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className="group flex min-h-16 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition-colors duration-200 hover:border-blue-300 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-700 shadow-sm ring-1 ring-slate-200">
+                      <item.icon size={19} aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-slate-900 sm:text-base">{item.title}</span>
+                      <span className="mt-0.5 hidden text-sm leading-5 text-slate-600 sm:block">{item.text}</span>
+                    </span>
+                    <ChevronRight size={18} className="shrink-0 text-slate-400 transition-colors group-hover:text-blue-700" aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+
+              <div className="mt-5 flex items-start gap-3 rounded-2xl bg-slate-900 px-4 py-3.5 text-white">
+                <LockKeyhole size={18} className="mt-0.5 shrink-0 text-sky-300" aria-hidden="true" />
+                <p className="text-sm leading-5 text-slate-200">
+                  {isBg ? 'Формата е кратка. Не изпращайте пароли или кодове за потвърждение.' : 'The form is short. Never send passwords or verification codes.'}
+                </p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section className="border-b border-slate-200 bg-white py-5" aria-label={isBg ? 'Поддържани платформи' : 'Supported platforms'}>
+          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 sm:px-6 lg:flex-row lg:items-center lg:gap-8">
+            <p className="shrink-0 text-sm font-semibold text-slate-500">
+              {isBg ? 'Казуси за основните платформи' : 'Cases across major platforms'}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {platforms.map((platform) => (
+                <span key={platform} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700">
+                  {platform}
+                </span>
               ))}
             </div>
           </div>
         </section>
 
-        {/* PROCESS */}
-        <section ref={processRef} className="py-12 bg-gradient-to-b from-slate-50 to-white relative">
-          <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-            <div className="text-center mb-8">
-              <p className="label-mono mb-2">{t('proc.label')}</p>
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">{t('proc.title')}<span className="gradient-text">{t('proc.titleSpan')}</span></h2>
-              <p className="text-slate-700 text-sm">{t('proc.sub')}</p>
+        <section className="bg-white py-14 sm:py-20">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="max-w-2xl">
+                <p className="section-kicker">{isBg ? 'Най-чести казуси' : 'Common cases'}</p>
+                <h2 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
+                  {isBg ? 'Изберете проблема, който описва ситуацията ви' : 'Choose the issue that best describes your situation'}
+                </h2>
+              </div>
+              <Link to="/services" className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-bold text-blue-700 hover:text-blue-900 sm:self-auto">
+                {t('svc.all')} <ArrowRight size={16} aria-hidden="true" />
+              </Link>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              {commonCases.map((item) => (
+                <Link key={item.href} to={item.href} className="case-card group">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                    <item.icon size={22} aria-hidden="true" />
+                  </span>
+                  <h3 className="mt-5 text-xl font-bold text-slate-950">{item.title}</h3>
+                  <p className="mt-2 text-base leading-7 text-slate-600">{item.text}</p>
+                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-700">
+                    {isBg ? 'Оцени този казус' : 'Assess this case'}
+                    <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="how-it-works" className="scroll-mt-24 border-y border-slate-200 bg-slate-50 py-14 sm:py-20">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6">
+            <div className="max-w-2xl">
+              <p className="section-kicker">{t('proc.label')}</p>
+              <h2 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
+                {isBg ? 'Три ясни стъпки, без излишно обикаляне' : 'Three clear steps without unnecessary back-and-forth'}
+              </h2>
+              <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">{t('proc.sub')}</p>
+            </div>
+
+            <ol className="mt-9 grid gap-4 lg:grid-cols-3">
               {steps.map((step) => (
-                <div key={step.num} className="process-step glass-card p-4 text-center relative">
-                  <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-white text-[10px] font-bold shadow-md">{step.num}</div>
-                  <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <step.icon size={16} className="text-blue-700" />
+                <li key={step.num} className="relative rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-700 text-white">
+                      <step.icon size={20} aria-hidden="true" />
+                    </span>
+                    <span className="text-sm font-bold tracking-[0.16em] text-slate-400">{step.num}</span>
                   </div>
-                  <h3 className="text-slate-900 font-bold text-sm mb-1">{step.title}</h3>
-                  <p className="text-slate-700 text-xs">{step.desc}</p>
-                </div>
+                  <h3 className="mt-5 text-xl font-bold text-slate-950">{step.title}</h3>
+                  <p className="mt-2 text-base leading-7 text-slate-600">{step.text}</p>
+                </li>
               ))}
-            </div>
-            <div className="mt-6 flex justify-center gap-4 flex-wrap">
-              {[t('proc.tag1'), t('proc.tag2'), t('proc.tag3')].map((tag) => (
-                <div key={tag} className="flex items-center gap-2 bg-white rounded-full px-4 py-2 border border-slate-300 shadow-sm">
-                  <CheckCircle2 size={14} className="text-blue-600" />
-                  <span className="text-slate-700 text-xs font-medium">{tag}</span>
-                </div>
-              ))}
-            </div>
+            </ol>
+
+            <Link to="/process" className="secondary-cta mt-7 w-full sm:w-auto">
+              {isBg ? 'Подробно за процеса' : 'See the full process'}
+              <ArrowRight size={17} aria-hidden="true" />
+            </Link>
           </div>
         </section>
 
-        {/* RESULTS */}
-        <section ref={resultsRef} className="py-12 bg-gradient-to-b from-white to-blue-50/50 relative">
-          <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-            <div className="text-center mb-8">
-              <p className="label-mono mb-2">{t('res.label')}</p>
-              <h2 className="text-2xl font-bold text-slate-900">{t('res.title')}<span className="gradient-text">{t('res.titleSpan')}</span></h2>
+        <section className="bg-slate-950 py-14 text-white sm:py-20">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6">
+            <div className="max-w-2xl">
+              <p className="text-sm font-bold uppercase tracking-[0.14em] text-sky-300">{isBg ? 'Какво да очаквате' : 'What to expect'}</p>
+              <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+                {isBg ? 'Ясна работа по казуса, без нереалистични обещания' : 'Clear case handling without unrealistic promises'}
+              </h2>
             </div>
-            <div className="grid grid-cols-3 gap-3 sm:gap-5 max-w-[700px] mx-auto">
-              {stats.map((s) => (
-                <div key={s.label} className="stat-item text-center glass-card p-4 sm:p-8">
-                  <s.icon size={24} className="sm:w-7 sm:h-7 text-blue-600 mx-auto mb-2 sm:mb-3" />
-                  <div className="text-xl sm:text-[2rem] font-extrabold gradient-text mb-1 sm:mb-2 leading-tight">{s.value}</div>
-                  <div className="text-slate-600 text-xs sm:text-sm font-semibold">{s.label}</div>
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap justify-center gap-2 mt-6">
-              {platforms.map((p) => (
-                <span key={p} className="px-3 py-1.5 bg-white rounded-lg text-slate-700 text-xs font-medium border border-slate-300">{p}</span>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        {/* SERVICE COMMITMENTS */}
-        <section ref={testimonialsRef} className="py-12 bg-gradient-to-b from-blue-50/50 to-violet-50/30 relative">
-          <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-            <div className="text-center mb-8">
-              <p className="label-mono mb-2">{isBg ? 'Нашият стандарт' : 'Our standard'}</p>
-              <h2 className="text-2xl font-bold text-slate-900">{isBg ? 'Какво можете да ' : 'What you can '}<span className="gradient-text">{isBg ? 'очаквате' : 'expect'}</span></h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="mt-9 grid gap-6 md:grid-cols-3">
               {commitments.map((item) => (
-                <div key={item.title} className="testimonial-card glass-card p-5">
-                  <CheckCircle2 size={20} className="text-blue-700 mb-3" aria-hidden="true" />
-                  <h3 className="text-slate-900 text-sm font-bold mb-2">{item.title}</h3>
-                  <p className="text-slate-700 text-sm leading-relaxed">{item.text}</p>
+                <div key={item.title} className="border-l border-slate-700 pl-5">
+                  <item.icon size={23} className="text-sky-300" aria-hidden="true" />
+                  <h3 className="mt-4 text-lg font-bold text-white">{item.title}</h3>
+                  <p className="mt-2 text-base leading-7 text-slate-300">{item.text}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-12 bg-gradient-to-br from-blue-600 to-violet-700 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-            backgroundSize: '30px 30px'
-          }} />
-          <div className="relative max-w-[600px] mx-auto px-6 text-center">
-            <h2 className="text-2xl font-bold text-white mb-3">{t('cta.title')}</h2>
-            <p className="text-blue-100 text-sm mb-6">{t('cta.desc')}</p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link to="/contact" className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg font-bold text-sm hover:bg-blue-50 transition-colors shadow-lg">{t('cta.btn1')} <ArrowRight size={15} /></Link>
-              <Link to="/pricing" className="inline-flex items-center gap-2 bg-white/10 text-white border border-white/20 px-6 py-3 rounded-lg font-medium text-sm hover:bg-white/20 transition-colors">{t('cta.btn2')}</Link>
+        <section className="bg-blue-700 py-14 sm:py-16">
+          <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-7 px-5 sm:px-6 lg:flex-row lg:items-center">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-bold text-white sm:text-4xl">{t('cta.title')}</h2>
+              <p className="mt-3 text-base leading-7 text-blue-100 sm:text-lg">{t('cta.desc')}</p>
             </div>
+            <Link to="/contact" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-base font-bold text-blue-800 shadow-lg transition-colors hover:bg-blue-50 sm:w-auto">
+              {t('cta.btn1')} <ArrowRight size={18} aria-hidden="true" />
+            </Link>
           </div>
         </section>
       </main>

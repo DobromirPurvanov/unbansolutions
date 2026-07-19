@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import CookieConsent from '@/components/CookieConsent';
 import AnalyticsPageView from '@/components/AnalyticsPageView';
+import MobileFunnelBar from '@/components/MobileFunnelBar';
 import Home from '@/pages/Home';
 
 const Services = lazy(() => import('@/pages/Services'));
@@ -48,6 +49,7 @@ export default function App() {
           </Routes>
         </Suspense>
         <Footer />
+        <MobileFunnelBar />
         <CookieConsent />
       </div>
     </LanguageProvider>

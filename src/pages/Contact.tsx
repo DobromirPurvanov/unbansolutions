@@ -1,7 +1,24 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  Clock,
+  FileImage,
+  LockKeyhole,
+  Mail,
+  MapPin,
+  Paperclip,
+  Phone,
+  Send,
+  ShieldCheck,
+  Upload,
+  X,
+} from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, X, Upload, FileImage, ChevronDown } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics';
 
 interface FormData {
@@ -11,490 +28,601 @@ interface FormData {
   issue: string;
   message: string;
   files: File[];
-  _gotcha: string; // honeypot field - bots fill this
+  _gotcha: string;
 }
 
-// MultiSelect Dropdown Component
-function PlatformMultiSelect({
-  options,
-  selected,
-  onChange,
-  label,
-  placeholder,
-}: {
-  options: string[];
-  selected: string[];
-  onChange: (vals: string[]) => void;
+interface SelectOption {
+  value: string;
   label: string;
-  placeholder: string;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const listboxId = 'contact-platform-options';
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const toggleOption = (opt: string) => {
-    if (selected.includes(opt)) {
-      onChange(selected.filter((s) => s !== opt));
-    } else {
-      onChange([...selected, opt]);
-    }
-  };
-
-  const displayText =
-    selected.length === 0
-      ? placeholder
-      : selected.length === 1
-        ? selected[0]
-        : `${selected.length} избрани`;
-
-  return (
-    <div ref={dropdownRef} className="relative">
-      <span id="contact-platform-label" className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">
-        {label}
-      </span>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-expanded={isOpen}
-        aria-controls={listboxId}
-        aria-labelledby="contact-platform-label"
-        className={`w-full form-input flex items-center justify-between text-left ${
-          selected.length === 0 ? 'text-slate-400' : 'text-slate-800'
-        }`}
-      >
-        <span className="text-xs truncate">{displayText}</span>
-        <ChevronDown
-          size={14}
-          className={`text-slate-500 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
-        />
-      </button>
-
-      {isOpen && (
-        <div id={listboxId} role="group" aria-labelledby="contact-platform-label" className="absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-[200px] overflow-y-auto">
-          {options.map((opt) => (
-            <label
-              key={opt}
-              className="flex min-h-11 items-center gap-2 px-3 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
-            >
-              <input
-                type="checkbox"
-                checked={selected.includes(opt)}
-                onChange={() => toggleOption(opt)}
-                className="h-4 w-4 rounded border-slate-300 text-blue-700 focus:ring-blue-600"
-              />
-              <span className="text-slate-700 text-xs select-none">{opt}</span>
-            </label>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 }
+
+const ISSUE_VALUES = ['banned', 'suspended', 'shadowban', 'restricted', 'hacked', 'other'];
+const PLATFORM_VALUES = ['instagram', 'tiktok', 'youtube', 'x', 'facebook', 'linkedin', 'other'];
 
 export default function Contact() {
-  const ref = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    name: '', email: '', platforms: [], issue: '', message: '', files: [], _gotcha: ''
-  });
   const { t, lang } = useLanguage();
   const isBg = lang === 'bg';
+  const [searchParams] = useSearchParams();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null);
+  const hasTrackedStart = useRef(false);
 
-  useEffect(() => {
-    if (window.innerWidth < 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let ctx: { revert: () => void } | undefined;
-    const init = async () => {
-      const { default: gsap } = await import('gsap');
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
-      gsap.registerPlugin(ScrollTrigger);
-      ctx = gsap.context(() => {
-        gsap.from('.contact-anim', { y: 30, duration: 0.6, stagger: 0.08, ease: 'power2.out',
-          scrollTrigger: { trigger: ref.current, start: 'top 80%', toggleActions: 'play none none reverse' },
-        });
-      });
-    };
-    init();
-    return () => { if (ctx) ctx.revert(); };
-  }, []);
-
+  const requestedIssue = searchParams.get('issue') || '';
+  const requestedPlatform = searchParams.get('platform') || '';
+  const [formStep, setFormStep] = useState<1 | 2>(1);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [stepError, setStepError] = useState('');
   const [fileError, setFileError] = useState('');
+  const [formData, setFormData] = useState<FormData>(() => ({
+    name: '',
+    email: '',
+    platforms: PLATFORM_VALUES.includes(requestedPlatform) ? [requestedPlatform] : [],
+    issue: ISSUE_VALUES.includes(requestedIssue) ? requestedIssue : '',
+    message: '',
+    files: [],
+    _gotcha: '',
+  }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const platformOptions: SelectOption[] = [
+    { value: 'instagram', label: t('cp.form.platformO1') },
+    { value: 'tiktok', label: t('cp.form.platformO2') },
+    { value: 'youtube', label: t('cp.form.platformO3') },
+    { value: 'x', label: t('cp.form.platformO4') },
+    { value: 'facebook', label: t('cp.form.platformO5') },
+    { value: 'linkedin', label: t('cp.form.platformO6') },
+    { value: 'other', label: t('cp.form.platformO7') },
+  ];
+
+  const issueOptions: SelectOption[] = [
+    { value: 'banned', label: t('cp.form.issueO1') },
+    { value: 'suspended', label: t('cp.form.issueO2') },
+    { value: 'shadowban', label: t('cp.form.issueO3') },
+    { value: 'restricted', label: t('cp.form.issueO4') },
+    { value: 'hacked', label: t('cp.form.issueO5') },
+    { value: 'other', label: t('cp.form.issueO6') },
+  ];
+
+  const contactInfo = [
+    { icon: Mail, label: t('cp.info.email'), value: t('cp.info.emailVal'), href: 'mailto:support@unbansolutions.com' },
+    { icon: Phone, label: t('cp.info.phone'), value: t('cp.info.phoneVal'), href: 'tel:0883391411' },
+    { icon: MapPin, label: t('cp.info.address'), value: `${t('cp.info.addrVal')}\n${t('cp.info.addrVal2')}` },
+    { icon: Clock, label: t('cp.info.availability'), value: `${t('cp.info.availVal')}\n${t('cp.info.availVal2')}` },
+  ];
+
+  const markFormStarted = () => {
+    if (hasTrackedStart.current) return;
+    hasTrackedStart.current = true;
+    trackEvent('contact_form_started', { source: requestedIssue ? 'prefilled_case' : 'contact_page' });
+  };
+
+  const focusStepHeading = () => {
+    window.requestAnimationFrame(() => stepHeadingRef.current?.focus());
+  };
+
+  const handleNextStep = () => {
+    markFormStarted();
+    if (formData.platforms.length === 0) {
+      setStepError(isBg ? 'Изберете поне една платформа.' : 'Select at least one platform.');
+      return;
+    }
+    if (!formData.issue) {
+      setStepError(isBg ? 'Изберете какъв е проблемът.' : 'Select the issue you are experiencing.');
+      return;
+    }
+
+    setStepError('');
+    setFormStep(2);
+    trackEvent('contact_form_step_completed', {
+      step: 1,
+      platforms_count: formData.platforms.length,
+      issue_type: formData.issue,
+    });
+    focusStepHeading();
+  };
+
+  const handlePreviousStep = () => {
+    setSubmitError('');
+    setFormStep(1);
+    focusStepHeading();
+  };
+
+  const togglePlatform = (value: string) => {
+    markFormStarted();
+    setStepError('');
+    setFormData((current) => ({
+      ...current,
+      platforms: current.platforms.includes(value)
+        ? current.platforms.filter((platform) => platform !== value)
+        : [...current.platforms, value],
+    }));
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    markFormStarted();
+    setFormData((current) => ({ ...current, [event.target.name]: event.target.value }));
+    if (event.target.name === 'issue') setStepError('');
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (formStep === 1) {
+      handleNextStep();
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError('');
 
     try {
-      const data = new FormData();
-      data.append('name', formData.name);
-      data.append('email', formData.email);
-      data.append('platforms', formData.platforms.join(', '));
-      data.append('issue', formData.issue);
-      data.append('message', formData.message);
-      data.append('_gotcha', formData._gotcha); // honeypot
-      formData.files.forEach((file) => data.append('attachments', file));
+      const payload = new FormData();
+      const selectedPlatforms = platformOptions
+        .filter((option) => formData.platforms.includes(option.value))
+        .map((option) => option.label);
+      const selectedIssue = issueOptions.find((option) => option.value === formData.issue)?.label || formData.issue;
 
-      trackEvent('contact_form_started', {
-        platforms_count: formData.platforms.length,
-        has_attachments: formData.files.length > 0,
-      });
+      payload.append('name', formData.name);
+      payload.append('email', formData.email);
+      payload.append('platforms', selectedPlatforms.join(', '));
+      payload.append('issue', selectedIssue);
+      payload.append('message', formData.message);
+      payload.append('_gotcha', formData._gotcha);
+      formData.files.forEach((file) => payload.append('attachments', file));
 
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        body: data,
-      });
+      const response = await fetch('/api/contact', { method: 'POST', body: payload });
+      const contentType = response.headers.get('content-type');
+      let result: { error?: string; success?: boolean } = {};
 
-      let result: { error?: string; success?: boolean };
-      const contentType = res.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        result = await res.json();
+      if (contentType?.includes('application/json')) {
+        result = await response.json();
       } else {
-        await res.text();
-        throw new Error('Сървърът не отговори правилно. Моля, опитайте отново.');
+        await response.text();
+        throw new Error(isBg
+          ? 'Сървърът не отговори правилно. Моля, опитайте отново.'
+          : 'The server did not respond correctly. Please try again.');
       }
 
-      if (!res.ok) {
-        throw new Error(result.error || 'Грешка при изпращане');
+      if (!response.ok) {
+        throw new Error(result.error || (isBg ? 'Грешка при изпращане.' : 'Unable to send your case.'));
       }
 
       trackEvent('contact_form_submitted', {
         platforms_count: formData.platforms.length,
+        issue_type: formData.issue,
         has_attachments: formData.files.length > 0,
       }, 'Lead');
-
       setIsSubmitted(true);
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setFormData({ name: '', email: '', platforms: [], issue: '', message: '', files: [], _gotcha: '' });
-      }, 4000);
-    } catch (err: unknown) {
-      trackEvent('contact_form_failed', { reason: err instanceof Error ? 'request_error' : 'unknown_error' });
-      setSubmitError(err instanceof Error ? err.message : 'Грешка при изпращане. Опитайте отново.');
+      focusStepHeading();
+    } catch (error: unknown) {
+      trackEvent('contact_form_failed', { reason: 'request_error' });
+      setSubmitError(error instanceof Error
+        ? error.message
+        : (isBg ? 'Грешка при изпращане. Опитайте отново.' : 'Unable to send your case. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const validateFile = (file: File): boolean => {
+  const validateFile = (file: File) => {
     if (file.size > 3 * 1024 * 1024) return false;
-    const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
-    return allowed.includes(file.type);
+    return ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'].includes(file.type);
   };
 
   const addFiles = useCallback((newFiles: FileList | null) => {
     if (!newFiles) return;
     const incoming = Array.from(newFiles);
-    const filesArray = incoming.filter(validateFile);
-    if (filesArray.length !== incoming.length) {
-      setFileError('Позволени са JPG, PNG, GIF, WebP и PDF файлове до 3 MB.');
+    const validFiles = incoming.filter(validateFile);
+
+    if (validFiles.length !== incoming.length) {
+      setFileError(isBg
+        ? 'Позволени са JPG, PNG, GIF, WebP и PDF файлове до 3 MB.'
+        : 'JPG, PNG, GIF, WebP and PDF files up to 3 MB are allowed.');
     } else {
       setFileError('');
     }
-    setFormData(prev => {
-      const combined = [...prev.files, ...filesArray];
+
+    setFormData((current) => {
+      const candidates = [...current.files, ...validFiles];
       const accepted: File[] = [];
-      let total = 0;
-      for (const file of combined) {
-        if (accepted.length >= 3 || total + file.size > 4 * 1024 * 1024) break;
+      let totalSize = 0;
+
+      for (const file of candidates) {
+        if (accepted.length >= 3 || totalSize + file.size > 4 * 1024 * 1024) break;
         accepted.push(file);
-        total += file.size;
+        totalSize += file.size;
       }
-      if (accepted.length !== combined.length) setFileError('Можете да прикачите до 3 файла с общ размер до 4 MB.');
-      return { ...prev, files: accepted };
+
+      if (accepted.length !== candidates.length) {
+        setFileError(isBg
+          ? 'Можете да прикачите до 3 файла с общ размер до 4 MB.'
+          : 'You can attach up to 3 files with a combined size of 4 MB.');
+      }
+      return { ...current, files: accepted };
     });
-  }, []);
+  }, [isBg]);
 
   const removeFile = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      files: prev.files.filter((_, i) => i !== index)
+    setFormData((current) => ({
+      ...current,
+      files: current.files.filter((_, fileIndex) => fileIndex !== index),
     }));
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    addFiles(e.dataTransfer.files);
-  };
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  };
-
-  const contactInfo = [
-    { icon: Mail, label: t('cp.info.email'), value: t('cp.info.emailVal'), href: 'mailto:support@unbansolutions.com' },
-    { icon: Phone, label: t('cp.info.phone'), value: t('cp.info.phoneVal'), href: 'tel:0883391411' },
-    { icon: MapPin, label: t('cp.info.address'), value: t('cp.info.addrVal') + '\n' + t('cp.info.addrVal2') },
-    { icon: Clock, label: t('cp.info.availability'), value: t('cp.info.availVal') + '\n' + t('cp.info.availVal2') },
-  ];
-
-  const platformOptions = [
-    t('cp.form.platformO1'), t('cp.form.platformO2'), t('cp.form.platformO3'),
-    t('cp.form.platformO4'), t('cp.form.platformO5'), t('cp.form.platformO6'), t('cp.form.platformO7'),
-  ];
-
-  const issueOptions = [
-    t('cp.form.issueO1'), t('cp.form.issueO2'), t('cp.form.issueO3'),
-    t('cp.form.issueO4'), t('cp.form.issueO5'), t('cp.form.issueO6'),
-  ];
+  const activeStep = isSubmitted ? 3 : formStep;
+  const progressLabels = isBg
+    ? ['Казус', 'Контакт', 'Оценка']
+    : ['Case', 'Contact', 'Assessment'];
 
   return (
     <>
       <SEOMeta
         title={isBg ? 'Контакт и безплатна първоначална оценка | Unban Solutions' : 'Contact and initial assessment | Unban Solutions'}
-        description={isBg ? 'Опишете проблема с вашия акаунт и изпратете нужните доказателства чрез защитената форма. Ще получите ясна първоначална оценка на казуса.' : 'Describe your account issue and send the necessary evidence through the protected form for a clear initial assessment.'}
+        description={isBg
+          ? 'Опишете проблема с вашия акаунт и изпратете нужните доказателства чрез защитената форма. Ще получите ясна първоначална оценка на казуса.'
+          : 'Describe your account issue and send the necessary evidence through the protected form for a clear initial assessment.'}
         keywords="контакт unban solutions, безплатна оценка акаунт, помогнете instagram бан, възстановяване профил"
         canonical="https://www.unbansolutions.com/contact"
       />
+
       <main>
-        {/* Hero */}
-        <section className="relative pt-24 pb-10 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
-          <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-200/30 rounded-full filter blur-[80px]" />
-          <div className="relative max-w-[1400px] mx-auto px-6 lg:px-10">
-            <p className="label-mono mb-2">{t('cp.hero.label')}</p>
-            <h1 className="text-[clamp(1.8rem,4vw,3rem)] font-bold text-slate-900 mb-3">
-              {t('cp.hero.title')}<span className="gradient-text">{t('cp.hero.titleSpan')}</span>{t('cp.hero.sub')}
+        <section className="border-b border-slate-200 bg-slate-50 pt-24 pb-8 sm:pt-28 sm:pb-10">
+          <div className="mx-auto max-w-5xl px-5 sm:px-6">
+            <p className="section-kicker">{t('cp.hero.label')}</p>
+            <h1 className="mt-3 max-w-3xl text-[clamp(2.15rem,7vw,3.75rem)] font-extrabold leading-[1.06] tracking-[-0.04em] text-slate-950">
+              {t('cp.hero.title')}<span className="text-blue-700">{t('cp.hero.titleSpan')}</span>
             </h1>
-            <p className="text-slate-700 text-sm max-w-[400px]">{t('cp.hero.desc')}</p>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{t('cp.hero.desc')}</p>
           </div>
         </section>
 
-        {/* Contact Form + Info */}
-        <section ref={ref} className="py-10 lg:py-14 bg-gradient-to-b from-white to-slate-50">
-          <div className="max-w-[1000px] mx-auto px-6 lg:px-10">
-            <div className="grid lg:grid-cols-[1fr_1.3fr] gap-6">
-              {/* Contact Info */}
-              <div className="contact-anim">
-                <h2 className="text-lg font-bold text-slate-900 mb-4">
-                  {t('cp.info.title')}<span className="gradient-text">{t('cp.info.titleSpan')}</span>
+        <section className="bg-white py-8 sm:py-14">
+          <div className="mx-auto grid max-w-5xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:gap-10">
+            <aside className="order-2 lg:order-1">
+              <div className="lg:sticky lg:top-24">
+                <h2 className="text-xl font-bold text-slate-950 sm:text-2xl">
+                  {isBg ? 'Друг начин за връзка' : 'Other ways to reach us'}
                 </h2>
-                <div className="space-y-3 mb-5">
+                <p className="mt-2 text-base leading-7 text-slate-600">
+                  {isBg ? 'За най-точна оценка използвайте формата. Можете да се свържете и директно.' : 'Use the form for the most accurate assessment, or contact us directly.'}
+                </p>
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                   {contactInfo.map((item) => (
-                    <div key={item.label} className="flex items-start gap-3 glass-card-hover p-3">
-                      <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                        <item.icon size={14} className="text-blue-700" />
-                      </div>
+                    <div key={item.label} className="flex min-h-20 items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-700 shadow-sm ring-1 ring-slate-200">
+                        <item.icon size={18} aria-hidden="true" />
+                      </span>
                       <div>
-                        <p className="text-slate-600 text-[10px] uppercase tracking-wider mb-0.5 font-bold">{item.label}</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">{item.label}</p>
                         {item.href ? (
-                          <a href={item.href} className="text-slate-800 text-xs hover:text-blue-700 transition-colors font-medium">{item.value}</a>
+                          <a
+                            href={item.href}
+                            className="mt-1 block text-base font-semibold text-slate-900 hover:text-blue-700"
+                            onClick={() => item.href.startsWith('tel:') && trackEvent('phone_cta_clicked', { location: 'contact_info' }, 'Contact')}
+                          >
+                            {item.value}
+                          </a>
                         ) : (
-                          <p className="text-slate-800 text-xs whitespace-pre-line font-medium">{item.value}</p>
+                          <p className="mt-1 whitespace-pre-line text-base font-semibold leading-6 text-slate-900">{item.value}</p>
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
 
-              {/* Form */}
-              <div className="contact-anim">
-                <div className="glass-card p-5">
-                  {isSubmitted ? (
-                    <div className="text-center py-8">
-                      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-100 flex items-center justify-center">
-                        <CheckCircle2 size={24} className="text-blue-700" />
+                <div className="mt-4 flex items-start gap-3 rounded-2xl bg-slate-900 p-4 text-white">
+                  <ShieldCheck size={20} className="mt-0.5 shrink-0 text-sky-300" aria-hidden="true" />
+                  <p className="text-sm leading-6 text-slate-200">
+                    {isBg
+                      ? 'Не изпращайте пароли, резервни кодове или кодове за двуфакторна защита.'
+                      : 'Never send passwords, recovery codes or two-factor authentication codes.'}
+                  </p>
+                </div>
+              </div>
+            </aside>
+
+            <div className="order-1 lg:order-2">
+              <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.1)] sm:p-7">
+                <div className="mb-7" aria-label={isBg ? `Стъпка ${activeStep} от 3` : `Step ${activeStep} of 3`}>
+                  <div className="flex items-center" aria-hidden="true">
+                    {[1, 2, 3].map((step, index) => (
+                      <div key={step} className="flex flex-1 items-center last:flex-none">
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                          activeStep >= step ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-500'
+                        }`}>
+                          {activeStep > step ? <Check size={16} /> : step}
+                        </span>
+                        {index < 2 && (
+                          <span className={`mx-2 h-0.5 flex-1 ${activeStep > step ? 'bg-blue-700' : 'bg-slate-200'}`} />
+                        )}
                       </div>
-                      <h3 className="text-slate-900 text-base font-bold mb-1">{t('cp.success.title')}</h3>
-                      <p className="text-slate-700 text-xs">{t('cp.success.desc')}</p>
+                    ))}
+                  </div>
+                  <div className="mt-2 grid grid-cols-3 text-center text-xs font-semibold text-slate-500">
+                    {progressLabels.map((label, index) => (
+                      <span key={label} className={activeStep === index + 1 ? 'text-blue-700' : ''}>{label}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {isSubmitted ? (
+                  <div className="py-5 text-center sm:py-9">
+                    <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+                      <CheckCircle2 size={32} aria-hidden="true" />
+                    </span>
+                    <h2 ref={stepHeadingRef} tabIndex={-1} className="mt-5 text-2xl font-bold text-slate-950 focus:outline-none">
+                      {t('cp.success.title')}
+                    </h2>
+                    <p className="mx-auto mt-3 max-w-md text-base leading-7 text-slate-600">{t('cp.success.desc')}</p>
+                    <div className="mx-auto mt-6 max-w-md rounded-2xl bg-slate-50 p-4 text-left">
+                      <p className="text-sm font-bold text-slate-900">{isBg ? 'Какво следва' : 'What happens next'}</p>
+                      <p className="mt-1 text-sm leading-6 text-slate-600">
+                        {isBg
+                          ? 'Ще прегледаме информацията и ще се свържем на посочения имейл с първоначална оценка.'
+                          : 'We will review the information and contact you by email with an initial assessment.'}
+                      </p>
                     </div>
-                  ) : (
-                    <form onSubmit={handleSubmit} className="space-y-3">
-                      {/* Honeypot field - hidden from humans, traps bots */}
-                      <div style={{ position: 'absolute', left: '-9999px', opacity: 0 }}>
-                        <input
-                          type="text"
-                          name="_gotcha"
-                          value={formData._gotcha}
-                          onChange={handleChange}
-                          tabIndex={-1}
-                          autoComplete="off"
-                          aria-hidden="true"
-                        />
-                      </div>
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        <div>
-                          <label htmlFor="contact-name" className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">{t('cp.form.name')}</label>
-                          <input id="contact-name" type="text" name="name" value={formData.name} onChange={handleChange} required minLength={2} maxLength={120} autoComplete="name" className="form-input" placeholder={t('cp.form.namePh')} />
-                        </div>
-                        <div>
-                          <label htmlFor="contact-email" className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">{t('cp.form.email')}</label>
-                          <input id="contact-email" type="email" name="email" value={formData.email} onChange={handleChange} required maxLength={254} autoComplete="email" className="form-input" placeholder={t('cp.form.emailPh')} />
-                        </div>
-                      </div>
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        {/* Platform Multi-Select */}
-                        <PlatformMultiSelect
-                          options={platformOptions}
-                          selected={formData.platforms}
-                          onChange={(vals) => setFormData({ ...formData, platforms: vals })}
-                          label={t('cp.form.platform')}
-                          placeholder={t('cp.form.platformDef')}
-                        />
-                        <div>
-                          <label htmlFor="contact-issue" className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">{t('cp.form.issue')}</label>
-                          <select id="contact-issue" name="issue" value={formData.issue} onChange={handleChange} required className="form-input bg-transparent">
-                            <option value="" className="bg-white">{t('cp.form.issueDef')}</option>
-                            {issueOptions.map((i) => (
-                              <option key={i} value={i.toLowerCase().replace(/ /g, '')} className="bg-white">{i}</option>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} noValidate={false}>
+                    <div className="sr-only" aria-hidden="true">
+                      <label htmlFor="contact-gotcha">Website</label>
+                      <input
+                        id="contact-gotcha"
+                        type="text"
+                        name="_gotcha"
+                        value={formData._gotcha}
+                        onChange={handleChange}
+                        tabIndex={-1}
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    {formStep === 1 ? (
+                      <div>
+                        <p className="text-sm font-semibold text-blue-700">{isBg ? 'Стъпка 1' : 'Step 1'}</p>
+                        <h2 ref={stepHeadingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-slate-950 focus:outline-none">
+                          {isBg ? 'Какво се е случило?' : 'What happened?'}
+                        </h2>
+                        <p className="mt-2 text-base leading-7 text-slate-600">
+                          {isBg ? 'Изберете една или повече платформи и вида на проблема.' : 'Select one or more platforms and the type of issue.'}
+                        </p>
+
+                        <fieldset className="mt-6">
+                          <legend className="text-sm font-bold text-slate-900">{t('cp.form.platform')}</legend>
+                          <p className="mt-1 text-sm text-slate-500">{isBg ? 'Може да изберете повече от една.' : 'You can select more than one.'}</p>
+                          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                            {platformOptions.map((option) => {
+                              const selected = formData.platforms.includes(option.value);
+                              return (
+                                <button
+                                  key={option.value}
+                                  type="button"
+                                  onClick={() => togglePlatform(option.value)}
+                                  aria-pressed={selected}
+                                  className={`flex min-h-12 items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-left text-sm font-semibold transition-colors ${option.value === 'other' ? 'col-span-2 sm:col-span-1' : ''} ${
+                                    selected
+                                      ? 'border-blue-700 bg-blue-50 text-blue-800'
+                                      : 'border-slate-300 bg-white text-slate-700 hover:border-blue-300 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <span className="truncate">{option.label}</span>
+                                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                                    selected ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white'
+                                  }`}>
+                                    {selected && <Check size={13} aria-hidden="true" />}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </fieldset>
+
+                        <div className="mt-6">
+                          <label htmlFor="contact-issue" className="text-sm font-bold text-slate-900">{t('cp.form.issue')}</label>
+                          <select
+                            id="contact-issue"
+                            name="issue"
+                            value={formData.issue}
+                            onChange={handleChange}
+                            required
+                            className="form-input mt-2 bg-white"
+                          >
+                            <option value="">{t('cp.form.issueDef')}</option>
+                            {issueOptions.map((option) => (
+                              <option key={option.value} value={option.value}>{option.label}</option>
                             ))}
                           </select>
                         </div>
-                      </div>
 
-                      {/* Selected platforms tags */}
-                      {formData.platforms.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5">
-                          {formData.platforms.map((p) => (
-                            <span key={p} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 border border-blue-200 rounded-md text-blue-700 text-[11px] font-medium">
-                              {p}
+                        {stepError && (
+                          <p className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-800" role="alert">
+                            {stepError}
+                          </p>
+                        )}
+
+                        <button type="button" onClick={handleNextStep} className="primary-cta mt-6 w-full">
+                          {isBg ? 'Продължи към детайлите' : 'Continue to Details'}
+                          <ArrowRight size={18} aria-hidden="true" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="text-sm font-semibold text-blue-700">{isBg ? 'Стъпка 2' : 'Step 2'}</p>
+                        <h2 ref={stepHeadingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-slate-950 focus:outline-none">
+                          {isBg ? 'Къде да изпратим оценката?' : 'Where should we send the assessment?'}
+                        </h2>
+                        <p className="mt-2 text-base leading-7 text-slate-600">
+                          {isBg ? 'Добавете контакт и кратко описание. Файловете са по желание.' : 'Add your contact details and a short description. Files are optional.'}
+                        </p>
+
+                        <div className="mt-6 space-y-5">
+                          <div>
+                            <label htmlFor="contact-name" className="text-sm font-bold text-slate-900">{t('cp.form.name')}</label>
+                            <input
+                              id="contact-name"
+                              type="text"
+                              name="name"
+                              value={formData.name}
+                              onChange={handleChange}
+                              required
+                              minLength={2}
+                              maxLength={120}
+                              autoComplete="name"
+                              className="form-input mt-2"
+                              placeholder={t('cp.form.namePh')}
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor="contact-email" className="text-sm font-bold text-slate-900">{t('cp.form.email')}</label>
+                            <input
+                              id="contact-email"
+                              type="email"
+                              inputMode="email"
+                              name="email"
+                              value={formData.email}
+                              onChange={handleChange}
+                              required
+                              maxLength={254}
+                              autoComplete="email"
+                              className="form-input mt-2"
+                              placeholder={t('cp.form.emailPh')}
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor="contact-message" className="text-sm font-bold text-slate-900">{t('cp.form.message')}</label>
+                            <p id="contact-message-help" className="mt-1 text-sm text-slate-500">
+                              {isBg ? 'Какво известие получихте и какво вече опитахте?' : 'What notice did you receive and what have you already tried?'}
+                            </p>
+                            <textarea
+                              id="contact-message"
+                              name="message"
+                              value={formData.message}
+                              onChange={handleChange}
+                              required
+                              minLength={10}
+                              maxLength={5000}
+                              rows={5}
+                              aria-describedby="contact-message-help"
+                              className="form-input mt-2 resize-y"
+                              placeholder={t('cp.form.messagePh')}
+                            />
+                          </div>
+
+                          <details className="group rounded-2xl border border-slate-200 bg-slate-50">
+                            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+                              <span className="flex items-center gap-2">
+                                <Paperclip size={18} className="text-blue-700" aria-hidden="true" />
+                                {isBg ? 'Добави снимки или PDF' : 'Add screenshots or a PDF'}
+                                <span className="font-normal text-slate-500">({isBg ? 'по желание' : 'optional'})</span>
+                              </span>
+                              <span className="text-lg text-slate-400 transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+                            </summary>
+                            <div className="border-t border-slate-200 p-4">
+                              <p className="text-sm leading-6 text-slate-600">{t('cp.form.filesDesc')}</p>
                               <button
                                 type="button"
-                                onClick={() => setFormData({ ...formData, platforms: formData.platforms.filter((pl) => pl !== p) })}
-                                className="w-11 h-11 inline-flex items-center justify-center hover:text-red-700 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-                                aria-label={`Премахни ${p}`}
+                                onDragOver={(event) => { event.preventDefault(); setIsDragOver(true); }}
+                                onDragLeave={(event) => { event.preventDefault(); setIsDragOver(false); }}
+                                onDrop={(event) => {
+                                  event.preventDefault();
+                                  setIsDragOver(false);
+                                  addFiles(event.dataTransfer.files);
+                                }}
+                                onClick={() => fileInputRef.current?.click()}
+                                className={`mt-3 w-full rounded-xl border-2 border-dashed p-5 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
+                                  isDragOver ? 'border-blue-500 bg-blue-50' : 'border-slate-300 bg-white hover:border-blue-400'
+                                }`}
                               >
-                                <X size={10} />
+                                <Upload size={24} className="mx-auto text-blue-700" aria-hidden="true" />
+                                <span className="mt-2 block text-sm font-bold text-slate-800">{t('cp.form.filesBrowse')}</span>
+                                <span className="mt-1 block text-xs leading-5 text-slate-500">{t('cp.form.filesMax')}</span>
                               </button>
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                              <input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                                onChange={(event) => addFiles(event.target.files)}
+                                className="sr-only"
+                                tabIndex={-1}
+                              />
 
-                      <div>
-                        <label htmlFor="contact-message" className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">{t('cp.form.message')}</label>
-                        <textarea id="contact-message" name="message" value={formData.message} onChange={handleChange} required minLength={10} maxLength={5000} rows={4} className="form-input resize-y" placeholder={t('cp.form.messagePh')} />
-                      </div>
-
-                      {/* File Upload */}
-                      <div>
-                        <span className="block text-slate-700 text-[10px] uppercase tracking-wider mb-1 font-bold">{t('cp.form.files')}</span>
-                        <p className="text-slate-600 text-[11px] mb-2">{t('cp.form.filesDesc')}</p>
-
-                        <button
-                          type="button"
-                          onDragOver={handleDragOver}
-                          onDragLeave={handleDragLeave}
-                          onDrop={handleDrop}
-                          onClick={() => fileInputRef.current?.click()}
-                          className={`w-full cursor-pointer border-2 border-dashed rounded-xl p-4 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
-                            isDragOver
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-slate-300 hover:border-blue-400 bg-slate-50'
-                          }`}
-                        >
-                          <Upload size={24} className="text-blue-600 mx-auto mb-1" />
-                          <p className="text-slate-700 text-xs">
-                            {t('cp.form.filesDrop')} <span className="text-blue-700 font-bold">{t('cp.form.filesBrowse')}</span>
-                          </p>
-                          <p className="text-slate-500 text-[10px] mt-0.5">{t('cp.form.filesMax')}</p>
-                        </button>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          multiple
-                          accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
-                          onChange={(e) => addFiles(e.target.files)}
-                          className="sr-only"
-                          tabIndex={-1}
-                        />
-                        {fileError && <p className="mt-2 text-xs text-red-700" role="alert">{fileError}</p>}
-
-                        {/* Selected Files */}
-                        {formData.files.length > 0 && (
-                          <div className="mt-2 space-y-1.5">
-                            <p className="text-slate-700 text-[11px] font-bold">
-                              {formData.files.length} {t('file.selected')}
-                            </p>
-                            {formData.files.map((file, idx) => (
-                              <div key={idx} className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
-                                <FileImage size={14} className="text-blue-600 flex-shrink-0" />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-slate-800 text-[11px] font-medium truncate">{file.name}</p>
-                                  <p className="text-slate-500 text-[10px]">{formatFileSize(file.size)}</p>
+                              {fileError && <p className="mt-3 text-sm font-medium text-red-700" role="alert">{fileError}</p>}
+                              {formData.files.length > 0 && (
+                                <div className="mt-3 space-y-2">
+                                  {formData.files.map((file, index) => (
+                                    <div key={`${file.name}-${index}`} className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2">
+                                      <FileImage size={18} className="shrink-0 text-blue-700" aria-hidden="true" />
+                                      <div className="min-w-0 flex-1">
+                                        <p className="truncate text-sm font-semibold text-slate-800">{file.name}</p>
+                                        <p className="text-xs text-slate-500">{formatFileSize(file.size)}</p>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => removeFile(index)}
+                                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-700"
+                                        aria-label={`${t('file.remove')} ${file.name}`}
+                                      >
+                                        <X size={17} aria-hidden="true" />
+                                      </button>
+                                    </div>
+                                  ))}
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={(e) => { e.stopPropagation(); removeFile(idx); }}
-                                  className="w-11 h-11 rounded-full bg-slate-200 hover:bg-red-100 flex items-center justify-center transition-colors flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-                                  aria-label={`Премахни ${file.name}`}
-                                >
-                                  <X size={10} className="text-slate-600 hover:text-red-600" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {submitError && (
-                        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs" role="alert">
-                          {submitError}
+                              )}
+                            </div>
+                          </details>
                         </div>
-                      )}
-                      <button type="submit" disabled={isSubmitting} aria-busy={isSubmitting} className={`w-full min-h-11 glow-btn flex items-center justify-center gap-2 text-xs py-2.5 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}>
-                        {isSubmitting ? (
-                          <>
-                            <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            <span>Изпращане...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Send size={12} /><span>{t('cp.form.submit')}</span>
-                          </>
-                        )}
-                      </button>
-                    </form>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Emergency */}
-        <section className="py-6 bg-gradient-to-b from-slate-50 to-white">
-          <div className="max-w-[1000px] mx-auto px-6 lg:px-10">
-            <div className="glass-card p-5 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-blue-100/50 rounded-full filter blur-[40px]" />
-              <div className="relative flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-slate-900 text-sm font-bold mb-0.5">{t('cp.emergency.title')}</h3>
-                  <p className="text-slate-700 text-xs">{t('cp.emergency.desc')}</p>
-                </div>
-                <a href="tel:0883391411" className="glow-btn flex items-center gap-2 whitespace-nowrap text-xs py-2.5 px-5">
-                  <Phone size={12} /><span>{t('cp.emergency.btn')}</span>
-                </a>
+                        <div className="mt-5 flex items-start gap-2 rounded-xl bg-blue-50 p-3 text-sm leading-6 text-blue-950">
+                          <LockKeyhole size={18} className="mt-0.5 shrink-0 text-blue-700" aria-hidden="true" />
+                          <span>{isBg ? 'Използваме данните само за оценка и комуникация по казуса.' : 'We use your information only to assess and communicate about your case.'}</span>
+                        </div>
+
+                        {submitError && (
+                          <p className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-800" role="alert">
+                            {submitError}
+                          </p>
+                        )}
+
+                        <div className="mt-6 grid grid-cols-[auto_1fr] gap-2">
+                          <button type="button" onClick={handlePreviousStep} className="secondary-cta px-4" aria-label={isBg ? 'Назад към стъпка 1' : 'Back to step 1'}>
+                            <ArrowLeft size={18} aria-hidden="true" />
+                            <span className="hidden sm:inline">{isBg ? 'Назад' : 'Back'}</span>
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            aria-busy={isSubmitting}
+                            className={`primary-cta w-full ${isSubmitting ? 'cursor-not-allowed opacity-70' : ''}`}
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" aria-hidden="true" />
+                                {isBg ? 'Изпращане...' : 'Sending...'}
+                              </>
+                            ) : (
+                              <>
+                                <Send size={18} aria-hidden="true" />
+                                {t('cp.form.submit')}
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </form>
+                )}
               </div>
             </div>
           </div>

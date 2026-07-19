@@ -1,22 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { ArrowRight, Menu, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
-import { Menu, X } from 'lucide-react';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const isBg = lang === 'bg';
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 40);
+    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isActive = (path: string) => location.pathname === path;
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMenuOpen(false);
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMenuOpen]);
 
   const navLinks = [
     { name: t('nav.home'), path: '/' },
@@ -24,70 +40,110 @@ export default function Navbar() {
     { name: t('nav.pricing'), path: '/pricing' },
     { name: t('nav.process'), path: '/process' },
     { name: t('nav.blog'), path: '/blog' },
-    { name: t('nav.contact'), path: '/contact' },
   ];
 
+  const isActive = (path: string) => location.pathname === path;
+
   return (
-    <nav aria-label="Основна навигация" className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white/95 backdrop-blur-xl shadow-sm border-b border-slate-200' : 'bg-white/80 backdrop-blur-md'
-    }`}>
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-        <div className="flex items-center justify-between h-[60px]">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/assets/unbansolutions.png" alt="Unban Solutions" className="h-8 w-auto" width="32" height="32" loading="eager" fetchPriority="high" />
+    <nav
+      aria-label={isBg ? 'Основна навигация' : 'Main navigation'}
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-200 ${
+        isScrolled || isMenuOpen
+          ? 'border-slate-200 bg-white/95 shadow-sm backdrop-blur-xl'
+          : 'border-transparent bg-white/90 backdrop-blur-lg'
+      }`}
+    >
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="flex h-[68px] items-center justify-between">
+          <Link to="/" className="flex min-h-11 items-center rounded-lg" aria-label="Unban Solutions">
+            <img
+              src="/assets/unbansolutions.png"
+              alt="Unban Solutions"
+              className="h-9 w-auto"
+              width="250"
+              height="92"
+              loading="eager"
+              fetchPriority="high"
+            />
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden items-center gap-1 md:flex">
             {navLinks.map((link) => (
-              <Link key={link.path} to={link.path}
-                className={`px-3 py-1.5 text-[0.8rem] font-medium transition-colors rounded-lg ${
-                  isActive(link.path) ? 'text-blue-700 bg-blue-50' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
-                }`}>
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                  isActive(link.path)
+                    ? 'bg-blue-50 text-blue-800'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950'
+                }`}
+              >
                 {link.name}
               </Link>
             ))}
             <LanguageSwitcher />
-            <Link to="/contact"
-              className="ml-2 px-4 py-2 text-[0.75rem] font-bold text-white rounded-lg bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 transition-all shadow-md shadow-blue-500/20">
-              {t('nav.help')}
+            <Link
+              to="/contact"
+              className="ml-2 inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-800"
+            >
+              {t('nav.help')} <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
 
-          <button
-            className="md:hidden w-11 h-11 inline-flex items-center justify-center text-slate-700 hover:text-slate-900 transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-blue-600"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label={isMenuOpen ? 'Затвори меню' : 'Отвори меню'}
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-navigation"
-            type="button"
-          >
-            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          <div className="flex items-center gap-1 md:hidden">
+            <LanguageSwitcher />
+            <button
+              type="button"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-blue-600"
+              onClick={() => setIsMenuOpen((open) => !open)}
+              aria-label={isMenuOpen
+                ? (isBg ? 'Затвори меню' : 'Close menu')
+                : (isBg ? 'Отвори меню' : 'Open menu')}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
+            >
+              {isMenuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+            </button>
+          </div>
         </div>
       </div>
 
       {isMenuOpen && (
-        <div id="mobile-navigation" className="md:hidden bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-lg">
-          <div className="px-6 py-4 space-y-1">
-            {navLinks.map((link) => (
-              <Link key={link.path} to={link.path}
+        <>
+          <button
+            type="button"
+            className="fixed inset-x-0 bottom-0 top-[68px] -z-10 bg-slate-950/25 md:hidden"
+            onClick={() => setIsMenuOpen(false)}
+            aria-label={isBg ? 'Затвори менюто' : 'Close navigation'}
+          />
+          <div id="mobile-navigation" className="border-t border-slate-200 bg-white p-4 shadow-xl md:hidden">
+            <div className="mx-auto max-w-md">
+              <Link
+                to="/contact"
                 onClick={() => setIsMenuOpen(false)}
-                className={`min-h-11 flex items-center px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(link.path) ? 'text-blue-700 bg-blue-50' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
-                }`}>
-                {link.name}
+                className="mb-3 flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3 text-base font-bold text-white"
+              >
+                {t('nav.help')} <ArrowRight size={17} aria-hidden="true" />
               </Link>
-            ))}
-            <div className="pt-2 flex items-center gap-2 px-4">
-              <LanguageSwitcher />
-            </div>
-            <div className="pt-2">
-              <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block min-h-11 text-center px-4 py-2.5 text-sm font-bold text-white rounded-lg bg-gradient-to-r from-blue-600 to-violet-600">
-                {t('nav.help')}
-              </Link>
+              <div className="grid grid-cols-2 gap-2">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex min-h-12 items-center rounded-xl px-4 py-3 text-base font-semibold transition-colors ${
+                      isActive(link.path)
+                        ? 'bg-blue-50 text-blue-800'
+                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-950'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </nav>
   );
