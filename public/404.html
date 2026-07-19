@@ -1,16 +1,21 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="bg">
   <head>
-    <meta charset="utf-8">
-    <title>Unban Solutions</title>
-    <script>
-      // SPA redirect: save the URL and redirect to root
-      var redirect = location.pathname + location.search + location.hash;
-      sessionStorage.setItem('spa_redirect', redirect);
-      location.replace('/');
-    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Страницата не е намерена | Unban Solutions</title>
+    <style>
+      body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f8fafc;color:#0f172a;text-align:center}
+      main{max-width:560px}.code{color:#1d4ed8;font-weight:800;letter-spacing:.18em}h1{font-size:clamp(2rem,6vw,3.5rem);margin:.5rem 0}p{color:#475569;line-height:1.6}a{display:inline-flex;min-height:44px;align-items:center;margin-top:1rem;padding:0 1.25rem;border-radius:.75rem;background:#1d4ed8;color:#fff;font-weight:700;text-decoration:none}a:focus-visible{outline:3px solid #93c5fd;outline-offset:3px}
+    </style>
   </head>
   <body>
-    Redirecting...
+    <main>
+      <div class="code">404</div>
+      <h1>Страницата не е намерена</h1>
+      <p>Адресът може да е променен или страницата вече да не съществува.</p>
+      <a href="/">Към началната страница</a>
+    </main>
   </body>
 </html>

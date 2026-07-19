@@ -1,73 +1,41 @@
-# React + TypeScript + Vite
+# Unban Solutions
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Production website for [unbansolutions.com](https://www.unbansolutions.com), built with React, TypeScript, Vite and Tailwind CSS.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Requirements: Node.js 22 and npm.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm ci
+cp .env.example .env.local
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Useful commands:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `npm run lint` — static code checks
+- `npm test` — security and content-integrity tests
+- `npm run build` — type-check, production build and route metadata generation
+- `npm run check` — the full local/CI verification pipeline
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Production behavior
+
+- Each public route receives its own generated HTML title, description, canonical URL and social metadata.
+- Known blog posts receive `BlogPosting` JSON-LD. Global JSON-LD contains only verifiable organization and website data.
+- Unknown paths are served by the static `404.html`; there is no wildcard SPA rewrite that turns them into soft 404s.
+- Google Analytics and Meta Pixel load only after explicit consent. Consent can be withdrawn from the footer or Privacy Policy.
+- The contact endpoint accepts same-origin multipart requests, validates fields and file signatures, enforces size/rate limits and reads the Resend key only from the environment.
+
+## Required Vercel environment
+
+Configure `RESEND_API_KEY` as a server-only secret. For a rate limit shared by all serverless instances, also configure `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` and a random `RATE_LIMIT_SALT`; the endpoint keeps a local safety limit if Redis is unavailable. `CONTACT_EMAIL`, `FROM_EMAIL` and `SITE_URL` may override their documented defaults. Analytics IDs are public and may be overridden with the `VITE_` variables in `.env.example`.
+
+After removing the previously embedded Resend key, rotate that key in Resend before the next deployment.
+
+## Content rules
+
+- Do not publish success rates, recovery counts, ratings or testimonials without a dated evidence source.
+- Never promise a platform outcome; the relevant platform makes the final decision.
+- Update `public/sitemap.xml` and add route metadata in `scripts/prerender.mjs` whenever a public route or article slug changes.
+- Never request passwords or two-factor authentication codes through the contact form.

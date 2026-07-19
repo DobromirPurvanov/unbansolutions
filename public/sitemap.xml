@@ -1,121 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-
-  <!-- Homepage -->
-  <url>
-    <loc>https://www.unbansolutions.com/</loc>
-    <lastmod>2025-07-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="bg" href="https://www.unbansolutions.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.unbansolutions.com/"/>
-  </url>
-
-  <!-- Services -->
-  <url>
-    <loc>https://www.unbansolutions.com/services</loc>
-    <lastmod>2025-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Pricing -->
-  <url>
-    <loc>https://www.unbansolutions.com/pricing</loc>
-    <lastmod>2025-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Process -->
-  <url>
-    <loc>https://www.unbansolutions.com/process</loc>
-    <lastmod>2025-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Blog -->
-  <url>
-    <loc>https://www.unbansolutions.com/blog</loc>
-    <lastmod>2025-07-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Contact -->
-  <url>
-    <loc>https://www.unbansolutions.com/contact</loc>
-    <lastmod>2025-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Blog Articles -->
- <url>
-    <loc>https://www.unbansolutions.com/blog/kak-da-vazstanovite-banat-instagram-akaunt</loc>
-    <lastmod>2025-06-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://www.unbansolutions.com/blog/shadowban-v-tiktok-kak-da-razberete-i-premahnete</loc>
-    <lastmod>2025-06-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://www.unbansolutions.com/blog/meta-business-suite-ad-account-restriction</loc>
-    <lastmod>2025-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://www.unbansolutions.com/blog/otkradnat-instagram-profil-kak-da-si-go-varnete</loc>
-    <lastmod>2025-05-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://www.unbansolutions.com/blog/youtube-monetizaciya-problemi-i-resheniya</loc>
-    <lastmod>2025-05-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://www.unbansolutions.com/blog/kak-da-zashitite-digitalniya-si-akaunt</loc>
-    <lastmod>2025-05-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Legal Pages -->
-  <url>
-    <loc>https://www.unbansolutions.com/privacy-policy</loc>
-    <lastmod>2025-07-04</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
-
-  <url>
-    <loc>https://www.unbansolutions.com/terms</loc>
-    <lastmod>2025-07-04</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
-
-  <url>
-    <loc>https://www.unbansolutions.com/payments-and-refunds</loc>
-    <lastmod>2025-07-04</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
-
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.unbansolutions.com/</loc><lastmod>2026-07-19</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.unbansolutions.com/services</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.unbansolutions.com/pricing</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.unbansolutions.com/process</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.unbansolutions.com/contact</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.unbansolutions.com/blog</loc><lastmod>2026-07-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.unbansolutions.com/blog/kak-da-podgotvite-obzhalvane-kum-platforma</loc><lastmod>2026-07-03</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.unbansolutions.com/blog/prava-pri-banvane-v-socialnite-mreji</loc><lastmod>2026-07-01</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.unbansolutions.com/blog/ad-account-ogranicheniya-v-meta</loc><lastmod>2026-06-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.unbansolutions.com/blog/sigurnost-na-profila-dvufaktorna-autentikacia</loc><lastmod>2026-06-25</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.unbansolutions.com/blog/kak-raboti-shadowban-v-tiktok</loc><lastmod>2026-06-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.unbansolutions.com/blog/kak-da-predpazite-instagram-akounta-si-ot-ban</loc><lastmod>2026-06-15</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.unbansolutions.com/privacy-policy</loc><lastmod>2026-07-19</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.unbansolutions.com/terms</loc><lastmod>2026-07-19</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.unbansolutions.com/payments-and-refunds</loc><lastmod>2026-07-19</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
 </urlset>

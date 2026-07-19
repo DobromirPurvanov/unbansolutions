@@ -1,17 +1,39 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "outputDirectory": "dist",
-  "rewrites": [
-    { "source": "/api/contact", "destination": "/api/contact.js" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/blog/ad-account-ogranicheniya-v-meta.md", "destination": "/blog/ad-account-ogranicheniya-v-meta", "permanent": true },
+    { "source": "/blog/kak-da-podgotvite-obzhalvane-kum-platforma.md", "destination": "/blog/kak-da-podgotvite-obzhalvane-kum-platforma", "permanent": true },
+    { "source": "/blog/kak-da-predpazite-instagram-akounta-si-ot-ban.md", "destination": "/blog/kak-da-predpazite-instagram-akounta-si-ot-ban", "permanent": true },
+    { "source": "/blog/kak-raboti-shadowban-v-tiktok.md", "destination": "/blog/kak-raboti-shadowban-v-tiktok", "permanent": true },
+    { "source": "/blog/prava-pri-banvane-v-socialnite-mreji.md", "destination": "/blog/prava-pri-banvane-v-socialnite-mreji", "permanent": true },
+    { "source": "/blog/sigurnost-na-profila-dvufaktorna-autentikacia.md", "destination": "/blog/sigurnost-na-profila-dvufaktorna-autentikacia", "permanent": true }
   ],
   "headers": [
     {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()" },
+        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https://www.facebook.com; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.facebook.com; upgrade-insecure-requests" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+        { "key": "Cache-Control", "value": "no-store" }
       ]
     }
   ]

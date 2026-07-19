@@ -1,120 +1,187 @@
-// API endpoint for contact form - uses Resend with full security
+import Busboy from 'busboy';
+import { createHash } from 'node:crypto';
+import { buildEmailTemplate } from './email-template.js';
+import { RATE_LIMIT, checkRateLimit, sanitizeText, validateEmail } from './contact-utils.js';
 
-import { Resend } from "resend";
-import Busboy from "busboy";
-import { buildEmailTemplate, buildClientConfirmationTemplate } from "./email-template.js";
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'support@unbansolutions.com';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'Unban Solutions <noreply@unbansolutions.com>';
 
-// API ключът се чете САМО от environment променлива (Vercel → Settings → Environment Variables).
-// НИКОГА не слагайте ключа директно в кода – репото е публично и GitHub/Resend
-// автоматично деактивират всеки ключ, който бъде комитнат.
-// .trim() маха случайни интервали/нови редове, попаднали при пействането във Vercel.
-const RESEND_API_KEY = (process.env.RESEND_API_KEY || "").trim();
+const MAX_FILE_SIZE = 3 * 1024 * 1024;
+const MAX_TOTAL_FILE_SIZE = 4 * 1024 * 1024;
+const MAX_FILES = 3;
+const MAX_BODY_SIZE = Math.floor(4.25 * 1024 * 1024);
+const ALLOWED_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+]);
+const ALLOWED_FIELDS = new Set(['name', 'email', 'platforms', 'issue', 'message', '_gotcha']);
 
-if (!RESEND_API_KEY) {
-  console.error("[Contact API] FATAL: RESEND_API_KEY environment variable is not set!");
-}
-const resend = new Resend(RESEND_API_KEY);
-
-// Получатели на известията – ФИКСИРАНИ в кода, БЕЗ env променливи
-// (env четенето докара плейсхолдър катастрофата). Всяко запитване пристига
-// и в трите кутии едновременно – загуба на мейл вече е невъзможна.
-const TO_EMAILS = [
-  "Dobromirpurvanov@gmail.com",
-  "support@unbansolutions.com",
-  "adsjustpablo@gmail.com",
-];
-const FROM_EMAIL = "Unban Solutions <noreply@unbansolutions.com>";
-
-// ======== RATE LIMITER ========
-const RATE_LIMIT = 5; // max 5 requests
-const RATE_WINDOW = 15 * 60 * 1000; // 15 minutes in ms
-const ipStore = new Map();
-
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const record = ipStore.get(ip);
-
-  if (!record) {
-    ipStore.set(ip, { count: 1, firstRequest: now });
-    return { allowed: true, remaining: RATE_LIMIT - 1 };
+class ClientError extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
   }
-
-  if (now - record.firstRequest > RATE_WINDOW) {
-    // Window expired, reset
-    ipStore.set(ip, { count: 1, firstRequest: now });
-    return { allowed: true, remaining: RATE_LIMIT - 1 };
-  }
-
-  if (record.count >= RATE_LIMIT) {
-    const retryAfter = Math.ceil((RATE_WINDOW - (now - record.firstRequest)) / 1000);
-    return { allowed: false, retryAfter };
-  }
-
-  record.count++;
-  return { allowed: true, remaining: RATE_LIMIT - record.count };
 }
 
-// ======== INPUT VALIDATION ========
-function validateEmail(email) {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
+function cleanFilename(input) {
+  const filename = sanitizeText(input, 120)
+    .replace(/[\\/\0-\x1f\x7f]/g, '-')
+    .replace(/\.{2,}/g, '.');
+  return filename || 'attachment';
 }
 
-function sanitizeInput(input) {
-  if (!input || typeof input !== 'string') return '';
-  return input.trim().slice(0, 5000); // max 5000 chars
+function hasValidSignature(buffer, mimeType) {
+  if (mimeType === 'image/jpeg') return buffer.length >= 3 && buffer.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]));
+  if (mimeType === 'image/png') return buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  if (mimeType === 'image/gif') return buffer.length >= 6 && ['GIF87a', 'GIF89a'].includes(buffer.subarray(0, 6).toString('ascii'));
+  if (mimeType === 'image/webp') return buffer.length >= 12 && buffer.subarray(0, 4).toString('ascii') === 'RIFF' && buffer.subarray(8, 12).toString('ascii') === 'WEBP';
+  if (mimeType === 'application/pdf') return buffer.length >= 5 && buffer.subarray(0, 5).toString('ascii') === '%PDF-';
+  return false;
+}
+
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  const firstForwarded = Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(',')[0];
+  return sanitizeText(firstForwarded || req.socket?.remoteAddress || 'unknown', 64);
+}
+
+async function checkDistributedRateLimit(ip) {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+
+  const keyHash = createHash('sha256')
+    .update(`${process.env.RATE_LIMIT_SALT || process.env.SITE_URL || 'unban-solutions'}:${ip}`)
+    .digest('hex')
+    .slice(0, 32);
+  const key = `contact-rate:${keyHash}`;
+  const script = "local count=redis.call('INCR',KEYS[1]); if count==1 then redis.call('PEXPIRE',KEYS[1],ARGV[1]); end; local ttl=redis.call('PTTL',KEYS[1]); return {count,ttl}";
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(['EVAL', script, 1, key, 15 * 60 * 1000]),
+      signal: AbortSignal.timeout(1_500),
+    });
+    if (!response.ok) throw new Error('rate_limit_provider_error');
+    const payload = await response.json();
+    const [count, ttl] = Array.isArray(payload.result) ? payload.result.map(Number) : [];
+    if (!Number.isFinite(count) || !Number.isFinite(ttl)) throw new Error('invalid_rate_limit_response');
+    return {
+      allowed: count <= RATE_LIMIT,
+      remaining: Math.max(0, RATE_LIMIT - count),
+      retryAfter: Math.max(1, Math.ceil(ttl / 1000)),
+    };
+  } catch (error) {
+    console.error('[Contact API] Distributed rate limiter unavailable:', error instanceof Error ? error.name : 'unknown_error');
+    return null;
+  }
+}
+
+function isAllowedOrigin(req) {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+
+  try {
+    const originHost = new URL(origin).host;
+    const requestHost = sanitizeText(req.headers.host, 255);
+    const canonicalHost = new URL(process.env.SITE_URL || 'https://www.unbansolutions.com').host;
+    return originHost === requestHost || originHost === canonicalHost || originHost === 'unbansolutions.com';
+  } catch {
+    return false;
+  }
 }
 
 function parseForm(req) {
   return new Promise((resolve, reject) => {
-    if (!req.headers["content-type"]) {
-      reject(new Error("Missing Content-Type header"));
+    const contentType = req.headers['content-type'] || '';
+    if (!contentType.toLowerCase().startsWith('multipart/form-data')) {
+      reject(new ClientError(415, 'Форматът на заявката не се поддържа.'));
       return;
     }
 
-    const busboy = Busboy({ headers: req.headers });
+    const contentLength = Number(req.headers['content-length'] || 0);
+    if (Number.isFinite(contentLength) && contentLength > MAX_BODY_SIZE) {
+      reject(new ClientError(413, 'Файловете са твърде големи.'));
+      return;
+    }
+
+    let busboy;
+    try {
+      busboy = Busboy({
+        headers: req.headers,
+        limits: {
+          files: MAX_FILES,
+          fileSize: MAX_FILE_SIZE,
+          fields: ALLOWED_FIELDS.size,
+          fieldSize: 5000,
+          parts: ALLOWED_FIELDS.size + MAX_FILES,
+        },
+      });
+    } catch {
+      reject(new ClientError(400, 'Невалидни данни във формата.'));
+      return;
+    }
+
     const data = {};
     const attachments = [];
+    let totalFileSize = 0;
+    let parsingError = null;
 
-    busboy.on("file", (_fieldname, file, info) => {
-      const { filename, mimeType } = info;
-      const buffer = [];
+    const fail = (error) => {
+      if (!parsingError) parsingError = error;
+    };
 
-      file.on("data", (chunk) => buffer.push(chunk));
+    busboy.on('file', (_fieldname, file, info) => {
+      const mimeType = sanitizeText(info.mimeType, 100).toLowerCase();
+      const filename = cleanFilename(info.filename);
+      const chunks = [];
+      let fileSize = 0;
 
-      file.on("end", () => {
-        const fileBuffer = Buffer.concat(buffer);
-        // Validate file size (max 10MB)
-        if (fileBuffer.length > 10 * 1024 * 1024) {
-          reject(new Error(`File ${filename} exceeds 10MB limit`));
+      if (!ALLOWED_TYPES.has(mimeType)) {
+        fail(new ClientError(400, 'Позволени са само JPG, PNG, GIF, WebP и PDF файлове.'));
+        file.resume();
+        return;
+      }
+
+      file.on('limit', () => fail(new ClientError(413, `Файлът ${filename} надвишава 3 MB.`)));
+      file.on('data', (chunk) => {
+        fileSize += chunk.length;
+        totalFileSize += chunk.length;
+        if (totalFileSize > MAX_TOTAL_FILE_SIZE) {
+          fail(new ClientError(413, 'Общият размер на файловете надвишава 4 MB.'));
           return;
         }
-        // Validate file type
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
-        if (!allowedTypes.includes(mimeType)) {
-          reject(new Error(`File type ${mimeType} not allowed`));
+        chunks.push(chunk);
+      });
+      file.on('end', () => {
+        if (parsingError || fileSize === 0) return;
+        const buffer = Buffer.concat(chunks);
+        if (!hasValidSignature(buffer, mimeType)) {
+          fail(new ClientError(400, `Съдържанието на файла ${filename} не отговаря на типа му.`));
           return;
         }
-        if (fileBuffer.length > 0) {
-          attachments.push({
-            filename,
-            content: fileBuffer.toString("base64"),
-            mimetype: mimeType,
-          });
-        }
+        attachments.push({ filename, content: buffer.toString('base64') });
       });
     });
 
-    busboy.on("field", (fieldname, val) => {
-      data[fieldname] = val;
+    busboy.on('field', (fieldname, value) => {
+      if (ALLOWED_FIELDS.has(fieldname)) data[fieldname] = value;
     });
-
-    busboy.on("finish", () => {
-      resolve({ ...data, attachments });
-    });
-
-    busboy.on("error", (err) => {
-      reject(err);
+    busboy.on('filesLimit', () => fail(new ClientError(413, `Можете да прикачите до ${MAX_FILES} файла.`)));
+    busboy.on('fieldsLimit', () => fail(new ClientError(400, 'Формата съдържа твърде много полета.')));
+    busboy.on('partsLimit', () => fail(new ClientError(400, 'Формата съдържа твърде много части.')));
+    busboy.on('error', () => reject(new ClientError(400, 'Невалидни данни във формата.')));
+    busboy.on('finish', () => {
+      if (parsingError) reject(parsingError);
+      else resolve({ ...data, attachments });
     });
 
     req.pipe(busboy);
@@ -122,269 +189,89 @@ function parseForm(req) {
 }
 
 export default async function handler(req, res) {
-  // CORS headers
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Vary', 'Origin');
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
+  if (!isAllowedOrigin(req)) {
+    return res.status(403).json({ error: 'Заявката е отказана.' });
   }
 
-  // ======== ДИАГНОСТИКА ========
-  // Отваря се в браузъра: /api/contact?diag=unban2026
-  // Показва версията, ключа, получателите И праща истински тестов мейл.
-  if (req.method === "GET") {
-    let diagToken = "";
-    try { diagToken = new URL(req.url, "http://x").searchParams.get("diag") || ""; } catch (e) {}
-    if (diagToken === "unban2026") {
-      const key = (process.env.RESEND_API_KEY || "").trim();
-      const out = {
-        версия: "diag-v1 / деплой от " + new Date().toISOString(),
-        resend_ключ: key ? key.slice(0, 8) + "… (" + key.length + " знака)" : "❌ ЛИПСВА ВЪВ VERCEL",
-        recaptcha_secret: (process.env.RECAPTCHA_SECRET_KEY || "").trim() ? "има" : "няма (мек режим)",
-        получатели: TO_EMAILS,
-        подател: FROM_EMAIL,
-      };
-      if (key) {
-        try {
-          const { data, error } = await resend.emails.send({
-            from: FROM_EMAIL,
-            to: TO_EMAILS,
-            subject: "🔧 ДИАГНОСТИКА — " + new Date().toLocaleString("bg-BG", { timeZone: "Europe/Sofia" }),
-            html: "<p>Тестов мейл от диагностиката на unbansolutions.com.<br>Ако четете това – изпращането и доставката работят.</p>",
-          });
-          out.тестов_мейл = error
-            ? { грешка: error.message || error.name || JSON.stringify(error) }
-            : { изпратен: true, id: data?.id, бележка: "Проверете Gmail (и Spam) + support@ кутията" };
-        } catch (e) {
-          out.тестов_мейл = { crash: e?.message || String(e) };
-        }
-      }
-      return res.status(200).json(out);
-    }
-    return res.status(405).json({ error: "Method not allowed" });
+  if (req.headers.origin) {
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+  if (req.method === 'OPTIONS') return res.status(204).end();
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST, OPTIONS');
+    return res.status(405).json({ error: 'Методът не се поддържа.' });
+  }
+
+  const clientIp = getClientIp(req);
+  const localRateCheck = checkRateLimit(clientIp);
+  const distributedRateCheck = localRateCheck.allowed ? await checkDistributedRateLimit(clientIp) : null;
+  const rateCheck = distributedRateCheck || localRateCheck;
+  res.setHeader('X-RateLimit-Limit', String(RATE_LIMIT));
+  res.setHeader('X-RateLimit-Remaining', String(rateCheck.remaining));
+  if (!rateCheck.allowed) {
+    res.setHeader('Retry-After', String(rateCheck.retryAfter));
+    return res.status(429).json({ error: 'Твърде много опити. Моля, опитайте отново след малко.' });
   }
 
   try {
-    // ======== CONFIG CHECK ========
-    if (!RESEND_API_KEY) {
-      return res.status(500).json({
-        error: "Server misconfiguration: RESEND_API_KEY is not set in environment variables.",
-      });
-    }
-
-    // ДИАГНОСТИКА: отпечатък на ключа, който продукцията реално ползва.
-    // Не разкрива целия ключ – само първите 8 символа и дължините.
-    const rawKey = process.env.RESEND_API_KEY || "";
-    console.log(
-      `[Contact API] Key fingerprint: starts=${RESEND_API_KEY.slice(0, 8)}..., trimmedLength=${RESEND_API_KEY.length}, rawLength=${rawKey.length}` +
-      (rawKey.length !== RESEND_API_KEY.length ? " ⚠️ КЛЮЧЪТ СЪДЪРЖАШЕ ПРАЗНИ СИМВОЛИ (оправено с trim)" : "")
-    );
-
-    // ======== RATE LIMITING ========
-    const clientIp = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(',')[0].trim();
-    console.log("[Contact API] Request from IP:", clientIp);
-    console.log("[Contact API] Content-Type:", req.headers["content-type"]);
-    
-    const rateCheck = checkRateLimit(clientIp);
-    
-    if (!rateCheck.allowed) {
-      res.setHeader("Retry-After", rateCheck.retryAfter);
-      return res.status(429).json({ 
-        error: "Too many requests. Please try again later.",
-        retryAfter: rateCheck.retryAfter
-      });
-    }
-
-    console.log("[Contact API] Parsing form...");
     const formData = await parseForm(req);
-    console.log("[Contact API] Form parsed. Fields:", Object.keys(formData).filter(k => k !== 'attachments'));
-    console.log("[Contact API] Attachments:", formData.attachments?.length || 0);
-
-    // ======== HONEYPOT CHECK ========
-    if (formData._gotcha && formData._gotcha.trim() !== '') {
-      // Bot detected - silently accept but don't send
-      console.log(`Bot detected from IP: ${clientIp}`);
-      return res.status(200).json({ success: true, message: "Received" });
+    if (sanitizeText(formData._gotcha, 100)) {
+      return res.status(200).json({ success: true });
     }
 
-    // ======== reCAPTCHA v3 ПРОВЕРКА ========
-    // Има ли токен – проверяваме го при Google (score < 0.5 = бот, тих отказ).
-    // НЯМА ли токен – пропускаме проверката и разчитаме на останалите филтри.
-    // СТРИКТЕН РЕЖИМ: като потвърдите, че badge-ът "protected by reCAPTCHA"
-    // се вижда долу вдясно на страницата с формата, сменете false на true –
-    // тогава и директните API ботове без токен ще отпадат.
-    const REQUIRE_RECAPTCHA_TOKEN = false;
-
-    const recaptchaSecret = (process.env.RECAPTCHA_SECRET_KEY || "").trim();
-    if (recaptchaSecret) {
-      const token = formData._recaptcha;
-      if (!token) {
-        console.warn(`[Contact API] Няма reCAPTCHA токен (VITE_RECAPTCHA_SITE_KEY липсва в build-а?) IP: ${clientIp}`);
-        if (REQUIRE_RECAPTCHA_TOKEN) {
-          return res.status(200).json({ success: true, message: "Received" });
-        }
-        // Пропускаме проверката – honeypot, линк филтърът и rate limit пазят.
-      } else {
-        try {
-          const verifyRes = await fetch("https://www.google.com/recaptcha/api/siteverify", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ secret: recaptchaSecret, response: token, remoteip: clientIp }),
-          });
-          const verify = await verifyRes.json();
-          console.log(`[Contact API] reCAPTCHA: success=${verify.success}, score=${verify.score}, action=${verify.action}`);
-          if (!verify.success || (typeof verify.score === "number" && verify.score < 0.5)) {
-            console.log(`[Contact API] Нисък reCAPTCHA рейтинг (score: ${verify.score ?? "n/a"}, errors: ${JSON.stringify(verify["error-codes"] || [])}) IP: ${clientIp}`);
-            // В мек режим (REQUIRE_RECAPTCHA_TOKEN=false) само записваме и пускаме –
-            // бързите повторни тестове на реален човек получават нисък score и не
-            // бива да изчезват тихо. В строг режим (true) ботовете се режат тук.
-            if (REQUIRE_RECAPTCHA_TOKEN) {
-              return res.status(200).json({ success: true, message: "Received" });
-            }
-          }
-        } catch (recaptchaErr) {
-          // Google недостъпен – пропускаме проверката, не наказваме клиента
-          console.error("[Contact API] reCAPTCHA verify failed:", recaptchaErr?.message || recaptchaErr);
-        }
-      }
-    } else {
-      console.warn("[Contact API] RECAPTCHA_SECRET_KEY не е зададен – проверката е пропусната");
-    }
-
-    const name = sanitizeInput(formData.name);
-    const email = sanitizeInput(formData.email);
-    const phone = sanitizeInput(formData.phone);
-    const platforms = sanitizeInput(formData.platforms);
-    const issue = sanitizeInput(formData.issue);
-    const message = sanitizeInput(formData.message);
+    const name = sanitizeText(formData.name, 120);
+    const email = sanitizeText(formData.email, 254).toLowerCase();
+    const platforms = sanitizeText(formData.platforms, 300);
+    const issue = sanitizeText(formData.issue, 200);
+    const message = sanitizeText(formData.message, 5000);
     const attachments = formData.attachments || [];
 
-    // ======== VALIDATION ========
-    if (!name || name.length < 2) {
-      return res.status(400).json({ error: "Name must be at least 2 characters" });
-    }
-    
-    if (!email || !validateEmail(email)) {
-      return res.status(400).json({ error: "Valid email is required" });
+    if (name.length < 2) throw new ClientError(400, 'Името трябва да е поне 2 символа.');
+    if (!validateEmail(email)) throw new ClientError(400, 'Моля, въведете валиден имейл адрес.');
+    if (message.length < 10) throw new ClientError(400, 'Съобщението трябва да е поне 10 символа.');
+
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error('[Contact API] RESEND_API_KEY is not configured.');
+      return res.status(503).json({ error: 'Формата временно не е достъпна. Моля, свържете се по телефон или имейл.' });
     }
 
-    // Телефонът е задължителен: 6–15 цифри (покрива 088..., +359..., чужди номера)
-    const phoneDigits = (phone || "").replace(/\D/g, "");
-    if (!phone || phoneDigits.length < 6 || phoneDigits.length > 15) {
-      return res.status(400).json({ error: "Моля, въведете валиден телефонен номер." });
-    }
-
-    // ======== ЕДНОКРАТНИ (DISPOSABLE) ИМЕЙЛИ ========
-    const DISPOSABLE_DOMAINS = [
-      "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com",
-      "temp-mail.org", "yopmail.com", "sharklasers.com", "trashmail.com",
-      "getnada.com", "maildrop.cc", "fakeinbox.com", "dispostable.com",
-    ];
-    const emailDomain = email.split("@")[1]?.toLowerCase() || "";
-    if (DISPOSABLE_DOMAINS.includes(emailDomain)) {
-      return res.status(400).json({ error: "Моля, използвайте реален имейл адрес, за да можем да се свържем с вас." });
-    }
-
-    // ======== ЛИНК СПАМ ФИЛТЪР ========
-    // Клиент може да пейстне линк-два към профила си – това е ок.
-    // Съобщение с 4+ линка или HTML/BBCode линкове е почти сигурно спам: тих отказ.
-    const linkCount = ((message || "").match(/https?:\/\/|www\./gi) || []).length;
-    if (linkCount > 3 || /\[url=|<a\s+href/i.test(message || "")) {
-      console.log(`[Contact API] Spam dropped (links: ${linkCount}) IP: ${clientIp}`);
-      return res.status(200).json({ success: true, message: "Received" });
-    }
-    
-    if (!message || message.length < 10) {
-      return res.status(400).json({ error: "Message must be at least 10 characters" });
-    }
-
-    // Max 5 attachments
-    if (attachments.length > 5) {
-      return res.status(400).json({ error: "Maximum 5 attachments allowed" });
-    }
-
-    // ======== BUILD EMAIL ========
-    const userAgent = req.headers["user-agent"] || "";
-    
+    const { Resend } = await import('resend');
+    const resend = new Resend(apiKey);
     const html = buildEmailTemplate({
       name,
       email,
-      phone,
       platforms,
       issue,
       message,
       attachmentsCount: attachments.length,
-      ip: clientIp,
-      userAgent,
       timestamp: Date.now(),
     });
 
-    const emailAttachments = attachments.map((att) => ({
-      filename: att.filename,
-      content: att.content,
-    }));
-
-    // ======== SEND EMAIL ========
-    console.log("[Contact API] Sending email...");
-    console.log("[Contact API] From:", FROM_EMAIL);
-    console.log("[Contact API] To:", TO_EMAILS.join(", "));
-    console.log("[Contact API] ReplyTo:", email);
-    
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: FROM_EMAIL,
-      to: TO_EMAILS,
+      to: [CONTACT_EMAIL],
       replyTo: email,
-      subject: `Ново запитване от ${name}${platforms ? " · " + platforms : ""}`,
+      subject: `${name} – ново запитване от Unban Solutions`,
       html,
-      attachments: emailAttachments.length > 0 ? emailAttachments : undefined,
+      attachments: attachments.length ? attachments : undefined,
     });
 
     if (error) {
-      console.error("[Contact API] Resend error:", JSON.stringify(error, null, 2));
-      return res.status(500).json({ 
-        error: "Failed to send email", 
-        details: error.message || error.name || JSON.stringify(error),
-        from: FROM_EMAIL,
-        to: TO_EMAILS.join(", ")
-      });
-    }
-    
-    console.log("[Contact API] Email sent! ID:", data?.id);
-
-    // ======== АВТО-ОТГОВОР ДО КЛИЕНТА ========
-    // Потвърждение „Получихме запитването ви". Ако то се провали,
-    // НЕ проваляме заявката – известието до екипа вече е изпратено.
-    try {
-      const confirmation = await resend.emails.send({
-        from: FROM_EMAIL,
-        to: [email],
-        replyTo: "support@unbansolutions.com",
-        subject: "Получихме запитването ви — Unban Solutions",
-        html: buildClientConfirmationTemplate({ name, platforms, issue, message }),
-      });
-      if (confirmation.error) {
-        console.error("[Contact API] Client confirmation error:", JSON.stringify(confirmation.error));
-      } else {
-        console.log("[Contact API] Client confirmation sent! ID:", confirmation.data?.id);
-      }
-    } catch (confirmErr) {
-      console.error("[Contact API] Client confirmation failed:", confirmErr?.message || confirmErr);
+      console.error('[Contact API] Email provider rejected the request:', error.name || 'unknown_error');
+      return res.status(502).json({ error: 'Съобщението не беше изпратено. Моля, опитайте отново или се свържете по телефон.' });
     }
 
-    return res.status(200).json({
-      success: true,
-      message: "Email sent successfully",
-      emailId: data?.id,
-      attachmentsCount: attachments.length,
-    });
-  } catch (err) {
-    console.error("Contact API error:", err);
-    return res.status(500).json({ error: err.message || "Internal server error" });
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    if (error instanceof ClientError) return res.status(error.status).json({ error: error.message });
+    console.error('[Contact API] Unexpected error:', error instanceof Error ? error.name : 'unknown_error');
+    return res.status(500).json({ error: 'Възникна неочаквана грешка. Моля, опитайте отново.' });
   }
 }

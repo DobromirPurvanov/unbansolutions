@@ -1,12 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /*.md$
 
-# Sitemap
 Sitemap: https://www.unbansolutions.com/sitemap.xml
-
-# Disallow auth pages
-Disallow: /login
-Disallow: /register
-
-# Crawl rate
-Crawl-delay: 1
