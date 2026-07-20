@@ -81,25 +81,45 @@ test('analytics receives generic funnel events without case metadata', async () 
   }
 });
 
-test('blog output has one page heading and explicit article typography', async () => {
-  const generated = await readFile(new URL('../src/generated/blog-posts.ts', import.meta.url), 'utf8');
-  const styles = await readFile(new URL('../src/index.css', import.meta.url), 'utf8');
+test('blog drafts and article runtime remain unpublished', async () => {
+  const app = await readFile(new URL('../src/App.tsx', import.meta.url), 'utf8');
+  const blog = await readFile(new URL('../src/pages/Blog.tsx', import.meta.url), 'utf8');
   const prerender = await readFile(new URL('../scripts/prerender.mjs', import.meta.url), 'utf8');
-
-  assert.doesNotMatch(generated, /"html": "\\u003ch1>/);
-  assert.match(styles, /\.prose-blog h2/);
-  assert.match(styles, /\.prose-blog ul/);
-  assert.match(prerender, /id="route-schema"/);
-  assert.doesNotMatch(prerender, /id="page-schema"/);
-});
-
-test('sitemap article URLs exactly match the markdown slugs', async () => {
+  const ignore = await readFile(new URL('../.gitignore', import.meta.url), 'utf8');
+  const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
   const sitemap = await readFile(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
-  const files = (await readdir(new URL('../public/blog/', import.meta.url))).filter((file) => file.endsWith('.md'));
-  for (const filename of files) {
-    const slug = filename.slice(0, -3);
-    assert.match(sitemap, new RegExp(`<loc>https://www\\.unbansolutions\\.com/blog/${slug}</loc>`));
+  const redirects = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
+  let publicArticles = [];
+  try {
+    publicArticles = (await readdir(new URL('../public/blog/', import.meta.url))).filter((file) => file.endsWith('.md'));
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error;
   }
+
+  assert.deepEqual(publicArticles, []);
+  assert.match(app, /path="\/blog"/);
+  assert.doesNotMatch(app, /BlogPost|\/blog\/:slug/);
+  assert.doesNotMatch(blog, /loadBlogPosts|to=\{`\/blog\//);
+  assert.doesNotMatch(prerender, /BlogPosting|blogDirectory/);
+  assert.match(ignore, /^content\/blog-drafts\/$/m);
+  assert.equal(packageJson.scripts.dev, 'vite');
+  assert.doesNotMatch(packageJson.scripts.build, /generate-blog-data/);
+  for (const hiddenRuntime of [
+    '../scripts/generate-blog-data.mjs',
+    '../src/pages/BlogPost.tsx',
+    '../src/lib/blog.ts',
+    '../src/generated/blog-posts.ts',
+  ]) {
+    await assert.rejects(
+      readFile(new URL(hiddenRuntime, import.meta.url), 'utf8'),
+      (error) => error?.code === 'ENOENT',
+    );
+  }
+  assert.equal((sitemap.match(/<loc>https:\/\/www\.unbansolutions\.com\/blog(?:<|\/)/g) || []).length, 1);
+  assert.deepEqual(
+    redirects.redirects.find((redirect) => redirect.source === '/blog/:slug'),
+    { source: '/blog/:slug', destination: '/blog', permanent: false },
+  );
 });
 
 function createResponse() {

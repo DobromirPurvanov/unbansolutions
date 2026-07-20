@@ -22,7 +22,7 @@ Useful commands:
 ## Production behavior
 
 - Each public route receives its own generated HTML title, description, canonical URL and social metadata.
-- Known blog posts receive `BlogPosting` JSON-LD. Global JSON-LD contains only verifiable organization and website data.
+- The blog is currently a non-clickable “coming soon” preview. Local article drafts may stay under ignored `content/blog-drafts` and are not tracked or copied into the public build.
 - Unknown paths are served by the static `404.html`; there is no wildcard SPA rewrite that turns them into soft 404s.
 - Google Analytics and Meta Pixel load only after explicit consent. Consent can be withdrawn from the footer or Privacy Policy.
 - The contact endpoint accepts same-origin multipart requests, validates fields and file signatures, enforces size/rate limits and reads the Resend key only from the environment.
@@ -39,5 +39,5 @@ Two Resend keys were embedded in earlier, already-published commits. Revoke both
 
 - Do not publish success rates, recovery counts, ratings or testimonials without a dated evidence source.
 - Never promise a platform outcome; the relevant platform makes the final decision.
-- Update `public/sitemap.xml` and add route metadata in `scripts/prerender.mjs` whenever a public route or article slug changes.
+- Update `public/sitemap.xml` and add route metadata in `scripts/prerender.mjs` whenever a public route changes. Publish blog routes only after their drafts are approved.
 - Never request passwords or two-factor authentication codes through the contact form.

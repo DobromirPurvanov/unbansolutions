@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import type { CSSProperties } from 'react';
 import { ArrowRight, CheckCircle2, ClipboardList, Clock3, Rocket, Search, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
@@ -26,11 +27,12 @@ export default function Process() {
       />
 
       <main>
-        <section className="border-b border-slate-200 bg-slate-50 pt-24 pb-10 sm:pt-28 sm:pb-14">
+        <section className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-slate-50 via-white to-violet-50/60 pt-24 pb-8 sm:pt-28 sm:pb-10">
+          <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-violet-200/35 blur-[90px]" aria-hidden="true" />
           <div className="mx-auto max-w-5xl px-5 sm:px-6">
             <p className="section-kicker">{t('pr.hero.label')}</p>
             <h1 className="mt-3 max-w-4xl text-[clamp(2.3rem,7vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-slate-950">
-              {isBg ? 'От първоначална оценка до ' : 'From initial assessment to '}<span className="text-blue-700">{isBg ? 'проследяване на казуса' : 'case follow-up'}</span>
+              {isBg ? 'От първоначална оценка до ' : 'From initial assessment to '}<span className="gradient-text">{isBg ? 'проследяване на казуса' : 'case follow-up'}</span>
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">
               {isBg
@@ -40,12 +42,17 @@ export default function Process() {
           </div>
         </section>
 
-        <section className="bg-white py-12 sm:py-20">
+        <section className="bg-white py-10 sm:py-16">
           <div className="mx-auto max-w-4xl px-5 sm:px-6">
             <ol className="relative space-y-5 before:absolute before:bottom-8 before:left-9 before:top-8 before:w-px before:bg-slate-200 sm:before:left-12">
-              {steps.map((step) => (
-                <li key={step.num} className="relative rounded-3xl border border-slate-200 bg-white p-5 pl-20 shadow-[0_12px_35px_rgba(15,23,42,0.06)] sm:p-7 sm:pl-24">
-                  <span className="absolute left-3 top-5 z-10 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-700 text-white shadow-[0_0_0_6px_white] sm:left-4 sm:top-7 sm:h-16 sm:w-16">
+              {steps.map((step, index) => (
+                <li
+                  key={step.num}
+                  className="relative rounded-3xl border border-slate-200 bg-white p-5 pl-20 shadow-[0_12px_35px_rgba(15,23,42,0.06)] sm:p-7 sm:pl-24"
+                  data-reveal
+                  style={{ '--reveal-delay': `${Math.min(index, 3) * 55}ms` } as CSSProperties}
+                >
+                  <span className={`absolute left-3 top-5 z-10 flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-[0_0_0_6px_white] sm:left-4 sm:top-7 sm:h-16 sm:w-16 ${index % 2 === 1 ? 'bg-violet-700' : 'bg-blue-700'}`}>
                     <step.icon size={22} aria-hidden="true" />
                   </span>
 
@@ -72,7 +79,7 @@ export default function Process() {
               ))}
             </ol>
 
-            <div className="mt-7 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950 sm:p-5 sm:text-base">
+            <div className="mt-7 rounded-2xl border border-violet-200 bg-gradient-to-r from-blue-50 to-violet-50 p-4 text-sm leading-6 text-slate-800 sm:p-5 sm:text-base">
               {isBg
                 ? 'Посочените срокове са ориентировъчни. Решението и времето за отговор на платформата не са под контрола на Unban Solutions.'
                 : 'The listed timeframes are indicative. The platform decision and response time are outside the control of Unban Solutions.'}
@@ -80,7 +87,7 @@ export default function Process() {
           </div>
         </section>
 
-        <section className="bg-slate-950 py-12 text-white sm:py-16">
+        <section className="bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 py-11 text-white sm:py-14">
           <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-6 px-5 sm:px-6 lg:flex-row lg:items-center">
             <div className="max-w-2xl">
               <h2 className="text-3xl font-bold text-white">{isBg ? 'Първата стъпка е кратка оценка' : 'The first step is a short assessment'}</h2>

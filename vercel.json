@@ -8,12 +8,7 @@
     { "source": "/login", "destination": "/contact", "permanent": false },
     { "source": "/register", "destination": "/contact", "permanent": false },
     { "source": "/portal", "destination": "/contact", "permanent": false },
-    { "source": "/blog/ad-account-ogranicheniya-v-meta.md", "destination": "/blog/ad-account-ogranicheniya-v-meta", "permanent": true },
-    { "source": "/blog/kak-da-podgotvite-obzhalvane-kum-platforma.md", "destination": "/blog/kak-da-podgotvite-obzhalvane-kum-platforma", "permanent": true },
-    { "source": "/blog/kak-da-predpazite-instagram-akounta-si-ot-ban.md", "destination": "/blog/kak-da-predpazite-instagram-akounta-si-ot-ban", "permanent": true },
-    { "source": "/blog/kak-raboti-shadowban-v-tiktok.md", "destination": "/blog/kak-raboti-shadowban-v-tiktok", "permanent": true },
-    { "source": "/blog/prava-pri-banvane-v-socialnite-mreji.md", "destination": "/blog/prava-pri-banvane-v-socialnite-mreji", "permanent": true },
-    { "source": "/blog/sigurnost-na-profila-dvufaktorna-autentikacia.md", "destination": "/blog/sigurnost-na-profila-dvufaktorna-autentikacia", "permanent": true }
+    { "source": "/blog/:slug", "destination": "/blog", "permanent": false }
   ],
   "headers": [
     {

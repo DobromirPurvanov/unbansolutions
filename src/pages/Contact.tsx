@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -277,17 +277,27 @@ export default function Contact() {
       />
 
       <main>
-        <section className="border-b border-slate-200 bg-slate-50 pt-24 pb-8 sm:pt-28 sm:pb-10">
+        <section className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-slate-50 via-white to-violet-50/70 pt-24 pb-7 sm:pt-28 sm:pb-9">
+          <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-violet-200/35 blur-[90px]" aria-hidden="true" />
           <div className="mx-auto max-w-5xl px-5 sm:px-6">
             <p className="section-kicker">{t('cp.hero.label')}</p>
             <h1 className="mt-3 max-w-3xl text-[clamp(2.15rem,7vw,3.75rem)] font-extrabold leading-[1.06] tracking-[-0.04em] text-slate-950">
-              {t('cp.hero.title')}<span className="text-blue-700">{t('cp.hero.titleSpan')}</span>
+              {t('cp.hero.title')}<span className="gradient-text">{t('cp.hero.titleSpan')}</span>
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{t('cp.hero.desc')}</p>
+            <Link
+              to="/pricing"
+              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-violet-200 bg-white/90 px-4 py-2 text-sm font-bold text-slate-900 shadow-sm transition-colors hover:border-violet-300 hover:bg-violet-50"
+            >
+              <span className="text-violet-700">{isBg ? 'Цени' : 'Pricing'}</span>
+              <span aria-hidden="true">·</span>
+              <span>100 · 250 · 500 EUR</span>
+              <ArrowRight size={15} className="text-violet-700" aria-hidden="true" />
+            </Link>
           </div>
         </section>
 
-        <section className="bg-white py-8 sm:py-14">
+        <section className="bg-white py-6 sm:py-10">
           <div className="mx-auto grid max-w-5xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:gap-10">
             <aside className="order-2 lg:order-1">
               <div className="lg:sticky lg:top-24">
@@ -334,8 +344,18 @@ export default function Contact() {
             </aside>
 
             <div className="order-1 lg:order-2">
-              <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.1)] sm:p-7">
-                <div className="mb-7" aria-label={isBg ? `Стъпка ${activeStep} от 3` : `Step ${activeStep} of 3`}>
+              <div className="rounded-3xl border border-violet-200/70 bg-white p-4 shadow-[0_20px_60px_rgba(63,47,120,0.11)] sm:p-7">
+                <div
+                  className="mb-7"
+                  role="progressbar"
+                  aria-label={isBg ? 'Напредък на оценката' : 'Assessment progress'}
+                  aria-valuemin={1}
+                  aria-valuemax={3}
+                  aria-valuenow={activeStep}
+                  aria-valuetext={isBg
+                    ? `Стъпка ${activeStep} от 3: ${progressLabels[activeStep - 1]}`
+                    : `Step ${activeStep} of 3: ${progressLabels[activeStep - 1]}`}
+                >
                   <div className="flex items-center" aria-hidden="true">
                     {[1, 2, 3].map((step, index) => (
                       <div key={step} className="flex flex-1 items-center last:flex-none">
@@ -358,7 +378,7 @@ export default function Contact() {
                 </div>
 
                 {isSubmitted ? (
-                  <div className="py-5 text-center sm:py-9">
+                  <div className="form-step-enter py-5 text-center sm:py-9">
                     <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
                       <CheckCircle2 size={32} aria-hidden="true" />
                     </span>
@@ -391,7 +411,7 @@ export default function Contact() {
                     </div>
 
                     {formStep === 1 ? (
-                      <div>
+                      <div className="form-step-enter">
                         <p className="text-sm font-semibold text-blue-700">{isBg ? 'Стъпка 1' : 'Step 1'}</p>
                         <h2 ref={stepHeadingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-slate-950 focus:outline-none">
                           {isBg ? 'Какво се е случило?' : 'What happened?'}
@@ -459,7 +479,7 @@ export default function Contact() {
                         </button>
                       </div>
                     ) : (
-                      <div>
+                      <div className="form-step-enter">
                         <p className="text-sm font-semibold text-blue-700">{isBg ? 'Стъпка 2' : 'Step 2'}</p>
                         <h2 ref={stepHeadingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-slate-950 focus:outline-none">
                           {isBg ? 'Къде да изпратим оценката?' : 'Where should we send the assessment?'}

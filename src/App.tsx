@@ -7,6 +7,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import CookieConsent from '@/components/CookieConsent';
 import AnalyticsPageView from '@/components/AnalyticsPageView';
 import MobileFunnelBar from '@/components/MobileFunnelBar';
+import RevealObserver from '@/components/RevealObserver';
 import Home from '@/pages/Home';
 
 const Services = lazy(() => import('@/pages/Services'));
@@ -17,7 +18,6 @@ const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const PaymentsRefunds = lazy(() => import('@/pages/PaymentsRefunds'));
 const Blog = lazy(() => import('@/pages/Blog'));
-const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 const PageLoader = () => (
@@ -31,6 +31,7 @@ export default function App() {
     <LanguageProvider>
       <div className="min-h-[100dvh] bg-white text-slate-900">
         <ScrollToTop />
+        <RevealObserver />
         <AnalyticsPageView />
         <Navbar />
         <Suspense fallback={<PageLoader />}>
@@ -44,7 +45,6 @@ export default function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/payments-and-refunds" element={<PaymentsRefunds />} />
             <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

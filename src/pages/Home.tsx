@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import type { CSSProperties } from 'react';
 import {
   ArrowRight,
   Ban,
@@ -81,6 +82,11 @@ export default function Home() {
   ];
 
   const platforms = ['Instagram', 'TikTok', 'Facebook', 'YouTube', 'X', 'LinkedIn', 'Snapchat', 'Pinterest'];
+  const priceOptions = [
+    { name: t('pp.p3.name'), price: '100 EUR' },
+    { name: t('pp.p1.name'), price: '250 EUR' },
+    { name: t('pp.p2.name'), price: '500 EUR' },
+  ];
 
   return (
     <>
@@ -98,13 +104,13 @@ export default function Home() {
       />
 
       <main>
-        <section className="relative overflow-hidden border-b border-slate-200 bg-slate-50 pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-32 lg:pb-20">
+        <section className="relative overflow-hidden border-b border-slate-200 bg-slate-50 pt-24 pb-9 sm:pt-28 sm:pb-12 lg:pt-28 lg:pb-14">
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -right-24 top-8 h-72 w-72 rounded-full bg-sky-200/45 blur-3xl" />
+            <div className="absolute -right-24 top-8 h-72 w-72 rounded-full bg-violet-200/45 blur-3xl" />
             <div className="absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-blue-100/70 blur-3xl" />
           </div>
 
-          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14">
+          <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-5 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10">
             <div>
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-800 shadow-sm">
                 <ShieldCheck size={17} aria-hidden="true" />
@@ -113,7 +119,7 @@ export default function Home() {
 
               <h1 className="max-w-3xl text-[clamp(2.35rem,8vw,4.5rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-slate-950">
                 {t('hero.title')}
-                <span className="text-blue-700">{t('hero.titleSpan')}</span>
+                <span className="gradient-text">{t('hero.titleSpan')}</span>
               </h1>
 
               <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
@@ -125,9 +131,9 @@ export default function Home() {
                   {t('hero.cta1')}
                   <ArrowRight size={18} aria-hidden="true" />
                 </Link>
-                <a href="#how-it-works" className="secondary-cta w-full sm:w-auto">
-                  {t('hero.cta2')}
-                </a>
+                <Link to="/pricing" className="secondary-cta w-full sm:w-auto">
+                  {isBg ? 'Виж цените — от 100 EUR' : 'See pricing — from 100 EUR'}
+                </Link>
               </div>
 
               <ul className="mt-7 grid gap-3 text-sm text-slate-700 sm:grid-cols-2" aria-label={isBg ? 'Важна информация' : 'Important information'}>
@@ -142,7 +148,7 @@ export default function Home() {
               </ul>
             </div>
 
-            <aside className="rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_24px_70px_rgba(15,23,42,0.12)] sm:p-6" aria-labelledby="case-start-title">
+            <aside className="hero-panel-intro rounded-3xl border border-violet-200/70 bg-white p-4 shadow-[0_24px_70px_rgba(63,47,120,0.13)] sm:p-6" aria-labelledby="case-start-title">
               <div className="flex items-start justify-between gap-4 border-b border-slate-200 pb-5">
                 <div>
                   <p className="text-sm font-semibold text-blue-700">{isBg ? 'Кратка първоначална оценка' : 'Quick initial assessment'}</p>
@@ -150,7 +156,7 @@ export default function Home() {
                     {isBg ? 'Започнете от проблема' : 'Start with the issue'}
                   </h2>
                 </div>
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
                   <SearchCheck size={22} aria-hidden="true" />
                 </div>
               </div>
@@ -185,6 +191,37 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="border-b border-slate-200 bg-white py-4" aria-labelledby="home-pricing-title">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p id="home-pricing-title" className="text-xs font-bold uppercase tracking-[0.14em] text-violet-700">
+                  {isBg ? 'Цената е ясна предварително' : 'Know the price upfront'}
+                </p>
+                <p className="mt-1 text-sm text-slate-600">
+                  {isBg ? 'Точният обхват се потвърждава писмено.' : 'The exact scope is confirmed in writing.'}
+                </p>
+              </div>
+              <Link to="/pricing" className="hidden min-h-11 shrink-0 items-center gap-2 text-sm font-bold text-blue-700 hover:text-violet-700 sm:inline-flex">
+                {isBg ? 'Всички цени' : 'All pricing'} <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </div>
+
+            <dl className="mt-3 grid grid-cols-3 divide-x divide-slate-200 rounded-2xl border border-slate-200 bg-slate-50 py-3">
+              {priceOptions.map((option) => (
+                <div key={option.price} className="min-w-0 px-2 text-center sm:px-5 sm:text-left">
+                  <dt className="truncate text-[10px] font-semibold text-slate-500 sm:text-xs">{option.name}</dt>
+                  <dd className="mt-0.5 text-base font-extrabold tracking-[-0.03em] text-slate-950 sm:text-xl">{option.price}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <Link to="/pricing" className="mt-2 inline-flex min-h-10 items-center gap-2 text-sm font-bold text-blue-700 hover:text-violet-700 sm:hidden">
+              {isBg ? 'Какво включват цените' : 'What the prices include'} <ArrowRight size={15} aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
+
         <section className="border-b border-slate-200 bg-white py-5" aria-label={isBg ? 'Поддържани платформи' : 'Supported platforms'}>
           <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 sm:px-6 lg:flex-row lg:items-center lg:gap-8">
             <p className="shrink-0 text-sm font-semibold text-slate-500">
@@ -200,7 +237,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-white py-14 sm:py-20">
+        <section className="bg-white py-12 sm:py-16">
           <div className="mx-auto max-w-6xl px-5 sm:px-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-2xl">
@@ -215,9 +252,16 @@ export default function Home() {
             </div>
 
             <div className="mt-8 grid gap-4 md:grid-cols-3">
-              {commonCases.map((item) => (
-                <Link key={item.issue} to="/contact" state={{ issue: item.issue }} className="case-card group">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+              {commonCases.map((item, index) => (
+                <Link
+                  key={item.issue}
+                  to="/contact"
+                  state={{ issue: item.issue }}
+                  className="case-card group"
+                  data-reveal
+                  style={{ '--reveal-delay': `${index * 55}ms` } as CSSProperties}
+                >
+                  <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${index === 1 ? 'bg-violet-50 text-violet-700' : 'bg-blue-50 text-blue-700'}`}>
                     <item.icon size={22} aria-hidden="true" />
                   </span>
                   <h3 className="mt-5 text-xl font-bold text-slate-950">{item.title}</h3>
@@ -232,7 +276,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="how-it-works" className="scroll-mt-24 border-y border-slate-200 bg-slate-50 py-14 sm:py-20">
+        <section id="how-it-works" className="scroll-mt-24 border-y border-slate-200 bg-slate-50 py-12 sm:py-16">
           <div className="mx-auto max-w-6xl px-5 sm:px-6">
             <div className="max-w-2xl">
               <p className="section-kicker">{t('proc.label')}</p>
@@ -243,10 +287,15 @@ export default function Home() {
             </div>
 
             <ol className="mt-9 grid gap-4 lg:grid-cols-3">
-              {steps.map((step) => (
-                <li key={step.num} className="relative rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
+              {steps.map((step, index) => (
+                <li
+                  key={step.num}
+                  className="relative rounded-3xl border border-slate-200 bg-white p-5 sm:p-6"
+                  data-reveal
+                  style={{ '--reveal-delay': `${index * 55}ms` } as CSSProperties}
+                >
                   <div className="flex items-center justify-between gap-4">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-700 text-white">
+                    <span className={`flex h-11 w-11 items-center justify-center rounded-2xl text-white ${index === 1 ? 'bg-violet-700' : 'bg-blue-700'}`}>
                       <step.icon size={20} aria-hidden="true" />
                     </span>
                     <span className="text-sm font-bold tracking-[0.16em] text-slate-400">{step.num}</span>
@@ -264,7 +313,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-slate-950 py-14 text-white sm:py-20">
+        <section className="bg-slate-950 py-12 text-white sm:py-16">
           <div className="mx-auto max-w-6xl px-5 sm:px-6">
             <div className="max-w-2xl">
               <p className="text-sm font-bold uppercase tracking-[0.14em] text-sky-300">{isBg ? 'Какво да очаквате' : 'What to expect'}</p>
@@ -274,9 +323,14 @@ export default function Home() {
             </div>
 
             <div className="mt-9 grid gap-6 md:grid-cols-3">
-              {commitments.map((item) => (
-                <div key={item.title} className="border-l border-slate-700 pl-5">
-                  <item.icon size={23} className="text-sky-300" aria-hidden="true" />
+              {commitments.map((item, index) => (
+                <div
+                  key={item.title}
+                  className="border-l border-slate-700 pl-5"
+                  data-reveal
+                  style={{ '--reveal-delay': `${index * 55}ms` } as CSSProperties}
+                >
+                  <item.icon size={23} className={index === 1 ? 'text-violet-300' : 'text-sky-300'} aria-hidden="true" />
                   <h3 className="mt-4 text-lg font-bold text-white">{item.title}</h3>
                   <p className="mt-2 text-base leading-7 text-slate-300">{item.text}</p>
                 </div>
@@ -285,7 +339,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-blue-700 py-14 sm:py-16">
+        <section className="bg-gradient-to-br from-blue-700 via-indigo-700 to-violet-700 py-12 sm:py-14">
           <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-7 px-5 sm:px-6 lg:flex-row lg:items-center">
             <div className="max-w-2xl">
               <h2 className="text-3xl font-bold text-white sm:text-4xl">{t('cta.title')}</h2>

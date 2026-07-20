@@ -8,6 +8,9 @@ coverage/
 *.tsbuildinfo
 *.local
 
+# Unpublished local content
+content/blog-drafts/
+
 # Environment files and secrets
 .env
 .env.*

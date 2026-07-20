@@ -104,10 +104,11 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
+                aria-current={isActive(link.path) ? 'page' : undefined}
                 className={`flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
                   isActive(link.path)
-                    ? 'bg-blue-50 text-blue-800'
-                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950'
+                    ? (link.path === '/pricing' ? 'bg-violet-50 text-violet-800' : 'bg-blue-50 text-blue-800')
+                    : (link.path === '/pricing' ? 'text-violet-700 hover:bg-violet-50 hover:text-violet-900' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950')
                 }`}
               >
                 {link.name}
@@ -116,7 +117,7 @@ export default function Navbar() {
             <LanguageSwitcher />
             <Link
               to="/contact"
-              className="ml-2 inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-800"
+              className="ml-2 inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition-[filter] hover:brightness-95"
             >
               {t('nav.help')} <ArrowRight size={16} aria-hidden="true" />
             </Link>
@@ -146,16 +147,16 @@ export default function Navbar() {
           <button
             type="button"
             tabIndex={-1}
-            className="fixed inset-x-0 bottom-0 top-[68px] -z-10 bg-slate-950/25 md:hidden"
+            className="mobile-menu-overlay fixed inset-x-0 bottom-0 top-[68px] -z-10 bg-slate-950/25 md:hidden"
             onClick={() => setIsMenuOpen(false)}
             aria-label={isBg ? 'Затвори менюто' : 'Close navigation'}
           />
-          <div ref={mobileMenuRef} id="mobile-navigation" className="border-t border-slate-200 bg-white p-4 shadow-xl md:hidden">
+          <div ref={mobileMenuRef} id="mobile-navigation" className="mobile-menu-panel border-t border-slate-200 bg-white p-4 shadow-xl md:hidden">
             <div className="mx-auto max-w-md">
               <Link
                 to="/contact"
                 onClick={() => setIsMenuOpen(false)}
-                className="mb-3 flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3 text-base font-bold text-white"
+                className="mb-3 flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 px-4 py-3 text-base font-bold text-white"
               >
                 {t('nav.help')} <ArrowRight size={17} aria-hidden="true" />
               </Link>
@@ -164,11 +165,12 @@ export default function Navbar() {
                   <Link
                     key={link.path}
                     to={link.path}
+                    aria-current={isActive(link.path) ? 'page' : undefined}
                     onClick={() => setIsMenuOpen(false)}
                     className={`flex min-h-12 items-center rounded-xl px-4 py-3 text-base font-semibold transition-colors ${
                       isActive(link.path)
-                        ? 'bg-blue-50 text-blue-800'
-                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-950'
+                        ? (link.path === '/pricing' ? 'bg-violet-50 text-violet-800' : 'bg-blue-50 text-blue-800')
+                        : (link.path === '/pricing' ? 'bg-violet-50/60 text-violet-700 hover:bg-violet-100' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-950')
                     }`}
                   >
                     {link.name}
