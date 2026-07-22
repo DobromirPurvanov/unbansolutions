@@ -75,7 +75,13 @@ function loadGoogleAnalytics() {
 
   const browserWindow = getBrowserWindow();
   browserWindow.dataLayer = browserWindow.dataLayer || [];
-  browserWindow.gtag = browserWindow.gtag || ((...args: unknown[]) => browserWindow.dataLayer?.push(args));
+  if (!browserWindow.gtag) {
+    browserWindow.gtag = function gtag() {
+      // gtag.js processes only `arguments` objects pushed to dataLayer; plain arrays are silently ignored.
+      // eslint-disable-next-line prefer-rest-params
+      browserWindow.dataLayer?.push(arguments);
+    };
+  }
   const grantedConsent = {
     analytics_storage: 'granted',
     ad_storage: 'denied',
