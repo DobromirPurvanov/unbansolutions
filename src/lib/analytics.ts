@@ -177,6 +177,26 @@ export function applyConsent(preferences = getConsent()) {
   else browserWindow.fbq?.('consent', 'revoke');
 }
 
+/**
+ * Езикът на сайта, залепен за всяко събитие. Сайтът е двуезичен и без това
+ * няма как да се види коя версия конвертира — GA4 има вградено измерение
+ * „Език", но то отразява настройката на браузъра, а не коя версия човекът
+ * реално е чел.
+ *
+ * Чете се от localStorage, а не от React контекста, за да остане analytics.ts
+ * независим от UI слоя. Ключът е същият, който LanguageContext записва.
+ *
+ * Взима се при всяко изпращане, а не веднъж в `config`, защото превключвателят
+ * сменя езика по средата на сесията.
+ */
+function siteLanguage(): 'bg' | 'en' {
+  try {
+    return localStorage.getItem('lang') === 'en' ? 'en' : 'bg';
+  } catch {
+    return 'bg';
+  }
+}
+
 export function trackEvent(name: string, properties: EventProperties = {}, metaEvent?: string) {
   const consent = getConsent();
   const browserWindow = getBrowserWindow();
@@ -184,7 +204,7 @@ export function trackEvent(name: string, properties: EventProperties = {}, metaE
      Without consent the event still leaves, but anonymously and cookieless —
      that is the whole point of loading GA in denied mode. Meta has no such
      mode, so it stays gated. */
-  browserWindow.gtag?.('event', name, properties);
+  browserWindow.gtag?.('event', name, { ...properties, site_language: siteLanguage() });
   if (consent?.marketing && metaEvent) {
     const method = ['Lead', 'Contact'].includes(metaEvent) ? 'track' : 'trackCustom';
     browserWindow.fbq?.(method, metaEvent, properties);
@@ -198,6 +218,7 @@ export function trackPageView(path: string, title: string) {
   browserWindow.gtag?.('event', 'page_view', {
     page_location: `${window.location.origin}${path}`,
     page_title: title,
+    site_language: siteLanguage(),
   });
   if (consent?.marketing) browserWindow.fbq?.('track', 'PageView');
 }
