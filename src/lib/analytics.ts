@@ -70,6 +70,20 @@ export function saveConsent(analytics: boolean, marketing: boolean) {
   window.dispatchEvent(new CustomEvent('unban-consent-changed', { detail: preferences }));
 }
 
+/**
+ * Loads GA4 on every page view with Google Consent Mode v2 defaults set to
+ * denied. In that state gtag writes no cookies and sends no identifiers — only
+ * anonymous pings Google aggregates into modelled traffic. That is the
+ * officially supported GDPR mode and it means visitors who never touch the
+ * banner are still measured, instead of being invisible.
+ *
+ * Consent is raised later via updateGoogleConsent(). Ordering matters: the
+ * `consent default` command must reach dataLayer before gtag.js executes,
+ * otherwise the first hit goes out with cookies.
+ *
+ * ad_* stay denied even after consent — this site runs Meta Pixel, not Google
+ * Ads, so there is nothing that needs them.
+ */
 function loadGoogleAnalytics() {
   if (!GA_ID) return;
 
@@ -82,19 +96,23 @@ function loadGoogleAnalytics() {
       browserWindow.dataLayer?.push(arguments);
     };
   }
-  const grantedConsent = {
-    analytics_storage: 'granted',
+  if (document.getElementById('unban-ga-script')) return;
+
+  browserWindow.gtag('consent', 'default', {
+    analytics_storage: 'denied',
     ad_storage: 'denied',
     ad_user_data: 'denied',
     ad_personalization: 'denied',
-  };
-  if (document.getElementById('unban-ga-script')) {
-    browserWindow.gtag('consent', 'update', grantedConsent);
-    return;
-  }
-  browserWindow.gtag('consent', 'default', {
-    ...grantedConsent,
+    functionality_storage: 'granted',
+    security_storage: 'granted',
+    // Give a stored choice up to 500 ms to raise consent before the first hit
+    // leaves, so returning visitors are not counted as anonymous.
+    wait_for_update: 500,
   });
+  // Without cookies the link between pages travels in the URL instead.
+  browserWindow.gtag('set', 'ads_data_redaction', true);
+  browserWindow.gtag('set', 'url_passthrough', true);
+
   browserWindow.gtag('js', new Date());
   browserWindow.gtag('config', GA_ID, {
     send_page_view: false,
@@ -107,6 +125,13 @@ function loadGoogleAnalytics() {
   script.async = true;
   script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA_ID)}`;
   document.head.appendChild(script);
+}
+
+/** Raises or lowers Google consent. Safe to call repeatedly. */
+function updateGoogleConsent(analyticsGranted: boolean) {
+  getBrowserWindow().gtag?.('consent', 'update', {
+    analytics_storage: analyticsGranted ? 'granted' : 'denied',
+  });
 }
 
 function loadMetaPixel() {
@@ -134,21 +159,32 @@ function loadMetaPixel() {
   document.head.appendChild(script);
 }
 
+/**
+ * Runs on every page load and on every change in the banner.
+ *
+ * GA4 always loads — denied by default, granted once the visitor accepts
+ * analytics cookies. Meta Pixel stays fully gated behind marketing consent,
+ * because it has no cookieless equivalent and loading it would already
+ * disclose the visitor's IP to Meta.
+ */
 export function applyConsent(preferences = getConsent()) {
-  if (!preferences) return;
   const browserWindow = getBrowserWindow();
 
-  if (preferences.analytics) loadGoogleAnalytics();
-  else browserWindow.gtag?.('consent', 'update', { analytics_storage: 'denied' });
+  loadGoogleAnalytics();
+  updateGoogleConsent(Boolean(preferences?.analytics));
 
-  if (preferences.marketing) loadMetaPixel();
+  if (preferences?.marketing) loadMetaPixel();
   else browserWindow.fbq?.('consent', 'revoke');
 }
 
 export function trackEvent(name: string, properties: EventProperties = {}, metaEvent?: string) {
   const consent = getConsent();
   const browserWindow = getBrowserWindow();
-  if (consent?.analytics) browserWindow.gtag?.('event', name, properties);
+  /* No consent check for gtag: Consent Mode already decides what may be stored.
+     Without consent the event still leaves, but anonymously and cookieless —
+     that is the whole point of loading GA in denied mode. Meta has no such
+     mode, so it stays gated. */
+  browserWindow.gtag?.('event', name, properties);
   if (consent?.marketing && metaEvent) {
     const method = ['Lead', 'Contact'].includes(metaEvent) ? 'track' : 'trackCustom';
     browserWindow.fbq?.(method, metaEvent, properties);
@@ -158,13 +194,25 @@ export function trackEvent(name: string, properties: EventProperties = {}, metaE
 export function trackPageView(path: string, title: string) {
   const consent = getConsent();
   const browserWindow = getBrowserWindow();
-  if (consent?.analytics) {
-    browserWindow.gtag?.('event', 'page_view', {
-      page_location: `${window.location.origin}${path}`,
-      page_title: title,
-    });
-  }
+  // Sent for everyone; Consent Mode decides whether it carries an identifier.
+  browserWindow.gtag?.('event', 'page_view', {
+    page_location: `${window.location.origin}${path}`,
+    page_title: title,
+  });
   if (consent?.marketing) browserWindow.fbq?.('track', 'PageView');
+}
+
+/**
+ * Fires a Meta PageView only. Needed when marketing consent is granted
+ * mid-page: the Pixel loads at that moment and would otherwise miss the
+ * current page until the next route change.
+ *
+ * Deliberately does not touch gtag — GA4 already sent its page_view on load,
+ * and re-sending it here would double-count every visitor who accepts.
+ */
+export function trackMetaPageView() {
+  if (!getConsent()?.marketing) return;
+  getBrowserWindow().fbq?.('track', 'PageView');
 }
 
 export function openCookieSettings() {

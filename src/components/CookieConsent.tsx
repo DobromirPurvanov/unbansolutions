@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Cookie, X } from 'lucide-react';
-import { getConsent, saveConsent, trackPageView } from '@/lib/analytics';
+import { getConsent, saveConsent, trackMetaPageView } from '@/lib/analytics';
 
 export default function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
@@ -41,8 +41,11 @@ export default function CookieConsent() {
   const choose = (analytics: boolean, marketing: boolean) => {
     const previous = getConsent();
     saveConsent(analytics, marketing);
-    if ((!previous?.analytics && analytics) || (!previous?.marketing && marketing)) {
-      trackPageView(window.location.pathname, document.title);
+    /* Only Meta needs a catch-up PageView here. GA4 already sent one on load
+       (anonymously, via Consent Mode), so re-sending it would double-count
+       every visitor who accepts. */
+    if (!previous?.marketing && marketing) {
+      trackMetaPageView();
     }
     setIsVisible(false);
   };

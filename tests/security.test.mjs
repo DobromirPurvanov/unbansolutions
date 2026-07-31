@@ -69,7 +69,11 @@ test('analytics receives generic funnel events without case metadata', async () 
   assert.doesNotMatch(cookieConsent, /location\.search/);
   assert.match(entry, /searchParams\.delete\('issue'\)/);
   assert.match(entry, /searchParams\.delete\('platform'\)/);
-  assert.match(analytics, /getElementById\('unban-ga-script'\)[\s\S]*gtag\('consent', 'update', grantedConsent\)/);
+  // Consent Mode v2: GA се зарежда винаги, но по подразбиране всичко е denied.
+  assert.match(analytics, /gtag\('consent', 'default', \{[\s\S]*?analytics_storage: 'denied'/);
+  // Гаранцията, която този тест пази от самото начало: съгласието се прилага
+  // при всяко викане на applyConsent, включително когато скриптът вече е зареден.
+  assert.match(analytics, /export function applyConsent[\s\S]*?loadGoogleAnalytics\(\);[\s\S]*?updateGoogleConsent\(/);
   assert.ok(
     analytics.indexOf("browserWindow.fbq('consent', 'grant')")
       < analytics.indexOf("getElementById('unban-meta-pixel')"),

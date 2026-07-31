@@ -25,7 +25,9 @@ const SAFE_FILE_EXTENSIONS = new Map([
   ['image/webp', '.webp'],
   ['application/pdf', '.pdf'],
 ]);
-const ALLOWED_FIELDS = new Set(['name', 'email', 'platforms', 'issue', 'message', '_gotcha']);
+// captchaToken трябва да е тук — busboy изхвърля тихо всяко поле извън
+// списъка, а лимитите `fields`/`parts` по-долу се извеждат от размера му.
+const ALLOWED_FIELDS = new Set(['name', 'email', 'platforms', 'issue', 'message', '_gotcha', 'captchaToken']);
 
 class ClientError extends Error {
   constructor(status, message) {
@@ -207,6 +209,60 @@ export function parseForm(req) {
   });
 }
 
+/* ── Cloudflare Turnstile ────────────────────────────────────
+   Три изхода, защото „бот" и „човек с блокер" не са едно и също:
+
+     block — токен, който Cloudflare отхвърля (подправен, изтекъл, вече
+             използван) или дошъл от чужд домейн. Блокерите не произвеждат
+             счупен токен, те не произвеждат никакъв.
+     flag  — липсващ токен. Минава, но се логва; TURNSTILE_REQUIRE_TOKEN=true
+             го прави блок.
+     allow — чист токен, или наша конфигурационна грешка / паднал Cloudflare.
+             Никога не наказваме клиента за чужд отказ.
+   ──────────────────────────────────────────────────────────── */
+const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const TURNSTILE_ALLOWED_HOSTS = ['unbansolutions.com', 'www.unbansolutions.com'];
+
+async function assessCaptcha(token, remoteip) {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  const requireToken = process.env.TURNSTILE_REQUIRE_TOKEN === 'true';
+
+  if (!secret) {
+    // Шумно, защото отвън е неразличимо от работеща защита.
+    console.error('[Contact API] TURNSTILE_SECRET_KEY липсва — формата е БЕЗ защита от ботове.');
+    return { verdict: 'allow', note: null };
+  }
+  if (!token) {
+    return requireToken
+      ? { verdict: 'block', note: 'липсващ Turnstile токен' }
+      : { verdict: 'flag', note: 'без Turnstile токен (блокер или бот)' };
+  }
+
+  let data;
+  try {
+    const body = new URLSearchParams({ secret, response: String(token) });
+    if (remoteip && remoteip !== 'unknown') body.set('remoteip', remoteip);
+    const response = await fetch(TURNSTILE_VERIFY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+    });
+    data = await response.json();
+  } catch (error) {
+    console.error('[Contact API] Turnstile verify недостъпна:', error instanceof Error ? error.name : 'unknown_error');
+    return { verdict: 'allow', note: 'Turnstile не можа да бъде проверена' };
+  }
+
+  if (!data?.success) {
+    const codes = (data?.['error-codes'] || []).join(', ') || 'unknown';
+    return { verdict: 'block', note: `Turnstile не премина (${codes})` };
+  }
+  if (data.hostname && !TURNSTILE_ALLOWED_HOSTS.includes(data.hostname)) {
+    return { verdict: 'block', note: `Turnstile hostname не съвпада (${data.hostname})` };
+  }
+  return { verdict: 'allow', note: null };
+}
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Vary', 'Origin');
@@ -240,9 +296,20 @@ export default async function handler(req, res) {
 
   try {
     const formData = await parseForm(req);
+    /* Honeypot: отвън изглежда като успех, за да не разбере ботът, че е
+       хванат. `delivered: false` е за нас — без него клиентът праща Lead към
+       GA4 и Meta, тоест спамът се брои като конверсия. */
     if (sanitizeText(formData._gotcha, 100)) {
-      return res.status(200).json({ success: true });
+      console.warn('[Contact API] honeypot улови заявка');
+      return res.status(200).json({ success: true, delivered: false });
     }
+
+    const captcha = await assessCaptcha(formData.captchaToken, clientIp);
+    if (captcha.verdict === 'block') {
+      console.warn('[Contact API] Turnstile отхвърли заявка:', captcha.note);
+      return res.status(403).json({ error: 'Проверката за сигурност не премина. Моля, опитайте отново или ни пишете на support@unbansolutions.com.' });
+    }
+    if (captcha.verdict === 'flag') console.warn('[Contact API] съмнителна заявка:', captcha.note);
 
     const name = sanitizeHeader(formData.name, 120);
     const email = sanitizeText(formData.email, 254).toLowerCase();

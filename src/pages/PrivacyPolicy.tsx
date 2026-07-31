@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
     },
     {
       title: '4. Получатели и услуги на трети страни',
-      content: <p>Данни могат да се обработват от доставчиците, необходими за работата на сайта и комуникацията: Vercel (хостинг), Resend (изпращане на имейл) и, когато е конфигуриран, Upstash (псевдонимизиран хеш на IP адреса за разпределена защита от злоупотреби с 15-минутен срок). Google Analytics и Meta Pixel се зареждат само след изрично съгласие. Когато доставчик обработва данни извън ЕИП, се прилагат наличните по закон механизми за трансфер.</p>,
+      content: <p>Данни могат да се обработват от доставчиците, необходими за работата на сайта и комуникацията: Vercel (хостинг), Resend (изпращане на имейл), Cloudflare (защита от ботове при формата) и, когато е конфигуриран, Upstash (псевдонимизиран хеш на IP адреса за разпределена защита от злоупотреби с 15-минутен срок). Meta Pixel се зарежда само след изрично съгласие. Google Analytics работи и без съгласие, но в режим без бисквитки — виж раздел 6. Когато доставчик обработва данни извън ЕИП, се прилагат наличните по закон механизми за трансфер.</p>,
     },
     {
       title: '5. Срокове за съхранение',
@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
     },
     {
       title: '6. Бисквитки и избор',
-      content: <><p>Необходимите технологии поддържат основната работа и запомнят вашите настройки. Google Analytics и Meta Pixel не се зареждат преди съгласие.</p><button type="button" onClick={openCookieSettings} className="mt-3 min-h-11 px-4 py-2 rounded-lg bg-blue-700 text-white font-bold text-xs hover:bg-blue-800">Промени настройките за бисквитки</button></>,
+      content: <><p>Необходимите технологии поддържат основната работа и запомнят вашите настройки.</p><p className="mt-2">Преди съгласие — и ако изберете само необходимите — Google Analytics работи през Google Consent Mode: не записва бисквитки и не създава идентификатор на устройството ви. Изпращат се само анонимни сигнали (например коя страница е заредена), от които се изчислява обобщена статистика. Тези данни не позволяват да бъдете разпознати или проследени между посещения. Meta Pixel не се зарежда изобщо без съгласие.</p><p className="mt-2">Формата за контакт е защитена с Cloudflare Turnstile, който различава хората от ботовете. Проверката е невидима и не изисква действие от вас; Cloudflare обработва ограничена техническа информация за браузъра и заявката. Подробностите са в <a href="https://www.cloudflare.com/application-services/terms/turnstile-privacy-addendum/" target="_blank" rel="noopener noreferrer" className="underline">Turnstile Privacy Addendum</a>.</p><button type="button" onClick={openCookieSettings} className="mt-3 min-h-11 px-4 py-2 rounded-lg bg-blue-700 text-white font-bold text-xs hover:bg-blue-800">Промени настройките за бисквитки</button></>,
     },
     {
       title: '7. Вашите права',
@@ -50,7 +50,7 @@ export default function PrivacyPolicy() {
     },
     {
       title: '4. Recipients and third-party services',
-      content: <p>Data may be processed by providers needed to run the website and communications: Vercel (hosting), Resend (email delivery) and, when configured, Upstash (a pseudonymised IP-address hash for distributed abuse protection with a 15-minute lifetime). Google Analytics and Meta Pixel load only after explicit consent. Where a provider processes data outside the EEA, legally available transfer mechanisms are used.</p>,
+      content: <p>Data may be processed by providers needed to run the website and communications: Vercel (hosting), Resend (email delivery), Cloudflare (bot protection on the contact form) and, when configured, Upstash (a pseudonymised IP-address hash for distributed abuse protection with a 15-minute lifetime). Meta Pixel loads only after explicit consent. Google Analytics runs without consent too, but in a cookieless mode — see section 6. Where a provider processes data outside the EEA, legally available transfer mechanisms are used.</p>,
     },
     {
       title: '5. Retention',
@@ -58,7 +58,7 @@ export default function PrivacyPolicy() {
     },
     {
       title: '6. Cookies and choice',
-      content: <><p>Essential technologies support core operation and remember your settings. Google Analytics and Meta Pixel do not load before consent.</p><button type="button" onClick={openCookieSettings} className="mt-3 min-h-11 px-4 py-2 rounded-lg bg-blue-700 text-white font-bold text-xs hover:bg-blue-800">Change cookie settings</button></>,
+      content: <><p>Essential technologies support core operation and remember your settings.</p><p className="mt-2">Before consent — and if you accept only essential cookies — Google Analytics runs under Google Consent Mode: it writes no cookies and creates no device identifier. Only anonymous signals are sent (such as which page was loaded), from which aggregate statistics are derived. This data cannot identify you or track you between visits. Meta Pixel does not load at all without consent.</p><p className="mt-2">The contact form is protected by Cloudflare Turnstile, which distinguishes humans from bots. The check is invisible and requires no action from you; Cloudflare processes limited technical information about the browser and the request. Details are in the <a href="https://www.cloudflare.com/application-services/terms/turnstile-privacy-addendum/" target="_blank" rel="noopener noreferrer" className="underline">Turnstile Privacy Addendum</a>.</p><button type="button" onClick={openCookieSettings} className="mt-3 min-h-11 px-4 py-2 rounded-lg bg-blue-700 text-white font-bold text-xs hover:bg-blue-800">Change cookie settings</button></>,
     },
     {
       title: '7. Your rights',

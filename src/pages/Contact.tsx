@@ -20,6 +20,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import { trackEvent } from '@/lib/analytics';
+import { getTurnstileToken, loadTurnstile } from '@/lib/turnstile';
 
 interface FormData {
   name: string;
@@ -108,6 +109,12 @@ export default function Contact() {
     if (hasTrackedStart.current) return;
     hasTrackedStart.current = true;
     trackEvent('contact_form_started');
+    /* Warm up Turnstile the moment the visitor engages, not on page load —
+       the token is only needed at submit, and this keeps the script off the
+       critical path for people who never touch the form. */
+    loadTurnstile().catch(() => {
+      // retried at submit
+    });
   };
 
   const focusStepHeading = () => {
@@ -179,9 +186,19 @@ export default function Contact() {
       payload.append('_gotcha', formData._gotcha);
       formData.files.forEach((file) => payload.append('attachments', file));
 
+      /* Turnstile must never hold the form hostage: if it stalls we send
+         without a token and let the server decide (missing token only gets
+         flagged, not blocked, because a real visitor's ad blocker produces
+         exactly the same result). */
+      const captchaToken = await Promise.race([
+        getTurnstileToken(),
+        new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 8000)),
+      ]);
+      if (captchaToken) payload.append('captchaToken', captchaToken);
+
       const response = await fetch('/api/contact', { method: 'POST', body: payload });
       const contentType = response.headers.get('content-type');
-      let result: { error?: string; success?: boolean } = {};
+      let result: { error?: string; success?: boolean; delivered?: boolean } = {};
 
       if (contentType?.includes('application/json')) {
         result = await response.json();
@@ -196,7 +213,10 @@ export default function Contact() {
         throw new Error(isBg ? (result.error || 'Грешка при изпращане.') : getEnglishSubmitError(response.status));
       }
 
-      trackEvent('contact_form_submitted', {}, 'Lead');
+      /* The honeypot answers with success so a bot cannot tell it was caught.
+         `delivered: false` is the signal that nothing was actually sent —
+         without it that spam would be counted as a Lead in GA4 and Meta. */
+      if (result.delivered !== false) trackEvent('contact_form_submitted', {}, 'Lead');
       setIsSubmitted(true);
       focusStepHeading();
     } catch (error: unknown) {
