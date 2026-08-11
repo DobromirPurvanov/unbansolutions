@@ -85,14 +85,13 @@ test('analytics receives generic funnel events without case metadata', async () 
   }
 });
 
-test('blog drafts and article runtime remain unpublished', async () => {
+test('published blog wiring is consistent, drafts stay local', async () => {
   const app = await readFile(new URL('../src/App.tsx', import.meta.url), 'utf8');
   const blog = await readFile(new URL('../src/pages/Blog.tsx', import.meta.url), 'utf8');
   const prerender = await readFile(new URL('../scripts/prerender.mjs', import.meta.url), 'utf8');
   const ignore = await readFile(new URL('../.gitignore', import.meta.url), 'utf8');
   const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
-  const sitemap = await readFile(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
-  const redirects = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
+  const vercel = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
   let publicArticles = [];
   try {
     publicArticles = (await readdir(new URL('../public/blog/', import.meta.url))).filter((file) => file.endsWith('.md'));
@@ -100,30 +99,19 @@ test('blog drafts and article runtime remain unpublished', async () => {
     if (error?.code !== 'ENOENT') throw error;
   }
 
+  // Raw markdown must never be exposed from public/; articles are served as prerendered HTML.
   assert.deepEqual(publicArticles, []);
   assert.match(app, /path="\/blog"/);
-  assert.doesNotMatch(app, /BlogPost|\/blog\/:slug/);
-  assert.doesNotMatch(blog, /loadBlogPosts|to=\{`\/blog\//);
-  assert.doesNotMatch(prerender, /BlogPosting|blogDirectory/);
+  assert.match(app, /path="\/blog\/:slug"/);
+  assert.match(blog, /to=\{`\/blog\//);
+  assert.match(prerender, /BlogPosting/);
   assert.match(ignore, /^content\/blog-drafts\/$/m);
-  assert.equal(packageJson.scripts.dev, 'vite');
-  assert.doesNotMatch(packageJson.scripts.build, /generate-blog-data/);
-  for (const hiddenRuntime of [
-    '../scripts/generate-blog-data.mjs',
-    '../src/pages/BlogPost.tsx',
-    '../src/lib/blog.ts',
-    '../src/generated/blog-posts.ts',
-  ]) {
-    await assert.rejects(
-      readFile(new URL(hiddenRuntime, import.meta.url), 'utf8'),
-      (error) => error?.code === 'ENOENT',
-    );
-  }
-  assert.equal((sitemap.match(/<loc>https:\/\/www\.unbansolutions\.com\/blog(?:<|\/)/g) || []).length, 1);
-  assert.deepEqual(
-    redirects.redirects.find((redirect) => redirect.source === '/blog/:slug'),
-    { source: '/blog/:slug', destination: '/blog', permanent: false },
-  );
+  assert.doesNotMatch(ignore, /^content\/blog\/$/m);
+  assert.match(packageJson.scripts.build, /generate-blog\.mjs/);
+  assert.match(packageJson.scripts.dev, /generate-blog\.mjs/);
+  // A redirect here would shadow the prerendered article pages.
+  assert.equal(vercel.redirects.find((redirect) => redirect.source === '/blog/:slug'), undefined);
+  assert.deepEqual(vercel.crons, [{ path: '/api/redeploy', schedule: '0 6 * * 2' }]);
 });
 
 function createResponse() {

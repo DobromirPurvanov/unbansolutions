@@ -74,7 +74,8 @@ export default function Navbar() {
     { name: t('nav.blog'), path: '/blog' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) =>
+    location.pathname === path || (path === '/blog' && location.pathname.startsWith('/blog/'));
 
   return (
     <nav

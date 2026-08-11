@@ -19,11 +19,12 @@
       "source": "/portal",
       "destination": "/contact",
       "permanent": false
-    },
+    }
+  ],
+  "crons": [
     {
-      "source": "/blog/:slug",
-      "destination": "/blog",
-      "permanent": false
+      "path": "/api/redeploy",
+      "schedule": "0 6 * * 2"
     }
   ],
   "headers": [
