@@ -48,6 +48,10 @@ export default function Footer() {
               <li><Link to="/process" className="inline-flex min-h-8 items-center text-sm text-slate-300 transition-colors hover:text-white">{t('nav.process')}</Link></li>
               <li><Link to="/pricing" className="inline-flex min-h-8 items-center text-sm text-slate-300 transition-colors hover:text-white">{t('nav.pricing')}</Link></li>
               <li><Link to="/contact" className="inline-flex min-h-8 items-center text-sm text-slate-300 transition-colors hover:text-white">{t('nav.contact')}</Link></li>
+              <li><Link to="/vidove-sanktsii" className="inline-flex min-h-8 items-center text-sm text-slate-300 transition-colors hover:text-white">{t('foot.sanctions')}</Link></li>
+              <li><Link to="/diagnostika" className="inline-flex min-h-8 items-center text-sm text-slate-300 transition-colors hover:text-white">{t('foot.diagnostic')}</Link></li>
+              <li><Link to="/pravila/organichno-sadarzhanie" className="inline-flex min-h-8 items-center text-sm text-slate-300 transition-colors hover:text-white">{t('foot.rulesOrganic')}</Link></li>
+              <li><Link to="/pravila/reklami" className="inline-flex min-h-8 items-center text-sm text-slate-300 transition-colors hover:text-white">{t('foot.rulesAds')}</Link></li>
             </ul>
           </div>
 

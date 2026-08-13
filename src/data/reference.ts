@@ -3,6 +3,8 @@
 // където JSON-ът получава типове.
 import sanctionsJson from '@/data/reference/sanctions.json';
 import diagnosticJson from '@/data/reference/diagnostic.json';
+import organicRulesJson from '@/data/reference/rules-organic.json';
+import adsRulesJson from '@/data/reference/rules-ads.json';
 
 export interface StrikePath {
   id: string;
@@ -85,6 +87,41 @@ export const diagnosticTree = diagnosticJson as DiagnosticTree;
 export function findSanction(id: string): Sanction | undefined {
   return sanctionsReference.sanctions.find((sanction) => sanction.id === id);
 }
+
+export interface RuleTopic {
+  id: string;
+  title: string;
+  /** Името на политиката, по която платформата преценява темата. */
+  standard?: string;
+  restricted: string;
+  avoid: string[];
+  instead: string[];
+  example: { before: string; after: string };
+  checklist: string[];
+}
+
+export interface RulesGuide {
+  slug: string;
+  updated: string;
+  kicker: string;
+  title: string;
+  lead: string;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  intro: { title: string; items: string[] }[];
+  goldenRule: { title: string; detail: string };
+  topics: RuleTopic[];
+  templates?: string[];
+  closing: { title: string; steps: string[] };
+}
+
+export const rulesGuides = {
+  organic: organicRulesJson as RulesGuide,
+  ads: adsRulesJson as RulesGuide,
+};
+
+export type RulesGuideKey = keyof typeof rulesGuides;
 
 export const RISK_LABELS: Record<Sanction['risk'], string> = {
   1: 'Ограничава растежа',

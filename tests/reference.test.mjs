@@ -8,6 +8,10 @@ const reference = JSON.parse(
 const diagnostic = JSON.parse(
   await readFile(new URL('../src/data/reference/diagnostic.json', import.meta.url), 'utf8'),
 );
+const guides = {
+  organic: JSON.parse(await readFile(new URL('../src/data/reference/rules-organic.json', import.meta.url), 'utf8')),
+  ads: JSON.parse(await readFile(new URL('../src/data/reference/rules-ads.json', import.meta.url), 'utf8')),
+};
 
 // Съвпада с падащото меню „Какъв е проблемът“ в контактната форма.
 const ISSUE_VALUES = ['banned', 'suspended', 'shadowban', 'restricted', 'hacked', 'other'];
@@ -84,6 +88,45 @@ test('диагностиката не праща данни за казуса к
   }
   // Типът казус се предава на формата през router state, не през адреса.
   assert.doesNotMatch(page, /\/contact\?(?:issue|platform)=/);
+});
+
+test('двете ръководства са пълни и без обещания за резултат', () => {
+  assert.equal(guides.organic.topics.length, 10);
+  assert.equal(guides.ads.topics.length, 16);
+
+  for (const guide of Object.values(guides)) {
+    assert.ok(guide.slug && guide.metaTitle && guide.metaDescription, `${guide.slug}: липсват мета данни`);
+    assert.ok(guide.intro.length >= 1 && guide.closing.steps.length >= 3, `${guide.slug}: липсва увод или закриваща процедура`);
+
+    const ids = new Set();
+    for (const topic of guide.topics) {
+      assert.ok(!ids.has(topic.id), `${guide.slug}: дублиран id ${topic.id}`);
+      ids.add(topic.id);
+      assert.ok(topic.restricted.length > 30, `${topic.id}: твърде кратко „какво се ограничава“`);
+      assert.ok(topic.avoid.length >= 2, `${topic.id}: под две неща за избягване`);
+      assert.ok(topic.instead.length >= 2, `${topic.id}: под две алтернативи`);
+      assert.ok(topic.checklist.length >= 2, `${topic.id}: чеклист под два въпроса`);
+      assert.ok(topic.example.before && topic.example.after, `${topic.id}: липсва пример преди/след`);
+    }
+
+    const text = JSON.stringify(guide).toLowerCase();
+    for (const promise of ['гарантираме', 'сигурно одобрение', '100% одобрение']) {
+      assert.ok(!text.includes(promise), `${guide.slug}: обещание за резултат — ${promise}`);
+    }
+  }
+});
+
+test('ръководствата са вързани в приложението, prerender-а и sitemap-а', async () => {
+  const app = await readFile(new URL('../src/App.tsx', import.meta.url), 'utf8');
+  const prerender = await readFile(new URL('../scripts/prerender.mjs', import.meta.url), 'utf8');
+  const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
+
+  for (const guide of Object.values(guides)) {
+    assert.ok(app.includes(`path="/pravila/${guide.slug}"`), `липсва маршрут за ${guide.slug}`);
+    assert.ok(llms.includes(`/pravila/${guide.slug}`), `${guide.slug} липсва в llms.txt`);
+  }
+  assert.match(prerender, /guideStaticHtml/);
+  assert.match(prerender, /guideSitemapEntries/);
 });
 
 test('страницата е вързана в приложението, prerender-а и sitemap-а', async () => {

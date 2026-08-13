@@ -19,6 +19,7 @@ const Terms = lazy(() => import('@/pages/Terms'));
 const PaymentsRefunds = lazy(() => import('@/pages/PaymentsRefunds'));
 const Sanctions = lazy(() => import('@/pages/Sanctions'));
 const Diagnostic = lazy(() => import('@/pages/Diagnostic'));
+const RulesGuide = lazy(() => import('@/pages/RulesGuide'));
 const Blog = lazy(() => import('@/pages/Blog'));
 const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
@@ -49,6 +50,8 @@ export default function App() {
             <Route path="/payments-and-refunds" element={<PaymentsRefunds />} />
             <Route path="/vidove-sanktsii" element={<Sanctions />} />
             <Route path="/diagnostika" element={<Diagnostic />} />
+            <Route path="/pravila/organichno-sadarzhanie" element={<RulesGuide guideKey="organic" />} />
+            <Route path="/pravila/reklami" element={<RulesGuide guideKey="ads" />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="*" element={<NotFound />} />

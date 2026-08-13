@@ -4,7 +4,7 @@ import { AlertTriangle, ArrowRight, BookOpen, Eye, Flag, ListChecks, ShieldAlert
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import RiskBadge from '@/components/RiskBadge';
-import { sanctionsReference } from '@/data/reference';
+import { rulesGuides, sanctionsReference } from '@/data/reference';
 
 const SITE_URL = 'https://www.unbansolutions.com';
 const PAGE_URL = `${SITE_URL}/vidove-sanktsii`;
@@ -359,6 +359,37 @@ export default function Sanctions() {
                 ? 'Unban Solutions не е свързана с Meta, TikTok или друга платформа. Работим по публично публикуваните правила и процедури за обжалване. Съдържанието тук е оперативен ориентир, не юридически съвет.'
                 : 'Unban Solutions is not affiliated with Meta, TikTok or any other platform. We work from publicly published policies and appeal procedures. This page is operational guidance, not legal advice.'}
             </p>
+          </div>
+        </section>
+
+        <section className="border-t border-slate-200 bg-slate-50 py-10 sm:py-14">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6">
+            <p className="section-kicker">{isBg ? 'Превенция' : 'Prevention'}</p>
+            <h2 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
+              {isBg ? 'Правилата, по които се стига дотук' : 'The rules behind these measures'}
+            </h2>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700">
+              {isBg
+                ? 'Санкцията е следствие. Причината почти винаги е конкретно правило — за съдържанието или за рекламата.'
+                : 'A sanction is the consequence. The cause is almost always a specific rule — for content or for ads.'}
+            </p>
+            <div className="mt-8 grid gap-5 md:grid-cols-2">
+              {[rulesGuides.organic, rulesGuides.ads].map((guide) => (
+                <Link
+                  key={guide.slug}
+                  to={`/pravila/${guide.slug}`}
+                  className="group flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_12px_35px_rgba(15,23,42,0.06)] transition-colors hover:border-blue-300 sm:p-6"
+                >
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-blue-700">{guide.kicker}</p>
+                  <h3 className="mt-2 text-xl font-bold text-slate-950">{guide.title}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{guide.lead}</p>
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-blue-700">
+                    {isBg ? `${guide.topics.length} теми` : `${guide.topics.length} topics`}
+                    <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 

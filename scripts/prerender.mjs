@@ -18,6 +18,11 @@ const sanctionsReference = JSON.parse(
 const diagnosticTree = JSON.parse(
   await readFile(path.join(root, 'src', 'data', 'reference', 'diagnostic.json'), 'utf8'),
 );
+const rulesGuides = await Promise.all(
+  ['rules-organic.json', 'rules-ads.json'].map(async (file) =>
+    JSON.parse(await readFile(path.join(root, 'src', 'data', 'reference', file), 'utf8')),
+  ),
+);
 
 const routes = [
   { path: '/', title: 'Unban Solutions | Защита и възстановяване на акаунти', description: 'Професионална оценка, подготовка на обжалвания и съдействие при ограничени, спрени или компрометирани акаунти. Изпратете казуса си за оценка.' },
@@ -191,6 +196,81 @@ function diagnosticStaticHtml() {
   ].join('');
 }
 
+function guideSchema(guide) {
+  const url = `${siteUrl}/pravila/${guide.slug}`;
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        name: guide.title,
+        description: guide.metaDescription,
+        url,
+        inLanguage: 'bg',
+        dateModified: guide.updated,
+        publisher: { '@id': organizationId },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${url}#breadcrumbs`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Начало', item: `${siteUrl}/` },
+          { '@type': 'ListItem', position: 2, name: 'Видове санкции', item: `${siteUrl}/vidove-sanktsii` },
+          { '@type': 'ListItem', position: 3, name: guide.title, item: url },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${url}#topics`,
+        name: guide.title,
+        itemListElement: guide.topics.map((topic, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: topic.title,
+          description: topic.restricted,
+          item: `${url}#${topic.id}`,
+        })),
+      },
+    ],
+  };
+}
+
+function guideStaticHtml(guide) {
+  const escape = (value) => escapeAttribute(value);
+  const list = (items) => `<ul>${items.map((item) => `<li>${escape(item)}</li>`).join('')}</ul>`;
+
+  return [
+    '<main class="article-static">',
+    `<h1>${escape(guide.title)}</h1>`,
+    `<p>${escape(guide.lead)}</p>`,
+    guide.intro.map((block) => `<h2>${escape(block.title)}</h2>${list(block.items)}`).join(''),
+    `<h2>${escape(guide.goldenRule.title)}</h2><p>${escape(guide.goldenRule.detail)}</p>`,
+    guide.topics
+      .map((topic) => [
+        `<section id="${escape(topic.id)}">`,
+        `<h2>${escape(topic.title)}</h2>`,
+        topic.standard ? `<p>${escape(topic.standard)}</p>` : '',
+        `<p>Какво се ограничава: ${escape(topic.restricted)}</p>`,
+        '<p>Какво поваля публикацията:</p>',
+        list(topic.avoid),
+        '<p>Вместо това:</p>',
+        list(topic.instead),
+        `<p>Преди: ${escape(topic.example.before)}</p>`,
+        `<p>След: ${escape(topic.example.after)}</p>`,
+        '<p>Преди да публикувате:</p>',
+        list(topic.checklist),
+        '</section>',
+      ].join(''))
+      .join(''),
+    guide.templates ? `<h2>Текстове, които минават прегледа</h2>${list(guide.templates)}` : '',
+    `<h2>${escape(guide.closing.title)}</h2><ol>${guide.closing.steps.map((step) => `<li>${escape(step)}</li>`).join('')}</ol>`,
+    '<p>Unban Solutions не е свързана с Meta, TikTok или друга платформа. Ръководството следва публично публикуваните правила, които се променят. Не е юридически съвет.</p>',
+    '<p><a href="/vidove-sanktsii">Справочник на санкциите</a> · <a href="/diagnostika">Диагностика</a> · <a href="/contact">Изпратете казуса си</a></p>',
+    '</main>',
+  ].join('');
+}
+
 function articleSchema(article) {
   const url = `${siteUrl}/blog/${article.slug}`;
   const graph = [
@@ -255,6 +335,16 @@ function articleStaticHtml(article) {
   ].join('');
 }
 
+for (const guide of rulesGuides) {
+  routes.push({
+    path: `/pravila/${guide.slug}`,
+    title: guide.metaTitle,
+    description: guide.metaDescription,
+    schema: guideSchema(guide),
+    rootHtml: guideStaticHtml(guide),
+  });
+}
+
 for (const article of published) {
   routes.push({
     path: `/blog/${article.slug}`,
@@ -316,13 +406,19 @@ const staticSitemapEntries = [
   { loc: `${siteUrl}/terms`, lastmod: '2026-07-19', changefreq: 'yearly', priority: '0.4' },
   { loc: `${siteUrl}/payments-and-refunds`, lastmod: '2026-07-19', changefreq: 'yearly', priority: '0.4' },
 ];
+const guideSitemapEntries = rulesGuides.map((guide) => ({
+  loc: `${siteUrl}/pravila/${guide.slug}`,
+  lastmod: guide.updated,
+  changefreq: 'monthly',
+  priority: '0.8',
+}));
 const articleSitemapEntries = published.map((article) => ({
   loc: `${siteUrl}/blog/${article.slug}`,
   lastmod: article.date,
   changefreq: 'monthly',
   priority: '0.7',
 }));
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...staticSitemapEntries, ...articleSitemapEntries]
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...staticSitemapEntries, ...guideSitemapEntries, ...articleSitemapEntries]
   .map((e) => `  <url><loc>${e.loc}</loc><lastmod>${e.lastmod}</lastmod><changefreq>${e.changefreq}</changefreq><priority>${e.priority}</priority></url>`)
   .join('\n')}\n</urlset>\n`;
 await writeFile(path.join(dist, 'sitemap.xml'), sitemap, 'utf8');
