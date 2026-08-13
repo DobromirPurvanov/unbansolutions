@@ -5,6 +5,9 @@ import test from 'node:test';
 const reference = JSON.parse(
   await readFile(new URL('../src/data/reference/sanctions.json', import.meta.url), 'utf8'),
 );
+const diagnostic = JSON.parse(
+  await readFile(new URL('../src/data/reference/diagnostic.json', import.meta.url), 'utf8'),
+);
 
 // Съвпада с падащото меню „Какъв е проблемът“ в контактната форма.
 const ISSUE_VALUES = ['banned', 'suspended', 'shadowban', 'restricted', 'hacked', 'other'];
@@ -46,6 +49,43 @@ test('справочникът не обещава резултат от пла�
   }
 });
 
+test('дървото на диагностиката води до реални санкции и покрива всичките 12', () => {
+  const sanctionIds = new Set(reference.sanctions.map((sanction) => sanction.id));
+  const reachable = new Set();
+  assert.ok(diagnostic.nodes[diagnostic.root], 'коренът сочи към несъществуващ въпрос');
+
+  for (const [id, node] of Object.entries(diagnostic.nodes)) {
+    assert.ok(node.question?.length > 5, `${id}: липсва въпрос`);
+    assert.ok(node.options.length >= 2, `${id}: под два отговора`);
+    for (const option of node.options) {
+      assert.ok(option.label && option.detail, `${id}: отговор без текст или пояснение`);
+      assert.ok(
+        Boolean(option.next) !== Boolean(option.result),
+        `${id} → ${option.label}: отговорът трябва да води или към следващ въпрос, или към санкция`,
+      );
+      if (option.next) assert.ok(diagnostic.nodes[option.next], `${id}: сочи към несъществуващ въпрос ${option.next}`);
+      if (option.result) {
+        assert.ok(sanctionIds.has(option.result), `${id}: сочи към несъществуваща санкция ${option.result}`);
+        reachable.add(option.result);
+      }
+    }
+  }
+
+  // Диагностиката е входната точка към справочника — всяка санкция трябва да е достижима.
+  for (const id of sanctionIds) assert.ok(reachable.has(id), `санкцията ${id} не се достига от диагностиката`);
+});
+
+test('диагностиката не праща данни за казуса към аналитиката', async () => {
+  const page = await readFile(new URL('../src/pages/Diagnostic.tsx', import.meta.url), 'utf8');
+  const events = [...page.matchAll(/trackEvent\(([^)]*)\)/g)].map((match) => match[1]);
+  assert.ok(events.length > 0);
+  for (const call of events) {
+    assert.doesNotMatch(call, /result|sanction|issue|answer/i, `събитието носи данни за казуса: ${call}`);
+  }
+  // Типът казус се предава на формата през router state, не през адреса.
+  assert.doesNotMatch(page, /\/contact\?(?:issue|platform)=/);
+});
+
 test('страницата е вързана в приложението, prerender-а и sitemap-а', async () => {
   const app = await readFile(new URL('../src/App.tsx', import.meta.url), 'utf8');
   const navbar = await readFile(new URL('../src/components/Navbar.tsx', import.meta.url), 'utf8');
@@ -53,10 +93,15 @@ test('страницата е вързана в приложението, preren
   const llms = await readFile(new URL('../public/llms.txt', import.meta.url), 'utf8');
 
   assert.match(app, /path="\/vidove-sanktsii"/);
+  assert.match(app, /path="\/diagnostika"/);
   assert.match(navbar, /path: '\/vidove-sanktsii'/);
   // Маршрутът, статичният HTML за ботове и sitemap записът вървят заедно.
   assert.match(prerender, /path: '\/vidove-sanktsii'/);
   assert.match(prerender, /referenceStaticHtml/);
   assert.match(prerender, /loc: `\$\{siteUrl\}\/vidove-sanktsii`/);
+  assert.match(prerender, /path: '\/diagnostika'/);
+  assert.match(prerender, /diagnosticStaticHtml/);
+  assert.match(prerender, /loc: `\$\{siteUrl\}\/diagnostika`/);
   assert.match(llms, /\/vidove-sanktsii/);
+  assert.match(llms, /\/diagnostika/);
 });

@@ -11,6 +11,7 @@ Unban Solutions supports individuals, creators and businesses with account restr
 - [Pricing](https://www.unbansolutions.com/pricing): Service options, prices and the scope included in each option.
 - [Process](https://www.unbansolutions.com/process): How case assessment, evidence collection, appeal preparation and follow-up work.
 - [Types of sanctions](https://www.unbansolutions.com/vidove-sanktsii): Reference (in Bulgarian) covering the twelve enforcement measures on Meta platforms, the four strike paths, where each status is visible and the first steps within 48 hours.
+- [Sanction diagnostic](https://www.unbansolutions.com/diagnostika): Short questionnaire (in Bulgarian) that identifies which enforcement measure an account is facing and lists the first steps.
 - [Blog](https://www.unbansolutions.com/blog): Guidance and updates about social media account restrictions and recovery.
 - [Contact](https://www.unbansolutions.com/contact): Submit a case for an initial assessment.
 

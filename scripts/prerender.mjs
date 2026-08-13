@@ -15,6 +15,9 @@ const latestDate = published[0]?.date || '2026-07-19';
 const sanctionsReference = JSON.parse(
   await readFile(path.join(root, 'src', 'data', 'reference', 'sanctions.json'), 'utf8'),
 );
+const diagnosticTree = JSON.parse(
+  await readFile(path.join(root, 'src', 'data', 'reference', 'diagnostic.json'), 'utf8'),
+);
 
 const routes = [
   { path: '/', title: 'Unban Solutions | Защита и възстановяване на акаунти', description: 'Професионална оценка, подготовка на обжалвания и съдействие при ограничени, спрени или компрометирани акаунти. Изпратете казуса си за оценка.' },
@@ -29,6 +32,13 @@ const routes = [
     description: 'Дванадесетте вида санкции в социалните мрежи: как изглежда всяка, къде се вижда в приложението, какви са типичните причини и кои са първите стъпки в първите 48 часа.',
     schema: referenceSchema(),
     rootHtml: referenceStaticHtml(),
+  },
+  {
+    path: '/diagnostika',
+    title: 'Каква е моята санкция? Бърза диагностика | Unban Solutions',
+    description: 'Отговорете на два-три въпроса и разберете коя мярка е наложена на профила ви, къде се вижда официално и какви са първите стъпки.',
+    schema: diagnosticSchema(),
+    rootHtml: diagnosticStaticHtml(),
   },
   { path: '/privacy-policy', title: 'Политика за поверителност | Unban Solutions', description: 'Как Unban Solutions събира, използва, съхранява и защитава личните данни.' },
   { path: '/terms', title: 'Общи условия | Unban Solutions', description: 'Условията за използване на сайта и възлагане на услуги на Unban Solutions.' },
@@ -122,6 +132,60 @@ function referenceStaticHtml() {
     '<h2>Митове и реалност</h2>',
     `<ul>${myths.map((item) => `<li>„${escape(item.myth)}“ — ${escape(item.reality)}</li>`).join('')}</ul>`,
     '<p>Unban Solutions не е свързана с Meta, TikTok или друга платформа. Работим по публично публикуваните правила и процедури за обжалване. Съдържанието тук е оперативен ориентир, не юридически съвет.</p>',
+    '<p><a href="/contact">Изпратете казуса си за оценка</a></p>',
+    '</main>',
+  ].join('');
+}
+
+function diagnosticSchema() {
+  const url = `${siteUrl}/diagnostika`;
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        name: 'Каква е моята санкция',
+        description: 'Кратка диагностика, която разпознава коя санкция е наложена по описанието на симптомите и показва първите стъпки.',
+        url,
+        inLanguage: 'bg',
+        publisher: { '@id': organizationId },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${url}#breadcrumbs`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Начало', item: `${siteUrl}/` },
+          { '@type': 'ListItem', position: 2, name: 'Видове санкции', item: `${siteUrl}/vidove-sanktsii` },
+          { '@type': 'ListItem', position: 3, name: 'Диагностика', item: url },
+        ],
+      },
+    ],
+  };
+}
+
+// Въпросникът е интерактивен, затова статичният вариант изрежда въпросите и
+// извежда всички възможни изхода като линкове към справочника.
+function diagnosticStaticHtml() {
+  const escape = (value) => escapeAttribute(value);
+  const questions = Object.values(diagnosticTree.nodes)
+    .map((node) => [
+      `<h2>${escape(node.question)}</h2>`,
+      node.hint ? `<p>${escape(node.hint)}</p>` : '',
+      `<ul>${node.options.map((option) => `<li>${escape(option.label)} — ${escape(option.detail)}</li>`).join('')}</ul>`,
+    ].join(''))
+    .join('');
+
+  return [
+    '<main class="article-static">',
+    '<h1>Каква е вашата санкция?</h1>',
+    '<p>Два-три въпроса по симптомите. Резултатът показва коя мярка стои зад тях, къде се вижда официално и какво има смисъл да направите първо.</p>',
+    questions,
+    '<h2>Възможните резултати</h2>',
+    `<ul>${sanctionsReference.sanctions
+      .map((sanction) => `<li><a href="/vidove-sanktsii#${escape(sanction.id)}">${escape(sanction.title)}</a>: ${escape(sanction.summary)}</li>`)
+      .join('')}</ul>`,
+    '<p>Диагностиката е ориентир по описаните симптоми, а не официално становище. Unban Solutions не е свързана с Meta, TikTok или друга платформа.</p>',
     '<p><a href="/contact">Изпратете казуса си за оценка</a></p>',
     '</main>',
   ].join('');
@@ -246,6 +310,7 @@ const staticSitemapEntries = [
   { loc: `${siteUrl}/process`, lastmod: '2026-07-19', changefreq: 'monthly', priority: '0.8' },
   { loc: `${siteUrl}/contact`, lastmod: '2026-07-19', changefreq: 'monthly', priority: '0.8' },
   { loc: `${siteUrl}/vidove-sanktsii`, lastmod: sanctionsReference.updated, changefreq: 'monthly', priority: '0.9' },
+  { loc: `${siteUrl}/diagnostika`, lastmod: sanctionsReference.updated, changefreq: 'monthly', priority: '0.8' },
   { loc: `${siteUrl}/blog`, lastmod: latestDate, changefreq: 'weekly', priority: '0.8' },
   { loc: `${siteUrl}/privacy-policy`, lastmod: '2026-07-19', changefreq: 'yearly', priority: '0.4' },
   { loc: `${siteUrl}/terms`, lastmod: '2026-07-19', changefreq: 'yearly', priority: '0.4' },

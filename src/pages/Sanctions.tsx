@@ -3,7 +3,8 @@ import type { CSSProperties } from 'react';
 import { AlertTriangle, ArrowRight, BookOpen, Eye, Flag, ListChecks, ShieldAlert } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
-import { RISK_LABELS, sanctionsReference, type Sanction } from '@/data/reference';
+import RiskBadge from '@/components/RiskBadge';
+import { sanctionsReference } from '@/data/reference';
 
 const SITE_URL = 'https://www.unbansolutions.com';
 const PAGE_URL = `${SITE_URL}/vidove-sanktsii`;
@@ -52,21 +53,6 @@ function buildStructuredData() {
   };
 }
 
-function RiskBadge({ risk }: { risk: Sanction['risk'] }) {
-  const tone =
-    risk === 3
-      ? 'border-rose-200 bg-rose-50 text-rose-700'
-      : risk === 2
-        ? 'border-amber-200 bg-amber-50 text-amber-700'
-        : 'border-slate-200 bg-slate-50 text-slate-600';
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold ${tone}`}>
-      <span aria-hidden="true">{'▲'.repeat(risk)}</span>
-      {RISK_LABELS[risk]}
-    </span>
-  );
-}
-
 // Съдържанието е статично, затова схемата се сглобява веднъж при зареждане на модула.
 const structuredData = buildStructuredData();
 
@@ -109,6 +95,13 @@ export default function Sanctions() {
                 This reference is written in Bulgarian. An English version is planned.
               </p>
             )}
+            <Link
+              to="/diagnostika"
+              className="group mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition-[filter] hover:brightness-95"
+            >
+              {isBg ? 'Не знаете коя е вашата? Направете диагностиката' : 'Not sure which one? Take the diagnostic'}
+              <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
+            </Link>
             <div className="mt-7 flex flex-wrap gap-2">
               {[
                 { href: '#patheki', label: 'Strike пътеките' },
@@ -381,12 +374,20 @@ export default function Sanctions() {
                   : 'Describe what happened and what the notification says. You will get an initial assessment and concrete next steps.'}
               </p>
             </div>
-            <Link
-              to="/contact"
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-base font-bold text-blue-800 hover:bg-blue-50 sm:w-auto"
-            >
-              {isBg ? 'Изпратете казуса' : 'Send your case'} <ArrowRight size={18} aria-hidden="true" />
-            </Link>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+              <Link
+                to="/diagnostika"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-base font-bold text-blue-800 hover:bg-blue-50"
+              >
+                {isBg ? 'Направете диагностиката' : 'Take the diagnostic'} <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/40 px-6 py-3 text-base font-bold text-white hover:bg-white/10"
+              >
+                {isBg ? 'Изпратете казуса' : 'Send your case'}
+              </Link>
+            </div>
           </div>
         </section>
       </main>

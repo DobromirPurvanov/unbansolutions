@@ -18,6 +18,7 @@ const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const PaymentsRefunds = lazy(() => import('@/pages/PaymentsRefunds'));
 const Sanctions = lazy(() => import('@/pages/Sanctions'));
+const Diagnostic = lazy(() => import('@/pages/Diagnostic'));
 const Blog = lazy(() => import('@/pages/Blog'));
 const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/payments-and-refunds" element={<PaymentsRefunds />} />
             <Route path="/vidove-sanktsii" element={<Sanctions />} />
+            <Route path="/diagnostika" element={<Diagnostic />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="*" element={<NotFound />} />

@@ -2,6 +2,7 @@
 // scripts/prerender.mjs (Node не може да импортира TS). Този модул е мястото,
 // където JSON-ът получава типове.
 import sanctionsJson from '@/data/reference/sanctions.json';
+import diagnosticJson from '@/data/reference/diagnostic.json';
 
 export interface StrikePath {
   id: string;
@@ -59,6 +60,31 @@ export interface SanctionsReference {
 }
 
 export const sanctionsReference = sanctionsJson as SanctionsReference;
+
+export interface DiagnosticOption {
+  label: string;
+  detail: string;
+  /** Следващият въпрос или id на санкция от sanctions.json — винаги едно от двете. */
+  next?: string;
+  result?: string;
+}
+
+export interface DiagnosticNode {
+  question: string;
+  hint?: string;
+  options: DiagnosticOption[];
+}
+
+export interface DiagnosticTree {
+  root: string;
+  nodes: Record<string, DiagnosticNode>;
+}
+
+export const diagnosticTree = diagnosticJson as DiagnosticTree;
+
+export function findSanction(id: string): Sanction | undefined {
+  return sanctionsReference.sanctions.find((sanction) => sanction.id === id);
+}
 
 export const RISK_LABELS: Record<Sanction['risk'], string> = {
   1: 'Ограничава растежа',
