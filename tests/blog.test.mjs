@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { loadArticles, markdownToHtml } from '../scripts/blog-lib.mjs';
 
@@ -62,6 +63,20 @@ test('internal blog links only point to real articles', () => {
     const html = article.bodyHtml + article.faq.map((f) => f.answerHtml).join('');
     for (const [, href] of html.matchAll(/href="\/blog\/([^"]+)"/g)) {
       assert.ok(slugs.has(href), `${article.slug}: links to unknown article ${href}`);
+    }
+  }
+});
+
+test('internal links from articles point to routes that exist', async () => {
+  const app = await readFile(new URL('../src/App.tsx', import.meta.url), 'utf8');
+  const routes = new Set([...app.matchAll(/path="(\/[^"*:]*)"/g)].map((match) => match[1]));
+
+  for (const article of all) {
+    const html = article.bodyHtml + article.faq.map((f) => f.answerHtml).join('');
+    for (const [, href] of html.matchAll(/href="(\/[^"]+)"/g)) {
+      if (href.startsWith('/blog/')) continue; // покрито от теста по-горе
+      const path = href.split('#')[0];
+      assert.ok(routes.has(path), `${article.slug}: сочи към несъществуващ маршрут ${path}`);
     }
   }
 });
