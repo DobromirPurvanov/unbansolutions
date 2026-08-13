@@ -100,6 +100,26 @@ test('диагностиката не праща данни за казуса к
   assert.doesNotMatch(page, /\/contact\?(?:issue|platform)=/);
 });
 
+test('диагностиката подава платформа и вид казус, за да не се пита втори път', async () => {
+  const diagnosticPage = await readFile(new URL('../src/pages/Diagnostic.tsx', import.meta.url), 'utf8');
+  const contact = await readFile(new URL('../src/pages/Contact.tsx', import.meta.url), 'utf8');
+
+  // Платформите в диагностиката трябва да са същите стойности като във формата.
+  const diagnosticPlatforms = [...diagnosticPage.matchAll(/value: '([a-z]+)', label:/g)].map((m) => m[1]);
+  const formPlatforms = contact.match(/const PLATFORM_VALUES = \[([^\]]+)\]/)[1]
+    .match(/'([a-z]+)'/g)
+    .map((value) => value.replaceAll("'", ''));
+  assert.ok(diagnosticPlatforms.length >= 6, 'диагностиката предлага под шест платформи');
+  for (const platform of diagnosticPlatforms) {
+    assert.ok(formPlatforms.includes(platform), `формата не познава платформа ${platform}`);
+  }
+
+  assert.match(diagnosticPage, /state=\{\{ issue: result\.issue, platform \}\}/);
+  // При готови отговори формата отваря направо стъпка 2.
+  assert.match(contact, /const hasPrefill = PLATFORM_VALUES\.includes\(requestedPlatform\) && ISSUE_VALUES\.includes\(requestedIssue\)/);
+  assert.match(contact, /useState<1 \| 2>\(hasPrefill \? 2 : 1\)/);
+});
+
 test('двете ръководства са пълни и без обещания за резултат', () => {
   assert.equal(guides.organic.topics.length, 10);
   assert.equal(guides.ads.topics.length, 16);

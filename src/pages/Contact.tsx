@@ -62,7 +62,9 @@ export default function Contact() {
   const routeState = location.state as { issue?: string; platform?: string } | null;
   const requestedIssue = routeState?.issue || '';
   const requestedPlatform = routeState?.platform || '';
-  const [formStep, setFormStep] = useState<1 | 2>(1);
+  // Диагностиката подава платформа и вид казус — тогава стъпка 1 е излишна.
+  const hasPrefill = PLATFORM_VALUES.includes(requestedPlatform) && ISSUE_VALUES.includes(requestedIssue);
+  const [formStep, setFormStep] = useState<1 | 2>(hasPrefill ? 2 : 1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -507,6 +509,28 @@ export default function Contact() {
                         <p className="mt-2 text-base leading-7 text-slate-600">
                           {isBg ? 'Добавете контакт и кратко описание. Файловете са по желание.' : 'Add your contact details and a short description. Files are optional.'}
                         </p>
+
+                        {formData.platforms.length > 0 && formData.issue && (
+                          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                            <span className="text-sm text-slate-600">
+                              {isBg ? 'От диагностиката:' : 'From the diagnostic:'}
+                            </span>
+                            <span className="text-sm font-bold text-slate-900">
+                              {formData.platforms
+                                .map((value) => platformOptions.find((option) => option.value === value)?.label || value)
+                                .join(', ')}
+                              {' · '}
+                              {issueOptions.find((option) => option.value === formData.issue)?.label}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handlePreviousStep}
+                              className="ml-auto inline-flex min-h-11 items-center text-sm font-bold text-blue-700 hover:text-blue-900"
+                            >
+                              {isBg ? 'Променете' : 'Change'}
+                            </button>
+                          </div>
+                        )}
 
                         <div className="mt-6 space-y-5">
                           <div>

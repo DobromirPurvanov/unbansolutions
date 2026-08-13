@@ -41,20 +41,38 @@ interface Answer {
   label: string;
 }
 
+/** Стойностите са същите като в контактната форма, за да се подадат директно. */
+const PLATFORMS = [
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'facebook', label: 'Facebook' },
+  { value: 'tiktok', label: 'TikTok' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'x', label: 'X (Twitter)' },
+  { value: 'linkedin', label: 'LinkedIn' },
+];
+
 export default function Diagnostic() {
   const { lang } = useLanguage();
   const isBg = lang === 'bg';
 
   const tree = diagnosticByLang[lang];
+  const [platform, setPlatform] = useState('');
   const [current, setCurrent] = useState(tree.root);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [resultId, setResultId] = useState<string | null>(null);
+
+  const platformLabel = PLATFORMS.find((item) => item.value === platform)?.label
+    || (platform === 'other' ? (isBg ? 'Друга платформа' : 'Another platform') : '');
+
+  const choosePlatform = (value: string) => {
+    trackEvent('diagnostic_started');
+    setPlatform(value);
+  };
 
   const node = tree.nodes[current];
   const result = resultId ? findSanction(resultId, lang) : undefined;
 
   const choose = (option: DiagnosticOption) => {
-    if (!answers.length) trackEvent('diagnostic_started');
     if (option.result) {
       setAnswers((previous) => [...previous, { node: current, label: option.label }]);
       setResultId(option.result);
@@ -70,13 +88,18 @@ export default function Diagnostic() {
 
   const goBack = () => {
     const previous = answers.at(-1);
-    if (!previous) return;
+    if (!previous) {
+      // От първия въпрос назад се връщаме към избора на платформа.
+      setPlatform('');
+      return;
+    }
     setAnswers((rest) => rest.slice(0, -1));
     setResultId(null);
     setCurrent(previous.node);
   };
 
   const restart = () => {
+    setPlatform('');
     setAnswers([]);
     setResultId(null);
     setCurrent(tree.root);
@@ -114,13 +137,48 @@ export default function Diagnostic() {
 
         <section className="bg-white py-9 sm:py-12">
           <div className="mx-auto max-w-3xl px-5 sm:px-6">
-            {!result && node && (
+            {!result && !platform && (
+              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_12px_35px_rgba(15,23,42,0.06)] sm:p-7">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
+                  {isBg ? 'Въпрос' : 'Question'} 1
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-slate-950">
+                  {isBg ? 'Къде е профилът?' : 'Which platform is the profile on?'}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {isBg
+                    ? 'Питаме го тук, за да не го попълвате втори път във формата после.'
+                    : 'We ask here so you do not have to fill it in again in the form later.'}
+                </p>
+                <div className="mt-6 flex flex-wrap gap-2.5">
+                  {PLATFORMS.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => choosePlatform(item.value)}
+                      className="inline-flex min-h-11 items-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 transition-colors hover:border-blue-300 hover:bg-blue-50/50 hover:text-blue-800"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => choosePlatform('other')}
+                    className="inline-flex min-h-11 items-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 transition-colors hover:border-blue-300 hover:bg-blue-50/50 hover:text-blue-800"
+                  >
+                    {isBg ? 'Друга' : 'Another one'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {!result && platform && node && (
               <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_12px_35px_rgba(15,23,42,0.06)] sm:p-7">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
-                    {isBg ? 'Въпрос' : 'Question'} {answers.length + 1}
+                    {isBg ? 'Въпрос' : 'Question'} {answers.length + 2}
                   </p>
-                  {answers.length > 0 && (
+                  {(answers.length > 0 || platform) && (
                     <button
                       type="button"
                       onClick={goBack}
@@ -153,12 +211,10 @@ export default function Diagnostic() {
                   ))}
                 </div>
 
-                {answers.length > 0 && (
-                  <p className="mt-5 text-xs leading-6 text-slate-500">
-                    {isBg ? 'Досега: ' : 'So far: '}
-                    {answers.map((answer) => answer.label).join(' → ')}
-                  </p>
-                )}
+                <p className="mt-5 text-xs leading-6 text-slate-500">
+                  {isBg ? 'Досега: ' : 'So far: '}
+                  {[platformLabel, ...answers.map((answer) => answer.label)].filter(Boolean).join(' → ')}
+                </p>
               </div>
             )}
 
@@ -200,10 +256,16 @@ export default function Diagnostic() {
                     ))}
                   </ol>
 
-                  <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-slate-100 pt-5">
+                  <p className="mt-6 text-sm leading-6 text-slate-600">
+                    {isBg
+                      ? 'Ако изпратите казуса оттук, платформата и видът на проблема вече са попълнени — остават имейлът и кратко описание.'
+                      : 'If you send the case from here, the platform and issue type are already filled in — only your email and a short description remain.'}
+                  </p>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-slate-100 pt-5">
                     <Link
                       to="/contact"
-                      state={{ issue: result.issue }}
+                      state={{ issue: result.issue, platform }}
                       className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 px-5 py-3 text-sm font-bold text-white transition-[filter] hover:brightness-95"
                     >
                       {isBg ? 'Изпратете казуса' : 'Send your case'} <ArrowRight size={16} aria-hidden="true" />
@@ -229,7 +291,7 @@ export default function Diagnostic() {
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs leading-6 text-slate-500">
                     {isBg ? 'Вашите отговори: ' : 'Your answers: '}
-                    {answers.map((answer) => answer.label).join(' → ')}
+                    {[platformLabel, ...answers.map((answer) => answer.label)].filter(Boolean).join(' → ')}
                   </p>
                   <button
                     type="button"
@@ -263,7 +325,7 @@ export default function Diagnostic() {
             </p>
             <Link
               to="/contact"
-              state={{ issue: 'other' }}
+              state={{ issue: 'other', platform }}
               className="mt-4 inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-800 transition-colors hover:border-blue-300 hover:text-blue-800"
             >
               {isBg ? 'Опишете казуса' : 'Describe your case'} <ArrowRight size={16} aria-hidden="true" />
