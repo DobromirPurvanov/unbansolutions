@@ -1,7 +1,7 @@
 ---
 title: "Спрян или изтрит акаунт: причини, срокове и как се обжалва"
 titleEn: "Suspended or Deleted Account: Causes, Deadlines and How to Appeal"
-date: "2026-08-18"
+date: "2026-08-01"
 excerpt: "Каква е разликата между деактивиран, спрян и изтрит акаунт, защо се стига дотам и кои стъпки при обжалването реално имат значение."
 excerptEn: "The difference between deactivated, suspended and deleted accounts, why it happens, and which appeal steps actually matter."
 description: "Разликата между спрян, деактивиран и изтрит акаунт в Instagram, Facebook и TikTok, най-честите причини за съспенд и стъпките за обжалване със сроковете, които трябва да спазите."

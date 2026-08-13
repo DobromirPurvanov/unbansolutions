@@ -1,7 +1,7 @@
 ---
 title: "Шадоубан: какво е, как да го разпознаете и какво реално помага"
 titleEn: "Shadowban: What It Is, How to Spot It and What Actually Helps"
-date: "2026-08-25"
+date: "2026-08-05"
 excerpt: "Как да различите истински шадоубан от обикновен спад в обхвата, къде платформите сами си признават за ограниченията и кои стъпки връщат видимостта."
 excerptEn: "How to tell a real shadowban from a normal reach drop, where platforms admit to limits, and which steps restore visibility."
 description: "Какво е шадоубан в Instagram, TikTok и Facebook, как да го разпознаете през Състояние на акаунта и статистиките, кои са реалните причини и кои стъпки връщат видимостта на съдържанието."

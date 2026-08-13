@@ -1,7 +1,7 @@
 ---
 title: "Фалшивият линк за верификация: как крадат профили и какво да направите"
 titleEn: "The Fake Verification Link: How Profiles Get Stolen and What to Do"
-date: "2026-09-01"
+date: "2026-08-08"
 excerpt: "Анатомията на най-разпространената измама за кражба на профили, признаците, по които се разпознава, и точните стъпки в първия час след пробива."
 excerptEn: "The anatomy of the most common profile-theft scam, the signs that give it away, and the exact steps for the first hour after a breach."
 description: "Как работи фишинг измамата с фалшив линк за верификация в Instagram и Facebook, как да я разпознаете и кои са точните стъпки за възстановяване на хакнат профил в първия час."

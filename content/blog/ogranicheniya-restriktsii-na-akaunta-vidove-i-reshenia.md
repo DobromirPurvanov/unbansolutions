@@ -1,7 +1,7 @@
 ---
 title: "Рестрикции на акаунта: видове ограничения и как се вдигат"
 titleEn: "Account Restrictions: The Types of Limits and How to Lift Them"
-date: "2026-09-08"
+date: "2026-08-12"
 excerpt: "Какво значи „временно ограничен“, кои са шестте най-чести типа рестрикции, откъде идват и кое ускорява, а кое удължава вдигането им."
 excerptEn: "What 'temporarily restricted' means, the six most common restriction types, where they come from, and what speeds up or delays their removal."
 description: "Видовете рестрикции в Instagram, Facebook и TikTok: блокирани действия, ограничени съобщения, спрян live и рекламни ограничения. Причините и стъпките, с които ограниченията се вдигат."
