@@ -143,7 +143,7 @@ export default function CookieConsent() {
             onClick={() => choose(analyticsEnabled, marketingEnabled)}
             className="min-h-11 rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-800 transition-colors hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
           >
-            {isBg ? 'Запази избора' : 'Save selection'}
+            {isBg ? 'Запази моя избор' : 'Save selection'}
           </button>
           <button
             type="button"

@@ -22,7 +22,7 @@ export default function MobileFunnelBar() {
       >
         <div className="mx-auto flex max-w-md items-center gap-2">
           <a
-            href="tel:+359883391411"
+            href="tel:+359887704737"
             className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-800"
             aria-label={isBg ? 'Обадете се' : 'Call us'}
             onClick={() => trackEvent('phone_cta_clicked', { location: 'mobile_funnel_bar' }, 'Contact')}
@@ -41,8 +41,8 @@ export default function MobileFunnelBar() {
             to="/contact"
             className="inline-flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 px-3 text-sm font-bold text-white shadow-sm min-[370px]:px-5 min-[370px]:text-base"
           >
-            <span className="whitespace-nowrap min-[370px]:hidden">{isBg ? 'Изпрати' : 'Send'}</span>
-            <span className="hidden whitespace-nowrap min-[370px]:inline">{isBg ? 'Изпрати казуса' : 'Send your case'}</span>
+            <span className="whitespace-nowrap min-[370px]:hidden">{isBg ? 'Изпратете' : 'Send'}</span>
+            <span className="hidden whitespace-nowrap min-[370px]:inline">{isBg ? 'Изпратете казуса' : 'Send your case'}</span>
             <ArrowRight size={18} aria-hidden="true" />
           </Link>
         </div>

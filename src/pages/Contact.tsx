@@ -41,14 +41,14 @@ const ISSUE_VALUES = ['banned', 'suspended', 'shadowban', 'restricted', 'hacked'
 const PLATFORM_VALUES = ['instagram', 'tiktok', 'youtube', 'x', 'facebook', 'linkedin', 'other'];
 
 function getEnglishSubmitError(status: number) {
-  if (status === 400) return 'Please check the fields and attachments, then try again.';
-  if (status === 403) return 'This request could not be verified. Please refresh the page and try again.';
-  if (status === 413) return 'The selected files are too large.';
-  if (status === 415) return 'The submitted form or attachment format is not supported.';
-  if (status === 429) return 'Too many attempts. Please wait a moment and try again.';
-  if (status === 502) return 'The email service could not send your message. Please try again or call us.';
-  if (status === 503) return 'The form is temporarily unavailable. Please contact us by phone or email.';
-  return 'Unable to send your case. Please try again.';
+  if (status === 400) return 'Something in the form did not go through. Check the email and description, then try again.';
+  if (status === 403) return 'The security check did not complete — it happens on slow connections too. Refresh the page and try again, or email support@unbansolutions.com.';
+  if (status === 413) return 'Together the files exceed 4 MB. Remove one — you can email the rest later.';
+  if (status === 415) return 'That format does not open on our side. We accept JPG, PNG, GIF, WebP and PDF.';
+  if (status === 429) return 'We received several submissions in a row. Wait a minute — your text is not lost.';
+  if (status === 502) return 'Your message did not reach us and it is not your fault. Copy your text and try again, or call +359 887 704 737.';
+  if (status === 503) return 'The form is paused. Copy your description so you do not have to retype it, and send it to support@unbansolutions.com or call +359 887 704 737.';
+  return 'We could not send your case. Your text is still here — please try again.';
 }
 
 export default function Contact() {
@@ -100,7 +100,7 @@ export default function Contact() {
 
   const contactInfo = [
     { icon: Mail, label: t('cp.info.email'), value: t('cp.info.emailVal'), href: 'mailto:support@unbansolutions.com' },
-    { icon: Phone, label: t('cp.info.phone'), value: t('cp.info.phoneVal'), href: 'tel:+359883391411' },
+    { icon: Phone, label: t('cp.info.phone'), value: t('cp.info.phoneVal'), href: 'tel:+359887704737' },
     { icon: MapPin, label: t('cp.info.address'), value: `${t('cp.info.addrVal')}\n${t('cp.info.addrVal2')}` },
     { icon: Clock, label: t('cp.info.availability'), value: `${t('cp.info.availVal')}\n${t('cp.info.availVal2')}` },
   ];
@@ -124,11 +124,11 @@ export default function Contact() {
   const handleNextStep = () => {
     markFormStarted();
     if (formData.platforms.length === 0) {
-      setStepError(isBg ? 'Изберете поне една платформа.' : 'Select at least one platform.');
+      setStepError(isBg ? 'Изберете поне една платформа, за да продължите.' : 'Select at least one platform to continue.');
       return;
     }
     if (!formData.issue) {
-      setStepError(isBg ? 'Изберете какъв е проблемът.' : 'Select the issue you are experiencing.');
+      setStepError(isBg ? 'Изберете вида на проблема, за да продължите.' : 'Select the type of issue to continue.');
       return;
     }
 
@@ -210,7 +210,7 @@ export default function Contact() {
       }
 
       if (!response.ok) {
-        throw new Error(isBg ? (result.error || 'Грешка при изпращане.') : getEnglishSubmitError(response.status));
+        throw new Error(isBg ? (result.error || 'Изпращането не мина. Написаното не е изгубено — опитайте отново.') : getEnglishSubmitError(response.status));
       }
 
       /* The honeypot answers with success so a bot cannot tell it was caught.
@@ -223,7 +223,7 @@ export default function Contact() {
       trackEvent('contact_form_failed', { reason: 'request_error' });
       setSubmitError(error instanceof Error
         ? error.message
-        : (isBg ? 'Грешка при изпращане. Опитайте отново.' : 'Unable to send your case. Please try again.'));
+        : (isBg ? 'Изпращането не мина. Написаното не е изгубено — опитайте отново.' : 'We could not send your case. Your text is still here — please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -410,8 +410,8 @@ export default function Contact() {
                       <p className="text-sm font-bold text-slate-900">{isBg ? 'Какво следва' : 'What happens next'}</p>
                       <p className="mt-1 text-sm leading-6 text-slate-600">
                         {isBg
-                          ? 'Ще прегледаме информацията и ще се свържем на посочения имейл с първоначална оценка.'
-                          : 'We will review the information and contact you by email with an initial assessment.'}
+                          ? 'Преглеждаме информацията и пишем с първоначална оценка и конкретните следващи стъпки. Не е нужно да изпращате казуса повторно.'
+                          : 'We review the information and reply with an initial assessment and the concrete next steps. There is no need to send the case again.'}
                       </p>
                     </div>
                   </div>
@@ -494,7 +494,7 @@ export default function Contact() {
                         )}
 
                         <button type="button" onClick={handleNextStep} className="primary-cta mt-6 w-full">
-                          {isBg ? 'Продължи към детайлите' : 'Continue to Details'}
+                          {isBg ? 'Продължете към детайлите' : 'Continue to Details'}
                           <ArrowRight size={18} aria-hidden="true" />
                         </button>
                       </div>

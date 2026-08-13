@@ -212,7 +212,7 @@ export default function Diagnostic() {
                       to={`/vidove-sanktsii#${result.id}`}
                       className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-900"
                     >
-                      {isBg ? 'Виж в справочника' : 'Open in the reference'}
+                      {isBg ? 'Вижте в справочника' : 'Open in the reference'}
                     </Link>
                     {result.article && (
                       <Link
@@ -237,7 +237,7 @@ export default function Diagnostic() {
                     className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-300 hover:text-blue-800"
                   >
                     <RotateCcw size={15} aria-hidden="true" />
-                    {isBg ? 'Започни отначало' : 'Start over'}
+                    {isBg ? 'Започнете отначало' : 'Start over'}
                   </button>
                 </div>
               </div>

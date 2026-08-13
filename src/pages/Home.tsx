@@ -132,7 +132,7 @@ export default function Home() {
                   <ArrowRight size={18} aria-hidden="true" />
                 </Link>
                 <Link to="/pricing" className="secondary-cta w-full sm:w-auto">
-                  {isBg ? 'Виж цените — от 100 EUR' : 'See pricing — from 100 EUR'}
+                  {isBg ? 'Вижте цените — от 100 EUR' : 'See pricing — from 100 EUR'}
                 </Link>
               </div>
 
@@ -267,7 +267,7 @@ export default function Home() {
                   <h3 className="mt-5 text-xl font-bold text-slate-950">{item.title}</h3>
                   <p className="mt-2 text-base leading-7 text-slate-600">{item.text}</p>
                   <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-700">
-                    {isBg ? 'Оцени този казус' : 'Assess this case'}
+                    {isBg ? 'Заявете оценка' : 'Assess this case'}
                     <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
                   </span>
                 </Link>

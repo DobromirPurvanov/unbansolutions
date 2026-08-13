@@ -97,7 +97,7 @@ export default function Services() {
                     ))}
                   </ul>
                   <Link to="/contact" state={{ issue: service.issue }} className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-900">
-                    {isBg ? 'Оцени този казус' : 'Assess this case'} <ArrowRight size={16} aria-hidden="true" />
+                    {isBg ? 'Заявете оценка' : 'Assess this case'} <ArrowRight size={16} aria-hidden="true" />
                   </Link>
                 </article>
               ))}

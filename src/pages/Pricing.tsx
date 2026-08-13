@@ -155,7 +155,7 @@ export default function Pricing() {
                     </ul>
 
                     <Link to="/contact" state={plan.issue ? { issue: plan.issue } : undefined} className={plan.featured ? 'primary-cta mt-7 w-full' : 'secondary-cta mt-7 w-full'}>
-                      {isBg ? 'Изпрати казус за оценка' : 'Send a Case for Assessment'}
+                      {isBg ? 'Изпратете казуса за оценка' : 'Send a Case for Assessment'}
                       <ArrowRight size={17} aria-hidden="true" />
                     </Link>
                   </article>

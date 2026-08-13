@@ -89,7 +89,7 @@ export default function Blog() {
                       to={`/blog/${article.slug}`}
                       className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 transition-colors hover:text-blue-900"
                     >
-                      {isBg ? 'Прочети статията' : 'Read the article'}
+                      {isBg ? 'Прочетете статията' : 'Read the article'}
                       <ArrowRight size={12} aria-hidden="true" />
                     </Link>
                   </article>

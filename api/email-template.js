@@ -403,7 +403,7 @@ export function buildEmailTemplate({ name, email, platforms, issue, message, att
       <div class="footer-text">Възстановяване на акаунти · Дигитална защита · Правни консултации</div>
       <div class="footer-links">
         <a href="https://unbansolutions.com">Сайт</a> ·
-        <a href="tel:0883391411">0883 391411</a> ·
+        <a href="tel:0887704737">0887 704 737</a> ·
         <a href="mailto:support@unbansolutions.com">support@unbansolutions.com</a>
       </div>
     </div>

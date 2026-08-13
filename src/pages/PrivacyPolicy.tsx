@@ -9,7 +9,7 @@ export default function PrivacyPolicy() {
   const sections = isBg ? [
     {
       title: '1. Администратор и контакт',
-      content: <p>Администратор на данните за този сайт е Unban Solutions, адрес: гр. София, бул. „Шипченски проход“ 18, имейл: <a className="text-blue-700 underline" href="mailto:support@unbansolutions.com">support@unbansolutions.com</a>, телефон: <a className="text-blue-700 underline" href="tel:+359883391411">+359 883 391 411</a>.</p>,
+      content: <p>Администратор на данните за този сайт е Unban Solutions, адрес: гр. София, бул. „Шипченски проход“ 18, имейл: <a className="text-blue-700 underline" href="mailto:support@unbansolutions.com">support@unbansolutions.com</a>, телефон: <a className="text-blue-700 underline" href="tel:+359887704737">+359 887 704 737</a>.</p>,
     },
     {
       title: '2. Какви данни обработваме',
@@ -38,7 +38,7 @@ export default function PrivacyPolicy() {
   ] : [
     {
       title: '1. Controller and contact',
-      content: <p>The data controller for this website is Unban Solutions, address: 18 Shipchenski Prohod Blvd., Sofia, Bulgaria, email: <a className="text-blue-700 underline" href="mailto:support@unbansolutions.com">support@unbansolutions.com</a>, phone: <a className="text-blue-700 underline" href="tel:+359883391411">+359 883 391 411</a>.</p>,
+      content: <p>The data controller for this website is Unban Solutions, address: 18 Shipchenski Prohod Blvd., Sofia, Bulgaria, email: <a className="text-blue-700 underline" href="mailto:support@unbansolutions.com">support@unbansolutions.com</a>, phone: <a className="text-blue-700 underline" href="tel:+359887704737">+359 887 704 737</a>.</p>,
     },
     {
       title: '2. Data we process',

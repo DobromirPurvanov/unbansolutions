@@ -195,7 +195,7 @@ export default function BlogPost() {
               to="/contact"
               className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-50"
             >
-              {isBg ? 'Изпрати казуса' : 'Send your case'}
+              {isBg ? 'Изпратете казуса' : 'Send your case'}
               <ArrowRight size={14} aria-hidden="true" />
             </Link>
           </div>

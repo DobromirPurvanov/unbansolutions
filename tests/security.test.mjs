@@ -203,5 +203,9 @@ test('contact endpoint fails safely when the email provider key is absent', asyn
   await contactHandler(request, response);
   if (previousKey) process.env.RESEND_API_KEY = previousKey;
   assert.equal(response.statusCode, 503);
-  assert.doesNotMatch(JSON.stringify(response.body), /RESEND_API_KEY|support@|noreply@/);
+  // Отговорът не бива да издава конфигурация: името на ключа и вътрешния
+  // подател. Публичният адрес за поддръжка е позволен нарочно — при спряла
+  // форма той е единственият работещ канал и без това стои във футъра.
+  assert.doesNotMatch(JSON.stringify(response.body), /RESEND_API_KEY|noreply@/);
+  assert.match(JSON.stringify(response.body), /support@unbansolutions\.com/);
 });

@@ -242,7 +242,7 @@ export default function Sanctions() {
                       state={{ issue: sanction.issue }}
                       className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-900"
                     >
-                      {isBg ? 'Оцени този казус' : 'Assess this case'} <ArrowRight size={16} aria-hidden="true" />
+                      {isBg ? 'Заявете оценка' : 'Assess this case'} <ArrowRight size={16} aria-hidden="true" />
                     </Link>
                     {sanction.article && (
                       <Link

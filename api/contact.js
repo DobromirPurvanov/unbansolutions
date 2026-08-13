@@ -120,13 +120,13 @@ export function parseForm(req) {
   return new Promise((resolve, reject) => {
     const contentType = req.headers['content-type'] || '';
     if (!contentType.toLowerCase().startsWith('multipart/form-data')) {
-      reject(new ClientError(415, 'Форматът на заявката не се поддържа.'));
+      reject(new ClientError(415, 'Формата не беше приета в този вид. Презаредете страницата и опитайте отново.'));
       return;
     }
 
     const contentLength = Number(req.headers['content-length'] || 0);
     if (Number.isFinite(contentLength) && contentLength > MAX_BODY_SIZE) {
-      reject(new ClientError(413, 'Файловете са твърде големи.'));
+      reject(new ClientError(413, 'Заедно файловете надхвърлят 4 MB. Махнете един — останалите можете да ни пратите после на имейл.'));
       return;
     }
 
@@ -143,7 +143,7 @@ export function parseForm(req) {
         },
       });
     } catch {
-      reject(new ClientError(400, 'Невалидни данни във формата.'));
+      reject(new ClientError(400, 'Формата не беше приета. Проверете попълнените полета и опитайте отново.'));
       return;
     }
 
@@ -163,17 +163,17 @@ export function parseForm(req) {
       let fileSize = 0;
 
       if (!ALLOWED_TYPES.has(mimeType)) {
-        fail(new ClientError(400, 'Позволени са само JPG, PNG, GIF, WebP и PDF файлове.'));
+        fail(new ClientError(400, 'Този формат не се отваря при нас. Приемаме JPG, PNG, GIF, WebP и PDF.'));
         file.resume();
         return;
       }
 
-      file.on('limit', () => fail(new ClientError(413, `Файлът ${filename} надвишава 3 MB.`)));
+      file.on('limit', () => fail(new ClientError(413, `${filename} е над 3 MB. Изрежете екранната снимка или я запазете като JPG.`)));
       file.on('data', (chunk) => {
         fileSize += chunk.length;
         totalFileSize += chunk.length;
         if (totalFileSize > MAX_TOTAL_FILE_SIZE) {
-          fail(new ClientError(413, 'Общият размер на файловете надвишава 4 MB.'));
+          fail(new ClientError(413, 'Заедно файловете надхвърлят 4 MB. Махнете един и опитайте отново.'));
           return;
         }
         chunks.push(chunk);
@@ -182,7 +182,7 @@ export function parseForm(req) {
         if (parsingError || fileSize === 0) return;
         const buffer = Buffer.concat(chunks);
         if (!hasValidSignature(buffer, mimeType)) {
-          fail(new ClientError(400, `Съдържанието на файла ${filename} не отговаря на типа му.`));
+          fail(new ClientError(400, `${filename} не се разчита при нас — съдържанието му не отговаря на типа му. Отворете го и го запазете наново като JPG или PDF.`));
           return;
         }
         attachments.push({ filename, content: buffer.toString('base64'), contentType: mimeType });
@@ -191,15 +191,15 @@ export function parseForm(req) {
 
     busboy.on('field', (fieldname, value, info) => {
       if (info.valueTruncated) {
-        fail(new ClientError(413, 'Текстът във формата е твърде дълъг.'));
+        fail(new ClientError(413, 'Описанието надхвърля лимита. Оставете най-важното — за детайлите ще питаме по имейл.'));
         return;
       }
       if (ALLOWED_FIELDS.has(fieldname)) data[fieldname] = value;
     });
-    busboy.on('filesLimit', () => fail(new ClientError(413, `Можете да прикачите до ${MAX_FILES} файла.`)));
-    busboy.on('fieldsLimit', () => fail(new ClientError(400, 'Формата съдържа твърде много полета.')));
-    busboy.on('partsLimit', () => fail(new ClientError(400, 'Формата съдържа твърде много части.')));
-    busboy.on('error', () => reject(new ClientError(400, 'Невалидни данни във формата.')));
+    busboy.on('filesLimit', () => fail(new ClientError(413, `Приемаме до ${MAX_FILES} файла — изберете най-важните.`)));
+    busboy.on('fieldsLimit', () => fail(new ClientError(400, 'Формата не беше приета. Презаредете страницата и опитайте отново.')));
+    busboy.on('partsLimit', () => fail(new ClientError(400, 'Формата не беше приета. Презаредете страницата и опитайте пак.')));
+    busboy.on('error', () => reject(new ClientError(400, 'Формата не беше приета. Проверете попълнените полета и опитайте отново.')));
     busboy.on('finish', () => {
       if (parsingError) reject(parsingError);
       else resolve({ ...data, attachments });
@@ -268,7 +268,7 @@ export default async function handler(req, res) {
   res.setHeader('Vary', 'Origin');
 
   if (!isAllowedOrigin(req)) {
-    return res.status(403).json({ error: 'Заявката е отказана.' });
+    return res.status(403).json({ error: 'Нещо ни попречи да приемем формата. Презаредете страницата и опитайте отново — ако пак спре, пишете ни на support@unbansolutions.com.' });
   }
 
   if (req.headers.origin) {
@@ -280,7 +280,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST, OPTIONS');
-    return res.status(405).json({ error: 'Методът не се поддържа.' });
+    return res.status(405).json({ error: 'Заявката не се поддържа от формата. Отворете страницата за контакт отново.' });
   }
 
   const clientIp = getClientIp(req);
@@ -291,7 +291,7 @@ export default async function handler(req, res) {
   res.setHeader('X-RateLimit-Remaining', String(rateCheck.remaining));
   if (!rateCheck.allowed) {
     res.setHeader('Retry-After', String(rateCheck.retryAfter));
-    return res.status(429).json({ error: 'Твърде много опити. Моля, опитайте отново след малко.' });
+    return res.status(429).json({ error: 'Получихме няколко изпращания едно след друго. Изчакайте минута — написаното не е изгубено.' });
   }
 
   try {
@@ -307,7 +307,7 @@ export default async function handler(req, res) {
     const captcha = await assessCaptcha(formData.captchaToken, clientIp);
     if (captcha.verdict === 'block') {
       console.warn('[Contact API] Turnstile отхвърли заявка:', captcha.note);
-      return res.status(403).json({ error: 'Проверката за сигурност не премина. Моля, опитайте отново или ни пишете на support@unbansolutions.com.' });
+      return res.status(403).json({ error: 'Проверката, че не сте робот, не се получи — случва се и при бавна връзка. Презаредете страницата или ни пишете на support@unbansolutions.com.' });
     }
     if (captcha.verdict === 'flag') console.warn('[Contact API] съмнителна заявка:', captcha.note);
 
@@ -318,14 +318,14 @@ export default async function handler(req, res) {
     const message = sanitizeText(formData.message, 5000);
     const attachments = formData.attachments || [];
 
-    if (name.length < 2) throw new ClientError(400, 'Името трябва да е поне 2 символа.');
-    if (!validateEmail(email)) throw new ClientError(400, 'Моля, въведете валиден имейл адрес.');
-    if (message.length < 10) throw new ClientError(400, 'Съобщението трябва да е поне 10 символа.');
+    if (name.length < 2) throw new ClientError(400, 'Напишете името си (поне 2 знака).');
+    if (!validateEmail(email)) throw new ClientError(400, 'Този имейл изглежда непълен — на него ще изпратим оценката.');
+    if (message.length < 10) throw new ClientError(400, 'Добавете кратко описание на случая — няколко изречения стигат.');
 
     const apiKey = process.env.RESEND_API_KEY?.trim();
     if (!apiKey) {
       console.error('[Contact API] RESEND_API_KEY is not configured.');
-      return res.status(503).json({ error: 'Формата временно не е достъпна. Моля, свържете се по телефон или имейл.' });
+      return res.status(503).json({ error: 'Формата е временно спряна. Копирайте описанието си, за да не го пишете пак, и ни го пратете на support@unbansolutions.com или на +359 887 704 737.' });
     }
 
     const { Resend } = await import('resend');
@@ -351,13 +351,13 @@ export default async function handler(req, res) {
 
     if (error) {
       console.error('[Contact API] Email provider rejected the request:', error.name || 'unknown_error');
-      return res.status(502).json({ error: 'Съобщението не беше изпратено. Моля, опитайте отново или се свържете по телефон.' });
+      return res.status(502).json({ error: 'Съобщението не стигна до нас и вината не е ваша. Копирайте текста и опитайте пак или звъннете на +359 887 704 737.' });
     }
 
     return res.status(200).json({ success: true });
   } catch (error) {
     if (error instanceof ClientError) return res.status(error.status).json({ error: error.message });
     console.error('[Contact API] Unexpected error:', error instanceof Error ? error.name : 'unknown_error');
-    return res.status(500).json({ error: 'Възникна неочаквана грешка. Моля, опитайте отново.' });
+    return res.status(500).json({ error: 'Проблемът е при нас, не при вас. Изчакайте минута и опитайте отново.' });
   }
 }
