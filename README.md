@@ -4,7 +4,7 @@ Production website for [unbansolutions.com](https://www.unbansolutions.com), bui
 
 ## Local development
 
-Requirements: Node.js 22 and npm.
+Requirements: Node.js 24 and npm.
 
 ```bash
 npm ci
@@ -22,7 +22,7 @@ Useful commands:
 ## Production behavior
 
 - Each public route receives its own generated HTML title, description, canonical URL and social metadata.
-- The blog is currently a non-clickable “coming soon” preview. Local article drafts may stay under ignored `content/blog-drafts` and are not tracked or copied into the public build.
+- The blog is live. Articles are Markdown files in `content/blog`; the build generates their pages, schema, sitemap entries and prerendered HTML, and only publishes an article once its frontmatter `date` is in the past. Every article needs its own unique date — the content tests enforce it. Local drafts may stay under ignored `content/blog-drafts` and are not tracked or copied into the public build.
 - Unknown paths are served by the static `404.html`; there is no wildcard SPA rewrite that turns them into soft 404s.
 - Google Analytics and Meta Pixel load only after explicit consent. Consent can be withdrawn from the footer or Privacy Policy.
 - The contact endpoint accepts same-origin multipart requests, validates fields and file signatures, enforces size/rate limits and reads the Resend key only from the environment.
