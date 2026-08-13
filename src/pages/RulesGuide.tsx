@@ -3,14 +3,14 @@ import type { CSSProperties } from 'react';
 import { ArrowRight, Check, ListChecks, ShieldCheck, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
-import { rulesGuides, type RulesGuide as Guide, type RulesGuideKey } from '@/data/reference';
+import { rulesGuides, rulesGuidesByLang, type RulesGuide as Guide, type RulesGuideKey } from '@/data/reference';
 
 const SITE_URL = 'https://www.unbansolutions.com';
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 
-const OTHER_GUIDE: Record<RulesGuideKey, { key: RulesGuideKey; label: string }> = {
-  organic: { key: 'ads', label: 'Правилата за реклами' },
-  ads: { key: 'organic', label: 'Правилата за органично съдържание' },
+const OTHER_GUIDE: Record<RulesGuideKey, { key: RulesGuideKey; label: string; labelEn: string }> = {
+  organic: { key: 'ads', label: 'Правилата за реклами', labelEn: 'The advertising rules' },
+  ads: { key: 'organic', label: 'Правилата за органично съдържание', labelEn: 'The organic content rules' },
 };
 
 function guideUrl(guide: Guide) {
@@ -61,7 +61,8 @@ function buildGuideSchema(guide: Guide) {
 export default function RulesGuidePage({ guideKey }: { guideKey: RulesGuideKey }) {
   const { lang } = useLanguage();
   const isBg = lang === 'bg';
-  const guide = rulesGuides[guideKey];
+  const guide = rulesGuidesByLang[lang][guideKey];
+  // Адресът винаги е българският slug — езикът сменя само текста.
   const other = rulesGuides[OTHER_GUIDE[guideKey].key];
 
   return (
@@ -70,8 +71,8 @@ export default function RulesGuidePage({ guideKey }: { guideKey: RulesGuideKey }
         title={guide.metaTitle}
         description={guide.metaDescription}
         keywords={guide.keywords}
-        canonical={guideUrl(guide)}
-        structuredData={buildGuideSchema(guide)}
+        canonical={guideUrl(rulesGuides[guideKey])}
+        structuredData={buildGuideSchema(rulesGuides[guideKey])}
       />
 
       <main>
@@ -83,11 +84,6 @@ export default function RulesGuidePage({ guideKey }: { guideKey: RulesGuideKey }
               {guide.title}
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{guide.lead}</p>
-            {!isBg && (
-              <p className="mt-5 max-w-2xl rounded-xl bg-violet-50 px-4 py-3 text-xs leading-relaxed text-violet-800">
-                This guide is written in Bulgarian. An English version is planned.
-              </p>
-            )}
 
             <nav aria-label={isBg ? 'Съдържание' : 'Contents'} className="mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {guide.topics.map((topic, index) => (
@@ -247,7 +243,7 @@ export default function RulesGuidePage({ guideKey }: { guideKey: RulesGuideKey }
                 to={`/pravila/${other.slug}`}
                 className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:border-blue-300 hover:text-blue-800"
               >
-                {OTHER_GUIDE[guideKey].label} <ArrowRight size={15} aria-hidden="true" />
+                {isBg ? OTHER_GUIDE[guideKey].label : OTHER_GUIDE[guideKey].labelEn} <ArrowRight size={15} aria-hidden="true" />
               </Link>
               <Link
                 to="/vidove-sanktsii"

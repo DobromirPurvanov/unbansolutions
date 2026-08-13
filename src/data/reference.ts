@@ -6,7 +6,9 @@ import sanctionsEnJson from '@/data/reference/sanctions.en.json';
 import diagnosticJson from '@/data/reference/diagnostic.json';
 import diagnosticEnJson from '@/data/reference/diagnostic.en.json';
 import organicRulesJson from '@/data/reference/rules-organic.json';
+import organicRulesEnJson from '@/data/reference/rules-organic.en.json';
 import adsRulesJson from '@/data/reference/rules-ads.json';
+import adsRulesEnJson from '@/data/reference/rules-ads.en.json';
 
 export interface StrikePath {
   id: string;
@@ -130,10 +132,19 @@ export interface RulesGuide {
   closing: { title: string; steps: string[] };
 }
 
-export const rulesGuides = {
-  organic: organicRulesJson as RulesGuide,
-  ads: adsRulesJson as RulesGuide,
-};
+export const rulesGuidesByLang = {
+  bg: {
+    organic: organicRulesJson as RulesGuide,
+    ads: adsRulesJson as RulesGuide,
+  },
+  en: {
+    organic: organicRulesEnJson as RulesGuide,
+    ads: adsRulesEnJson as RulesGuide,
+  },
+} satisfies Record<ReferenceLang, Record<string, RulesGuide>>;
+
+/** Българската версия е каноничната — от нея идват адресите и схемите. */
+export const rulesGuides = rulesGuidesByLang.bg;
 
 export type RulesGuideKey = keyof typeof rulesGuides;
 

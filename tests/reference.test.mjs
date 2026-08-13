@@ -18,6 +18,10 @@ const guides = {
   organic: JSON.parse(await readFile(new URL('../src/data/reference/rules-organic.json', import.meta.url), 'utf8')),
   ads: JSON.parse(await readFile(new URL('../src/data/reference/rules-ads.json', import.meta.url), 'utf8')),
 };
+const guidesEn = {
+  organic: JSON.parse(await readFile(new URL('../src/data/reference/rules-organic.en.json', import.meta.url), 'utf8')),
+  ads: JSON.parse(await readFile(new URL('../src/data/reference/rules-ads.en.json', import.meta.url), 'utf8')),
+};
 
 // Съвпада с падащото меню „Какъв е проблемът“ в контактната форма.
 const ISSUE_VALUES = ['banned', 'suspended', 'shadowban', 'restricted', 'hacked', 'other'];
@@ -119,6 +123,31 @@ test('двете ръководства са пълни и без обещани
     for (const promise of ['гарантираме', 'сигурно одобрение', '100% одобрение']) {
       assert.ok(!text.includes(promise), `${guide.slug}: обещание за резултат — ${promise}`);
     }
+  }
+});
+
+test('английските ръководства са огледало на българските', () => {
+  for (const key of Object.keys(guides)) {
+    const source = guides[key];
+    const translated = guidesEn[key];
+    // Адресът се пази от българския slug — той е в маршрутите и в sitemap-а.
+    assert.equal(translated.slug, source.slug, `${key}: разминат slug`);
+    assert.deepEqual(
+      translated.topics.map((topic) => topic.id),
+      source.topics.map((topic) => topic.id),
+      `${key}: разминати теми`,
+    );
+    for (const [index, topic] of translated.topics.entries()) {
+      const original = source.topics[index];
+      assert.equal(topic.avoid.length, original.avoid.length, `${topic.id}: различен брой „не прави“`);
+      assert.equal(topic.instead.length, original.instead.length, `${topic.id}: различен брой алтернативи`);
+      assert.equal(topic.checklist.length, original.checklist.length, `${topic.id}: различен чеклист`);
+      assert.ok(topic.restricted.length > 30, `${topic.id}: липсва превод на „какво се ограничава“`);
+      assert.ok(topic.example.before && topic.example.after, `${topic.id}: непреведен пример`);
+    }
+    assert.equal(translated.intro.length, source.intro.length, `${key}: различен увод`);
+    assert.equal(translated.closing.steps.length, source.closing.steps.length, `${key}: различна закриваща процедура`);
+    assert.equal(Boolean(translated.templates), Boolean(source.templates), `${key}: разминати шаблони`);
   }
 });
 

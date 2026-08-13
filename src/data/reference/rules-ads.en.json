@@ -1,0 +1,386 @@
+{
+  "slug": "reklami",
+  "updated": "2026-08-13",
+  "kicker": "Rules · advertising",
+  "title": "Why ads fail review and how to get them through",
+  "lead": "The sixteen topics behind most Meta ad rejections. For each: what is restricted, what brings the ad down, and what the version that passes looks like.",
+  "metaTitle": "Meta advertising rules: why your ad gets rejected | Unban Solutions",
+  "metaDescription": "The sixteen reasons Meta disapproves ads: misleading claims, before/after visuals, personal attributes, Special Ad Categories, landing-page mismatch, Lead Ads and circumvention.",
+  "keywords": "disapproved ad, ads policies, restricted ad account, special ad categories, lead ads, landing page mismatch, ad review",
+  "intro": [
+    {
+      "title": "Why ad rules are stricter than organic ones",
+      "items": [
+        "Paid reach hits many people fast, so the risk of harm or deception is higher.",
+        "The EU adds requirements on consumer protection, minors, alcohol, gambling, financial services and health claims.",
+        "Platforms protect a brand-safe environment because advertiser trust depends on it."
+      ]
+    },
+    {
+      "title": "How review works",
+      "items": [
+        "Automated detection first, then human moderators for disputed cases or after reports.",
+        "The creative, copy, headline, CTA, landing page, form and targeting are all reviewed together.",
+        "The outcome is approved, disapproved or limited delivery, plus warnings in Account Quality.",
+        "The ladder runs: rejected ads → limited ad features → restricted ad account → restricted Business Manager."
+      ]
+    }
+  ],
+  "goldenRule": {
+    "title": "The rule that prevents most rejections",
+    "detail": "The ad and the landing page have to say the same thing. If you promise a discount, a price or a condition, it must be visible on the page the click lands on."
+  },
+  "topics": [
+    {
+      "id": "zabluzhdavashti-tvardeniya",
+      "title": "Misleading claims and fake offers",
+      "restricted": "Promises of easy money, unrealistic results, hidden conditions and offers with nothing real behind them.",
+      "avoid": [
+        "'Earn 1,000 today with no effort' and 'guaranteed profit'.",
+        "Conditions buried in an asterisk in tiny type."
+      ],
+      "instead": [
+        "A real benefit with verifiable claims.",
+        "A visible price, deadline and limits, plus a link to the full terms."
+      ],
+      "example": {
+        "before": "'Triple your money in 24 hours' with a 'Get it now' CTA and a landing page with no terms.",
+        "after": "'-10% with code SPRING until 15.05' with an 'Order today' CTA and the terms visible at the top of the landing page."
+      },
+      "checklist": [
+        "Is there a real benefit and a verifiable claim?",
+        "Are 'guaranteed', 'easy' and 'risk-free' absent?"
+      ]
+    },
+    {
+      "id": "predi-sled",
+      "title": "Before/after and sensational claims",
+      "restricted": "Body and face transformations, sensational imagery and shocking visuals used as clickbait.",
+      "avoid": [
+        "Close-ups of 'flaws' and dramatic before/after collages.",
+        "Numeric promises like '-15 kg in 10 days'."
+      ],
+      "instead": [
+        "Wide shots and silhouettes instead of visual exploitation.",
+        "Client stories with the method described and a disclaimer that results vary."
+      ],
+      "example": {
+        "before": "A carousel with a before/after midsection and '-15 kg in 10 days', with no evidence.",
+        "after": "A carousel with the coach and the program: 'Our clients follow a personal regimen for 12 weeks', with the method described."
+      },
+      "checklist": [
+        "No before/after and no sensational visuals?",
+        "Are the claims moderate and backed by real data?"
+      ]
+    },
+    {
+      "id": "zabraneni-produkti",
+      "title": "Prohibited products and services",
+      "restricted": "Illegal products and services, hacking tools, forged documents, fireworks, and the sale of accounts or engagement.",
+      "avoid": [
+        "Advertising help with banned substances or devices.",
+        "Selling profiles, likes and followers."
+      ],
+      "instead": [
+        "A lawful alternative to the product.",
+        "Educational content that does not encourage purchase or use."
+      ],
+      "example": {
+        "before": "A product from a banned category with 'Buy now — 100% guarantee'.",
+        "after": "An explainer graphic on 'which products are regulated and why', with a 'Learn more' CTA."
+      },
+      "checklist": [
+        "Is the category legal in the country you target?",
+        "No workaround through a link, a QR code or another domain?"
+      ]
+    },
+    {
+      "id": "alkohol-hazart",
+      "title": "Alcohol, gambling, tobacco and vaping",
+      "restricted": "A special regime: age and territorial limits, licensing requirements and mandatory legal notices.",
+      "avoid": [
+        "Targeting that includes people under 18.",
+        "Missing legal markers and encouragement of excessive use."
+      ],
+      "instead": [
+        "Geo-targeting that follows local law, plus age verification.",
+        "The required warnings in the copy and a license on file."
+      ],
+      "example": {
+        "before": "'Party without end!' with no age filter and no legal notices.",
+        "after": "18+ targeting, regional requirements, and copy reading 'Drink responsibly (18+)'."
+      },
+      "checklist": [
+        "Age, country and license — are all three covered?",
+        "Is the format allowed for this category?"
+      ]
+    },
+    {
+      "id": "zdrave",
+      "title": "Health: medicines, supplements, weight loss",
+      "restricted": "Prescription drugs, high-risk supplements and medical claims with no evidence.",
+      "avoid": [
+        "The words 'cures', 'heals' and 'guaranteed effect'.",
+        "Targeting by health status and before/after body shots."
+      ],
+      "instead": [
+        "A general wellness framing with no diagnoses.",
+        "An invitation to consult a specialist and a link to the research."
+      ],
+      "example": {
+        "before": "A video of capsules with 'Cures gastritis. Guaranteed effect.'",
+        "after": "A video with a coach and nutrition: 'Support for your energy. Read the ingredients.'"
+      },
+      "checklist": [
+        "No diagnoses and no promised outcomes?",
+        "Is there an invitation to consult a specialist and a source for the data?"
+      ]
+    },
+    {
+      "id": "lichni-harakteristiki",
+      "title": "Personal attributes",
+      "restricted": "Claims or hints that you know someone's personal status: health, race, religion, income, orientation, age.",
+      "avoid": [
+        "Openers like 'Do you have diabetes? Buy this.'",
+        "Addressing 'you' or 'your group' by a protected characteristic."
+      ],
+      "instead": [
+        "General phrasing: 'people with diabetes often…' instead of 'you, who have…'.",
+        "Focus on what the product does, not on who the user is."
+      ],
+      "example": {
+        "before": "'Do you have depression? Get X.'",
+        "after": "'Resources for mental wellbeing.'"
+      },
+      "checklist": [
+        "No address by a personal characteristic?",
+        "Does the copy work for a broad audience?"
+      ]
+    },
+    {
+      "id": "diskriminatsionno-targetirane",
+      "title": "Housing, employment and credit (Special Ad Categories)",
+      "restricted": "For housing, employment and credit offers, targeting is limited and the ad must be flagged in the matching special category.",
+      "avoid": [
+        "Excluding people by ethnicity, religion, age or gender.",
+        "Running such an offer without flagging the special category."
+      ],
+      "instead": [
+        "Flag the campaign as a Special Ad Category and work with broad targeting.",
+        "Contextual placement and creatives free of discriminatory messaging."
+      ],
+      "example": {
+        "before": "A housing ad reading 'for young families 25–35 only', with narrowed targeting.",
+        "after": "Special Ad Category: Housing, broad targeting and neutral copy: 'New apartments — see what is available'."
+      },
+      "checklist": [
+        "Is the special category flagged?",
+        "No exclusions or stereotypes in the copy and the visual?"
+      ]
+    },
+    {
+      "id": "prava-i-marki",
+      "title": "Content rights and trademarks",
+      "restricted": "Logos, visuals and music you have no right to use, and third-party trademarks placed in a misleading context.",
+      "avoid": [
+        "Claiming to be an 'official partner' with no contract.",
+        "Third-party footage and logos positioned to imply a relationship."
+      ],
+      "instead": [
+        "Your own assets or written permission.",
+        "Correct credits and precise wording about the partnership."
+      ],
+      "example": {
+        "before": "A third-party logo and 'Official partner of …' with no contract.",
+        "after": "'Joint campaign with …' using your own assets, a contract and a correct credit."
+      },
+      "checklist": [
+        "Do I hold usage rights for every asset?",
+        "Are the words 'partner' and 'certified' accurate?"
+      ]
+    },
+    {
+      "id": "dezinformatsiya-reklami",
+      "title": "Misinformation in ads",
+      "restricted": "False claims on matters of public importance, fake offers and imitation of news sites.",
+      "avoid": [
+        "A design that mimics a news story in order to sell a product.",
+        "Fake reviews and 'official news' with no source."
+      ],
+      "instead": [
+        "Verifiable sources in the description.",
+        "A clear line between the ad and editorial content, plus real testimonials with consent."
+      ],
+      "example": {
+        "before": "A video in fake news styling: 'Shocking: product X cures everything'.",
+        "after": "A video on 'how the product works according to research', with links to the studies and clear 'sponsored' labelling."
+      },
+      "checklist": [
+        "Is there a source behind every claim?",
+        "Is it obvious this is an ad and not a news story?"
+      ]
+    },
+    {
+      "id": "politicheski-temi",
+      "title": "Political and social issues",
+      "restricted": "These ads require advertiser verification and a disclaimer naming who paid for them.",
+      "avoid": [
+        "Running an issue ad with no authorization and no 'Paid for by'.",
+        "Verification in the wrong jurisdiction."
+      ],
+      "instead": [
+        "Complete verification before you plan the budget.",
+        "Set up the disclaimer and keep the evidence about the payer."
+      ],
+      "example": {
+        "before": "'Support the bill…' with a 'Donate' CTA and no disclaimer.",
+        "after": "A verified advertiser with 'Paid for by', the correct jurisdiction and archived transparency."
+      },
+      "checklist": [
+        "Is there verification and the right disclaimer?",
+        "Does the geo targeting match the jurisdiction?"
+      ]
+    },
+    {
+      "id": "lending",
+      "title": "Landing pages",
+      "restricted": "Mismatch between the ad and the page, hidden prices, blocking pop-ups, broken forms and misleading timers.",
+      "avoid": [
+        "An offer in the ad that does not exist on the landing page.",
+        "Autoplay sound and pop-ups that block reading."
+      ],
+      "instead": [
+        "A one-to-one match between offer, visual and page.",
+        "A visible price and terms, a fast mobile page and an easy way out."
+      ],
+      "example": {
+        "before": "An ad reading '−50% today' while the landing page shows no price and throws pop-ups.",
+        "after": "'−20% with code SPRING until 15.05' with the same offer visible in the first screen of the landing page."
+      },
+      "checklist": [
+        "Do the offer, visual and price match?",
+        "Does the page load fast on a phone, with no barriers?"
+      ]
+    },
+    {
+      "id": "lead-ads",
+      "title": "Data collection and Lead Ads",
+      "restricted": "Sensitive fields — health and financial data — forms without consent and without a link to the privacy policy.",
+      "avoid": [
+        "Asking for a national ID, medical or banking details in the form.",
+        "Silently signing people up for a newsletter, with no link to the policy."
+      ],
+      "instead": [
+        "A minimal set of fields collected for a clear purpose.",
+        "An explicit consent checkbox, a link to the policy and double opt-in for email."
+      ],
+      "example": {
+        "before": "A form asking for a national ID and health data, with no link to the policy.",
+        "after": "A form with minimal fields, a consent checkbox and a link to the privacy policy."
+      },
+      "checklist": [
+        "No sensitive data in the form?",
+        "Is consent explicit and the purpose stated?"
+      ]
+    },
+    {
+      "id": "brandirano-sadarzhanie",
+      "title": "Branded content and disclosure",
+      "restricted": "Paid partnerships without labelling and hidden advertising by creators.",
+      "avoid": [
+        "'#ad' buried at the end of a long caption.",
+        "A missing paid-partnership tag where one is required."
+      ],
+      "instead": [
+        "Visible disclosure up front and a partnership tag.",
+        "Creatives agreed with the brand and contracts kept on file."
+      ],
+      "example": {
+        "before": "'I love product X!!!' with no disclosure of the paid partnership.",
+        "after": "'#ad My experience with product X…' with a partnership tag and a contract on file."
+      },
+      "checklist": [
+        "Is it clear from the first line that the content is paid?",
+        "Is there a contract and copy approved by the brand?"
+      ]
+    },
+    {
+      "id": "zaobikalyane",
+      "title": "Circumventing the systems",
+      "restricted": "Cloaking, rapid domain switching, text hidden in images and QR codes, re-uploading a rejected ad.",
+      "avoid": [
+        "Re-uploading the same ad with one word changed.",
+        "Redirecting to content other than what was reviewed."
+      ],
+      "instead": [
+        "Remove the cause of the rejection on the merits.",
+        "Update creative and landing page honestly, then appeal with an argument."
+      ],
+      "example": {
+        "before": "Re-uploading '-15 kg in 10 days' after a rejection, with a cosmetic change.",
+        "after": "A corrected creative — 'a healthy 12-week plan' — with an explanation in the appeal."
+      },
+      "checklist": [
+        "No cloaking and no redirects?",
+        "Is the change substantive rather than cosmetic?"
+      ]
+    },
+    {
+      "id": "seksualizirano-v-reklami",
+      "title": "Sexualized and shocking content in ads",
+      "restricted": "The limits here are stricter than for organic content: sexualized poses, emphasis on body parts and shock used to grab attention.",
+      "avoid": [
+        "Close-ups of intimate areas and gestures with an undertone.",
+        "Bloody or shocking visuals used as a hook."
+      ],
+      "instead": [
+        "Neutral framing focused on the product and the benefit.",
+        "Visuals suitable for any audience."
+      ],
+      "example": {
+        "before": "A video with a sexualized pose and 'The hottest offer…'.",
+        "after": "A video of the product in use with 'Light and comfortable…'."
+      },
+      "checklist": [
+        "Is the visual neutral?",
+        "Is the product the focus rather than the body?"
+      ]
+    },
+    {
+      "id": "mladi-auditorii",
+      "title": "Limits for young audiences",
+      "restricted": "Ads to people under 18 for sensitive categories: alcohol, weight loss, finance, dating, tobacco and vaping.",
+      "avoid": [
+        "Targeting teenagers with a sensitive product.",
+        "Visuals and language that speak to children."
+      ],
+      "instead": [
+        "Age filters and content written for adults.",
+        "Alternative campaigns with no sales push if the audience skews young."
+      ],
+      "example": {
+        "before": "A dating ad targeted at 16–17 year olds.",
+        "after": "18+ targeting with copy reading 'Meet people near you (18+)'."
+      },
+      "checklist": [
+        "Is the target age 18+ for this category?",
+        "Are the language and visuals written for adults?"
+      ]
+    }
+  ],
+  "templates": [
+    "'Save up to X% until [date]. Full terms: [link].'",
+    "'Results vary depending on individual factors. Consult a specialist.'",
+    "'Sponsored by [organization name].' — for political and issue ads, after verification."
+  ],
+  "closing": {
+    "title": "If the ad is disapproved",
+    "steps": [
+      "Read the rejection notice and which policy it cites.",
+      "Check all four elements together: creative, copy, landing page and targeting.",
+      "Fix it on the merits — swapping one word reads as circumvention.",
+      "Appeal with a short explanation and evidence: links, licenses, screenshots.",
+      "If rejections keep coming, run a full audit of creatives, catalogs, domains, pixels and forms."
+    ]
+  }
+}

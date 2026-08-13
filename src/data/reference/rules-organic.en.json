@@ -1,0 +1,278 @@
+{
+  "slug": "organichno-sadarzhanie",
+  "updated": "2026-08-13",
+  "kicker": "Rules · organic content",
+  "title": "What passes and what comes down on Instagram and Facebook",
+  "lead": "The ten topics behind most takedowns, and what the safe version of the same content looks like. The logic is always the same: context, warning, rights.",
+  "metaTitle": "Content rules for Instagram and Facebook | Unban Solutions",
+  "metaDescription": "The ten topics Meta removes most often: what is restricted, what not to do, what to do instead, and the checklist to run before you publish.",
+  "keywords": "content rules, removed post, community standards, graphic content, hateful conduct, nudity, copyright, restricted goods",
+  "intro": [
+    {
+      "title": "Why these rules exist",
+      "items": [
+        "Audience safety: platforms limit traumatic, hateful and deceptive content because they host people of every age.",
+        "Law and regulation: Meta follows European and local rules on child protection, copyright and online services.",
+        "Advertiser trust: monetization is steadier around content that carries no risk.",
+        "Algorithmic distribution: the rules are built into recommendations, so low-risk content simply reaches further."
+      ]
+    },
+    {
+      "title": "How they are enforced",
+      "items": [
+        "A mix of automated detection, user reports and human moderators.",
+        "Measures run from labels and demotion, through removal and temporary limits, to strikes and blocking for repeat cases.",
+        "Borderline posts often pass automatically, but a few reports and a human review can still take them down after the fact."
+      ]
+    }
+  ],
+  "goldenRule": {
+    "title": "The golden rule: context, warning, rights",
+    "detail": "Most borderline cases come down to three questions. Have I explained why I am showing this? Have I warned people if it is heavy? Do I have the right to use this visual and this music?"
+  },
+  "topics": [
+    {
+      "id": "nasilie",
+      "title": "Violence and graphic content",
+      "standard": "Community Standards: Violent and Graphic Content; Violence and Incitement",
+      "restricted": "Bloody and traumatic scenes, praise of violence, credible threats. Graphic means open wounds, severe injuries, dead bodies and close-ups of violence, including footage taken right after an incident or crime.",
+      "avoid": [
+        "Raw footage with no warning.",
+        "Headlines that sell the shock, along the lines of 'watch the most brutal…'."
+      ],
+      "instead": [
+        "In a news or educational context, blur and crop the worst of it.",
+        "State the purpose — information or help — without glorifying the violence.",
+        "Put a warning in the caption and link to a resource if the topic calls for it."
+      ],
+      "example": {
+        "before": "A reel with a close-up of an injury captioned 'watch this bloody video!'",
+        "after": "Blurred footage plus first-aid steps, captioned '⚠️ Sensitive content. Here is how to help at an accident,' with a link to resources."
+      },
+      "checklist": [
+        "Are there graphic scenes I can blur or crop?",
+        "Is there a warning in the first lines of the caption?",
+        "Does the tone describe rather than glorify?"
+      ]
+    },
+    {
+      "id": "omraza",
+      "title": "Hateful conduct and harassment",
+      "standard": "Community Standards: Hateful Conduct; Bullying and Harassment",
+      "restricted": "Slurs and dehumanization aimed at groups by race, gender, religion, nationality, disability or orientation, plus coordinated harassment of a specific person.",
+      "avoid": [
+        "Calling a group 'animals', 'vermin' or 'inferior', or comparing them to disease and filth.",
+        "Calls for exclusion, sweeping generalizations and stereotypes by protected characteristic.",
+        "Mocking an accent, a physical trait or impersonations that ridicule a group."
+      ],
+      "instead": [
+        "Criticize an action or a policy, not a whole group of people.",
+        "On news, state the facts in a neutral tone, without epithets.",
+        "Plan moderation: hiding and limiting hostile comments."
+      ],
+      "example": {
+        "before": "A graphic with an insulting claim about an entire group.",
+        "after": "A carousel arguing against the specific policy, with facts and sources, plus moderation in the comments."
+      },
+      "checklist": [
+        "Am I criticizing ideas and actions instead of people?",
+        "Do I have a plan for who clears the comments, and when?"
+      ]
+    },
+    {
+      "id": "golota",
+      "title": "Nudity and sexual content",
+      "standard": "Community Standards: Adult Nudity and Sexual Activity",
+      "restricted": "Pornography, fetish content and any sexualization of minors, where tolerance is zero. Also risky: shots focused on intimate areas, low angles, wet or see-through clothing, and gestures with an explicit sexual undertone.",
+      "avoid": [
+        "Close-ups of genitals, buttocks or breasts, including through see-through fabric.",
+        "Rhythmic movements and gestures that mimic a sexual act, plus NSFW hashtags.",
+        "Slowly zooming toward an intimate area and holding the shot there."
+      ],
+      "instead": [
+        "A medium or wider shot with a neutral pose and movement.",
+        "Swimwear and sportswear in a fitting context — beach, gym, dance — without provocative framing.",
+        "For art, fashion or medical topics: silhouette, distance, a discreet shot and an explanation in the caption.",
+        "Breastfeeding and postpartum topics are allowed when the context is clearly stated."
+      ],
+      "example": {
+        "before": "A close-up shot captioned 'Hot drop…' with NSFW hashtags.",
+        "after": "A medium shot focused on the styling, captioned 'Workout outfit ideas — 3 tips for comfort'."
+      },
+      "checklist": [
+        "Are there sexualized details in the frame or in the hashtags?",
+        "Can I make the same point with a more discreet shot?"
+      ]
+    },
+    {
+      "id": "opasni-organizatsii",
+      "title": "Dangerous organizations and symbols",
+      "standard": "Community Standards: Dangerous Organizations and Individuals",
+      "restricted": "Propaganda and praise, calls to join, links for recruiting members or funds. High-risk visuals include extremist flags and emblems, Nazi symbols, numeric codes used by such groups and uniforms of banned formations.",
+      "avoid": [
+        "Praise along the lines of 'heroes' and 'support them'.",
+        "Memes with logos or leaders framed positively.",
+        "Instructions on how to join or donate."
+      ],
+      "instead": [
+        "For news or educational topics, cover or replace the symbols.",
+        "Use neutral illustrations and maps instead of logos and portraits.",
+        "Add a clear disclaimer that the content is informational and does not endorse the organization."
+      ],
+      "example": {
+        "before": "A collage with an extremist emblem and a positive caption.",
+        "after": "An explainer graphic on what happened and why it is dangerous, with neutral icons, sources and a disclaimer."
+      },
+      "checklist": [
+        "Is the tone descriptive and critical?",
+        "Are there no calls to join or support?"
+      ]
+    },
+    {
+      "id": "samonaranyavane",
+      "title": "Self-injury and dangerous challenges",
+      "standard": "Community Standards: Suicide and Self-Injury",
+      "restricted": "Encouraging, coordinating or instructing on self-injury, suicide, eating disorders or risky challenges.",
+      "avoid": [
+        "Demonstrating how a dangerous stunt is done.",
+        "Joining a trend that carries a health risk, with no warning."
+      ],
+      "instead": [
+        "Speak preventively: why it is unsafe and what can go wrong.",
+        "Add where someone can find support.",
+        "Offer safe alternatives to the trend."
+      ],
+      "example": {
+        "before": "A short demonstrating a risky challenge, captioned 'try this!'",
+        "after": "A short that warns 'this is dangerous because X' and offers three safe alternatives, with a link to support resources."
+      },
+      "checklist": [
+        "Are there no instructions or encouragement toward harm?",
+        "Is there information on where to get help?"
+      ]
+    },
+    {
+      "id": "izmami-spam",
+      "title": "Scams and spam",
+      "standard": "Community Standards: Spam",
+      "restricted": "Content that deceives or overwhelms people to inflate views artificially: 'easy money', fake giveaways, mass mentions and copy-paste comments.",
+      "avoid": [
+        "Promises of doubling money and 'profit with no effort'.",
+        "Fake giveaways 'for everyone, just DM me'.",
+        "The same comment posted under dozens of posts."
+      ],
+      "instead": [
+        "Real offers with clear terms, a deadline and a link to the full rules.",
+        "A sensible number of tags and meaningful, personalized comments."
+      ],
+      "example": {
+        "before": "'Today only — send me an amount and I return double.'",
+        "after": "'Promo code XXX gives 10% off until Friday. Full terms: link.'"
+      },
+      "checklist": [
+        "Is the offer verifiable and fully described?",
+        "Is there no mass tagging or repeated commenting?"
+      ]
+    },
+    {
+      "id": "dezinformatsiya",
+      "title": "Misinformation",
+      "standard": "Community Standards: Misinformation",
+      "restricted": "False claims on high-risk topics — health, elections, safety — especially where they can lead to direct physical harm.",
+      "avoid": [
+        "Strong health claims with no source, for example that something 'cures' a condition.",
+        "Claims about elections and public processes without an official source."
+      ],
+      "instead": [
+        "Cite reliable sources and link them.",
+        "Separate personal experience from medical advice.",
+        "If you get it wrong, publish a correction instead of going quiet."
+      ],
+      "example": {
+        "before": "'This tea cures gastritis.'",
+        "after": "'Personal experience; not medical advice. Here is what the research says: link.'"
+      },
+      "checklist": [
+        "Do I have a source for every factual claim?",
+        "Am I ready to publish a correction if I am wrong?"
+      ]
+    },
+    {
+      "id": "avtorski-prava",
+      "title": "Copyright: music, video, photos, logos",
+      "standard": "Help Center: Intellectual Property",
+      "restricted": "Third-party assets you have no right to use — music, video, photos, logos and trademarks.",
+      "avoid": [
+        "A popular track ripped from another platform.",
+        "Someone else's video or logo in the thumbnail with no connection to the topic."
+      ],
+      "instead": [
+        "Music from the in-app library or a licensed platform.",
+        "Your own footage or written permission from the author.",
+        "Credit the author and the license where that is required."
+      ],
+      "example": {
+        "before": "A reel using a chart hit without a license, over someone else's clips.",
+        "after": "A reel with your own footage and a track from the library, crediting the author in the caption."
+      },
+      "checklist": [
+        "Can I prove my right to use this asset?",
+        "Have I credited the author and license where needed?"
+      ]
+    },
+    {
+      "id": "regulirani-stoki",
+      "title": "Restricted goods",
+      "standard": "Community Standards: Restricted Goods and Services",
+      "restricted": "Promoting or trading weapons, drugs, tobacco products, anabolics and other regulated goods.",
+      "avoid": [
+        "'Here is how to…' instructions tied to a banned or regulated product.",
+        "Any encouragement to buy or use."
+      ],
+      "instead": [
+        "If the topic is news or education, stay informational.",
+        "Explain the risks and the legal framework, without a promotional tone."
+      ],
+      "example": {
+        "before": "A story showing the product, captioned 'get yours now'.",
+        "after": "An explainer graphic on what the rules say and what the legal risks are, in a neutral tone."
+      },
+      "checklist": [
+        "Is there any sale or encouragement in the post?",
+        "Is the tone informational rather than promotional?"
+      ]
+    },
+    {
+      "id": "nepalnoletni",
+      "title": "Children and teenagers",
+      "standard": "Community Standards: Child Sexual Exploitation, Abuse and Nudity",
+      "restricted": "Anything that exploits or endangers children, including sexualization and exposure of personal data. Platforms also remove photos of nude children shared with good intentions, because of the risk of misuse.",
+      "avoid": [
+        "Provocative or risky scenes involving children, including jokes with a double meaning.",
+        "Showing a school, an address or other identifying details."
+      ],
+      "instead": [
+        "Parental consent before a child appears on camera.",
+        "Discreet shots with no emphasis on sensitive details.",
+        "Blur faces and locations where needed."
+      ],
+      "example": {
+        "before": "An identifiable child in a risky context, with the location tagged.",
+        "after": "A family scene focused on the activity, with no precise location and blurring where needed."
+      },
+      "checklist": [
+        "Do I have parental consent where it is needed?",
+        "Have I protected the child's identity and safety?"
+      ]
+    }
+  ],
+  "closing": {
+    "title": "If a measure lands anyway",
+    "steps": [
+      "Screenshot the notification before it disappears from your notifications.",
+      "Save the removed post and the context around it — comments, date, campaign.",
+      "Check Account Quality for a strike, a label or a limit.",
+      "Describe the case and send the materials for an assessment of the next step."
+    ]
+  }
+}
