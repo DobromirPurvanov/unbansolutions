@@ -11,6 +11,11 @@ const organizationId = `${siteUrl}/#organization`;
 const { published } = await loadArticles();
 const latestDate = published[0]?.date || '2026-07-19';
 
+// Справочните страници се хранят от същия JSON, който React импортира.
+const sanctionsReference = JSON.parse(
+  await readFile(path.join(root, 'src', 'data', 'reference', 'sanctions.json'), 'utf8'),
+);
+
 const routes = [
   { path: '/', title: 'Unban Solutions | Защита и възстановяване на акаунти', description: 'Професионална оценка, подготовка на обжалвания и съдействие при ограничени, спрени или компрометирани акаунти. Изпратете казуса си за оценка.' },
   { path: '/services', title: 'Услуги за възстановяване на акаунти | Unban Solutions', description: 'Оценка на казуса, подготовка на обжалване, съдействие при компрометирани профили и превантивен одит за основните социални платформи.' },
@@ -18,10 +23,109 @@ const routes = [
   { path: '/process', title: 'Как протича работата по вашия казус | Unban Solutions', description: 'От първоначалната оценка и събирането на доказателства до подаването на обжалване и проследяването на отговора по вашия казус.' },
   { path: '/contact', title: 'Контакт и безплатна първоначална оценка | Unban Solutions', description: 'Опишете проблема с вашия акаунт и изпратете нужните доказателства чрез защитената форма. Ще получите ясна първоначална оценка на казуса.' },
   { path: '/blog', title: 'Блог за защита и възстановяване на акаунти | Unban Solutions', description: 'Практически статии за спрени акаунти, шадоубан, рестрикции, фишинг и правилата за съдържание в социалните мрежи. Нова статия всяка седмица.' },
+  {
+    path: '/vidove-sanktsii',
+    title: 'Видове санкции в Instagram и Facebook | Unban Solutions',
+    description: 'Дванадесетте вида санкции в социалните мрежи: как изглежда всяка, къде се вижда в приложението, какви са типичните причини и кои са първите стъпки в първите 48 часа.',
+    schema: referenceSchema(),
+    rootHtml: referenceStaticHtml(),
+  },
   { path: '/privacy-policy', title: 'Политика за поверителност | Unban Solutions', description: 'Как Unban Solutions събира, използва, съхранява и защитава личните данни.' },
   { path: '/terms', title: 'Общи условия | Unban Solutions', description: 'Условията за използване на сайта и възлагане на услуги на Unban Solutions.' },
   { path: '/payments-and-refunds', title: 'Плащания, отказ и възстановяване | Unban Solutions', description: 'Условия за плащане, право на отказ и възстановяване на суми при възложени услуги.' },
 ];
+
+function referenceSchema() {
+  const url = `${siteUrl}/vidove-sanktsii`;
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        name: 'Видове санкции в социалните мрежи',
+        description: 'Дванадесетте вида санкции в Instagram и Facebook: как изглежда всяка, къде се вижда, какви са причините и кои са първите стъпки.',
+        url,
+        inLanguage: 'bg',
+        dateModified: sanctionsReference.updated,
+        publisher: { '@id': organizationId },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${url}#breadcrumbs`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Начало', item: `${siteUrl}/` },
+          { '@type': 'ListItem', position: 2, name: 'Видове санкции', item: url },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        '@id': `${url}#sanctions`,
+        name: 'Видове санкции',
+        itemListElement: sanctionsReference.sanctions.map((sanction, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: sanction.title,
+          description: sanction.summary,
+          item: `${url}#${sanction.id}`,
+        })),
+      },
+    ],
+  };
+}
+
+// Същият текст, който React рендира — за ботовете, които не изпълняват JavaScript.
+function referenceStaticHtml() {
+  const { strikePaths, sanctions, statusPlaces, reportOutcomes, reportSignals, reportSop, myths } = sanctionsReference;
+  const escape = (value) => escapeAttribute(value);
+  const list = (items) => `<ul>${items.map((item) => `<li>${escape(item)}</li>`).join('')}</ul>`;
+
+  return [
+    '<main class="article-static">',
+    '<h1>Дванадесетте вида санкции и какво прави всяка от тях</h1>',
+    '<p>Първата задача при всяка мярка е да разберете коя точно е тя. Оттам следват срокът, мястото, където се вижда, и стъпките, които имат смисъл.</p>',
+    '<h2>Четирите strike пътеки</h2>',
+    strikePaths
+      .map((path) => [
+        `<h3>${escape(path.name)} (${escape(path.scope)})</h3>`,
+        `<p>Тригери: ${escape(path.triggers)}</p>`,
+        `<p>Ескалация: ${escape(path.escalation)}</p>`,
+        `<p>Какво помага: ${escape(path.response)}</p>`,
+      ].join(''))
+      .join(''),
+    '<p>Точните прагове и срокове не са публични и се променят. Използвайте това като оперативен ориентир, не като правилник.</p>',
+    '<h2>Санкция по санкция</h2>',
+    sanctions
+      .map((sanction) => [
+        `<section id="${escape(sanction.id)}">`,
+        `<h3>${escape(sanction.title)}</h3>`,
+        `<p>${escape(sanction.summary)}</p>`,
+        `<p>Как изглежда: ${escape(sanction.looksLike)}</p>`,
+        `<p>Къде се вижда: ${escape(sanction.whereToSee)}</p>`,
+        `<p>Типични причини: ${escape(sanction.causes)}</p>`,
+        '<p>Първи стъпки (до 48 часа):</p>',
+        list(sanction.firstSteps),
+        sanction.article ? `<p><a href="/blog/${escape(sanction.article)}">Подробна статия по темата</a></p>` : '',
+        '</section>',
+      ].join(''))
+      .join(''),
+    '<h2>Къде се вижда статусът на акаунта</h2>',
+    `<ul>${statusPlaces.map((place) => `<li>${escape(place.name)}: ${escape(place.detail)}</li>`).join('')}</ul>`,
+    '<h2>Когато ви залеят със сигнали</h2>',
+    '<p>Сигналът от потребител не е присъда, а повод за проверка.</p>',
+    '<h3>Възможните изходи</h3>',
+    list(reportOutcomes),
+    '<h3>Признаци за координирана вълна</h3>',
+    list(reportSignals),
+    '<h3>Какво да направите по ред</h3>',
+    `<ol>${reportSop.map((step) => `<li>${escape(step.title)}: ${escape(step.detail)}</li>`).join('')}</ol>`,
+    '<h2>Митове и реалност</h2>',
+    `<ul>${myths.map((item) => `<li>„${escape(item.myth)}“ — ${escape(item.reality)}</li>`).join('')}</ul>`,
+    '<p>Unban Solutions не е свързана с Meta, TikTok или друга платформа. Работим по публично публикуваните правила и процедури за обжалване. Съдържанието тук е оперативен ориентир, не юридически съвет.</p>',
+    '<p><a href="/contact">Изпратете казуса си за оценка</a></p>',
+    '</main>',
+  ].join('');
+}
 
 function articleSchema(article) {
   const url = `${siteUrl}/blog/${article.slug}`;
@@ -141,6 +245,7 @@ const staticSitemapEntries = [
   { loc: `${siteUrl}/pricing`, lastmod: '2026-07-19', changefreq: 'monthly', priority: '0.9' },
   { loc: `${siteUrl}/process`, lastmod: '2026-07-19', changefreq: 'monthly', priority: '0.8' },
   { loc: `${siteUrl}/contact`, lastmod: '2026-07-19', changefreq: 'monthly', priority: '0.8' },
+  { loc: `${siteUrl}/vidove-sanktsii`, lastmod: sanctionsReference.updated, changefreq: 'monthly', priority: '0.9' },
   { loc: `${siteUrl}/blog`, lastmod: latestDate, changefreq: 'weekly', priority: '0.8' },
   { loc: `${siteUrl}/privacy-policy`, lastmod: '2026-07-19', changefreq: 'yearly', priority: '0.4' },
   { loc: `${siteUrl}/terms`, lastmod: '2026-07-19', changefreq: 'yearly', priority: '0.4' },

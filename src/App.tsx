@@ -17,6 +17,7 @@ const Contact = lazy(() => import('@/pages/Contact'));
 const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const PaymentsRefunds = lazy(() => import('@/pages/PaymentsRefunds'));
+const Sanctions = lazy(() => import('@/pages/Sanctions'));
 const Blog = lazy(() => import('@/pages/Blog'));
 const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/payments-and-refunds" element={<PaymentsRefunds />} />
+            <Route path="/vidove-sanktsii" element={<Sanctions />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="*" element={<NotFound />} />

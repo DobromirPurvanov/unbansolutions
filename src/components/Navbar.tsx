@@ -71,6 +71,7 @@ export default function Navbar() {
     { name: t('nav.services'), path: '/services' },
     { name: t('nav.pricing'), path: '/pricing' },
     { name: t('nav.process'), path: '/process' },
+    { name: t('nav.reference'), path: '/vidove-sanktsii' },
     { name: t('nav.blog'), path: '/blog' },
   ];
 
