@@ -69,13 +69,18 @@ export default function BlogPost() {
   if (!article) return <NotFound />;
 
   const related = publishedArticles.filter((a) => a.slug !== article.slug).slice(0, 3);
+  // Английската версия се показва само ако е преведена; иначе остава българската с бележка.
+  const english = !isBg && article.hasEnglish;
+  const bodyHtml = english ? article.bodyHtmlEn : article.bodyHtml;
+  const faq = english ? article.faqEn : article.faq;
+  const tags = english ? article.tagsEn : article.tags;
 
   return (
     <>
       <SEOMeta
-        title={`${article.title} | Unban Solutions`}
-        description={article.description}
-        keywords={article.keywords}
+        title={`${english ? article.titleEn : article.title} | Unban Solutions`}
+        description={english ? article.descriptionEn : article.description}
+        keywords={english ? article.keywordsEn : article.keywords}
         canonical={`${SITE_URL}/blog/${article.slug}`}
         type="article"
         structuredData={structuredData}
@@ -92,7 +97,7 @@ export default function BlogPost() {
               {isBg ? 'Всички статии' : 'All articles'}
             </Link>
             <h1 className="mb-4 text-[clamp(1.6rem,3.5vw,2.4rem)] font-bold leading-tight text-slate-900">
-              {article.title}
+              {english ? article.titleEn : article.title}
             </h1>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
               <span className="flex items-center gap-1.5">
@@ -104,13 +109,13 @@ export default function BlogPost() {
                 <Clock3 size={12} aria-hidden="true" />
                 {isBg ? `${article.readTime} четене` : `${article.readTimeEn} read`}
               </span>
-              {article.tags.map((tag) => (
+              {tags.map((tag) => (
                 <span key={tag} className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-blue-700">
                   {tag}
                 </span>
               ))}
             </div>
-            {!isBg && (
+            {!isBg && !article.hasEnglish && (
               <p className="mt-4 rounded-lg bg-violet-50 px-4 py-3 text-xs leading-relaxed text-violet-800">
                 This article is available in Bulgarian. An English version is planned.
               </p>
@@ -121,15 +126,15 @@ export default function BlogPost() {
         <section className="bg-white py-10 sm:py-12">
           <div className="mx-auto max-w-[820px] px-6">
             <article>
-              <div className="article-body" dangerouslySetInnerHTML={{ __html: article.bodyHtml }} />
+              <div className="article-body" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
 
-              {article.faq.length > 0 && (
+              {faq.length > 0 && (
                 <section className="mt-10">
                   <h2 className="mb-4 text-xl font-bold text-slate-900">
                     {isBg ? 'Често задавани въпроси' : 'Frequently asked questions'}
                   </h2>
                   <div className="space-y-3">
-                    {article.faq.map((item) => (
+                    {faq.map((item) => (
                       <details key={item.question} className="faq-item glass-card group">
                         <summary className="cursor-pointer list-none px-5 py-4 text-sm font-bold text-slate-900">
                           {item.question}

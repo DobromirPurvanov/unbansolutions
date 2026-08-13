@@ -48,9 +48,24 @@ test('published/upcoming split matches the publish dates', () => {
   assert.equal(published.length + upcoming.length, all.length);
 });
 
+test('всяка публикувана статия има английски близнак', () => {
+  for (const article of published) {
+    assert.ok(article.hasEnglish, `${article.slug}: липсва файл в content/blog-en`);
+    assert.ok(article.titleEn && article.excerptEn && article.descriptionEn, `${article.slug}: непълни английски мета данни`);
+    assert.ok(article.descriptionEn.length <= 200, `${article.slug}: английското описание е твърде дълго за meta таг`);
+    assert.ok(article.tagsEn.length > 0, `${article.slug}: липсват английски етикети`);
+    // Преводът трябва да покрива същия материал, не резюме.
+    assert.equal(article.faqEn.length, article.faq.length, `${article.slug}: различен брой въпроси в FAQ`);
+    for (const item of article.faqEn) {
+      assert.ok(item.question.endsWith('?'), `${article.slug}: английски FAQ въпрос без въпросителна`);
+      assert.ok(item.answer.length > 40, `${article.slug}: кратък английски отговор`);
+    }
+  }
+});
+
 test('generated HTML contains no unconverted markdown', () => {
   for (const article of all) {
-    const html = article.bodyHtml + article.faq.map((f) => f.answerHtml).join('');
+    const html = article.bodyHtml + article.bodyHtmlEn + article.faq.map((f) => f.answerHtml).join('') + article.faqEn.map((f) => f.answerHtml).join('');
     assert.ok(!html.includes('**'), `${article.slug}: raw bold marker in HTML`);
     assert.ok(!/\]\(/.test(html), `${article.slug}: raw markdown link in HTML`);
     assert.ok(!/^#/m.test(html), `${article.slug}: raw heading marker in HTML`);
@@ -60,7 +75,7 @@ test('generated HTML contains no unconverted markdown', () => {
 test('internal blog links only point to real articles', () => {
   const slugs = new Set(all.map((a) => a.slug));
   for (const article of all) {
-    const html = article.bodyHtml + article.faq.map((f) => f.answerHtml).join('');
+    const html = article.bodyHtml + article.bodyHtmlEn + article.faq.map((f) => f.answerHtml).join('');
     for (const [, href] of html.matchAll(/href="\/blog\/([^"]+)"/g)) {
       assert.ok(slugs.has(href), `${article.slug}: links to unknown article ${href}`);
     }
@@ -82,7 +97,7 @@ test('internal links from articles point to routes that exist', async () => {
   const routes = new Set([...app.matchAll(/path="(\/[^"*:]*)"/g)].map((match) => match[1]));
 
   for (const article of all) {
-    const html = article.bodyHtml + article.faq.map((f) => f.answerHtml).join('');
+    const html = article.bodyHtml + article.bodyHtmlEn + article.faq.map((f) => f.answerHtml).join('');
     for (const [, href] of html.matchAll(/href="(\/[^"]+)"/g)) {
       if (href.startsWith('/blog/')) continue; // покрито от теста по-горе
       const path = href.split('#')[0];

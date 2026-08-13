@@ -18,13 +18,19 @@ const toPublic = (a) => ({
   excerpt: a.excerpt,
   excerptEn: a.excerptEn,
   description: a.description,
+  descriptionEn: a.descriptionEn,
   keywords: a.keywords,
+  keywordsEn: a.keywordsEn,
   tags: a.tags,
+  tagsEn: a.tagsEn,
   wordCount: a.wordCount,
   readTime: a.readTime,
   readTimeEn: a.readTimeEn,
   bodyHtml: a.bodyHtml,
+  bodyHtmlEn: a.bodyHtmlEn,
   faq: a.faq,
+  faqEn: a.faqEn,
+  hasEnglish: a.hasEnglish,
 });
 
 const toTeaser = (a) => ({
@@ -53,13 +59,20 @@ export interface BlogArticle {
   excerpt: string;
   excerptEn: string;
   description: string;
+  descriptionEn: string;
   keywords: string;
+  keywordsEn: string;
   tags: string[];
+  tagsEn: string[];
   wordCount: number;
   readTime: string;
   readTimeEn: string;
   bodyHtml: string;
+  /** Празно, докато статията няма превод в content/blog-en. */
+  bodyHtmlEn: string;
   faq: BlogFaqItem[];
+  faqEn: BlogFaqItem[];
+  hasEnglish: boolean;
 }
 
 export interface UpcomingArticle {

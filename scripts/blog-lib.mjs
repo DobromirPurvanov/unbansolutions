@@ -2,7 +2,10 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'blog');
+// Английските близнаци живеят в отделна папка със същите имена на файловете.
+const EN_CONTENT_DIR = path.join(process.cwd(), 'content', 'blog-en');
 const FAQ_HEADING = 'Често задавани въпроси';
+const FAQ_HEADING_EN = 'Frequently asked questions';
 const WORDS_PER_MINUTE = 180;
 
 function escapeHtml(text) {
@@ -120,8 +123,8 @@ export function markdownToHtml(markdown, publishedSlugs = new Set()) {
   return out.join('\n');
 }
 
-function splitFaq(body) {
-  const marker = `## ${FAQ_HEADING}`;
+function splitFaq(body, heading = FAQ_HEADING) {
+  const marker = `## ${heading}`;
   const index = body.indexOf(marker);
   if (index === -1) return { main: body.trim(), faqSource: '' };
   return {
@@ -158,8 +161,25 @@ export function todayUtc() {
   return new Date().toISOString().slice(0, 10);
 }
 
+async function loadTranslations() {
+  const translations = new Map();
+  let files;
+  try {
+    files = (await readdir(EN_CONTENT_DIR)).filter((name) => name.endsWith('.md'));
+  } catch (error) {
+    if (error?.code === 'ENOENT') return translations; // преводите са опционални
+    throw error;
+  }
+  for (const file of files) {
+    const raw = await readFile(path.join(EN_CONTENT_DIR, file), 'utf8');
+    translations.set(file.replace(/\.md$/, ''), parseFrontmatter(raw));
+  }
+  return translations;
+}
+
 export async function loadArticles() {
   const files = (await readdir(CONTENT_DIR)).filter((name) => name.endsWith('.md')).sort();
+  const translations = await loadTranslations();
   const cutoff = todayUtc();
   const parsed = [];
   for (const file of files) {
@@ -173,21 +193,42 @@ export async function loadArticles() {
     const { main, faqSource } = splitFaq(body);
     const words = countWords(body);
     const minutes = Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
+    const translation = translations.get(slug);
+    const english = translation
+      ? (() => {
+          const { main: mainEn, faqSource: faqSourceEn } = splitFaq(translation.body, FAQ_HEADING_EN);
+          const wordsEn = countWords(translation.body);
+          return {
+            meta: translation.meta,
+            minutes: Math.max(1, Math.ceil(wordsEn / WORDS_PER_MINUTE)),
+            bodyHtml: markdownToHtml(mainEn, publishedSlugs),
+            faq: parseFaq(faqSourceEn, publishedSlugs),
+          };
+        })()
+      : null;
+
     return {
       slug,
       title: meta.title,
-      titleEn: meta.titleEn || meta.title,
+      titleEn: english?.meta.title || meta.titleEn || meta.title,
       date: meta.date,
       excerpt: meta.excerpt,
-      excerptEn: meta.excerptEn || meta.excerpt,
+      excerptEn: english?.meta.excerpt || meta.excerptEn || meta.excerpt,
       description: meta.description || meta.excerpt,
+      descriptionEn: english?.meta.description || english?.meta.excerpt || meta.excerptEn || meta.description || meta.excerpt,
       keywords: meta.keywords || '',
+      keywordsEn: english?.meta.keywords || meta.keywords || '',
       tags: Array.isArray(meta.tags) ? meta.tags : [],
+      tagsEn: Array.isArray(english?.meta.tags) ? english.meta.tags : (Array.isArray(meta.tags) ? meta.tags : []),
       wordCount: words,
       readTime: `${minutes} мин`,
-      readTimeEn: `${minutes} min`,
+      readTimeEn: `${english?.minutes ?? minutes} min`,
       bodyHtml: markdownToHtml(main, publishedSlugs),
       faq: parseFaq(faqSource, publishedSlugs),
+      // Празни, докато статията няма превод — BlogPost показва българския текст с бележка.
+      bodyHtmlEn: english?.bodyHtml || '',
+      faqEn: english?.faq || [],
+      hasEnglish: Boolean(english),
     };
   });
 
