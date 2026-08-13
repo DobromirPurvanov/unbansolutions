@@ -31,6 +31,8 @@ Useful commands:
 
 ## Required Vercel environment
 
+The weekly redeploy cron is intentionally absent from `vercel.json`: every article is published, so it only produced failing invocations. `api/redeploy.js` stays in place — re-add the cron entry together with `DEPLOY_HOOK_URL` and `CRON_SECRET` the moment an article is dated in the future (a test enforces the pairing).
+
 Configure `RESEND_API_KEY` as a server-only secret. For a rate limit shared by all serverless instances, also configure `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` and a random `RATE_LIMIT_SALT`; the endpoint keeps a local safety limit if Redis is unavailable. `CONTACT_EMAIL`, `FROM_EMAIL` and `SITE_URL` may override their documented defaults. Analytics IDs are public and may be overridden with the `VITE_` variables in `.env.example`.
 
 Two Resend keys were embedded in earlier, already-published commits. Revoke both historical keys in Resend and configure a newly generated key before the next deployment. Rewriting Git history is optional cleanup and does not replace key revocation.

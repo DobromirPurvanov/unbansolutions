@@ -21,12 +21,6 @@
       "permanent": false
     }
   ],
-  "crons": [
-    {
-      "path": "/api/redeploy",
-      "schedule": "0 6 * * 2"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",

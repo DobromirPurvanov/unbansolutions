@@ -67,6 +67,16 @@ test('internal blog links only point to real articles', () => {
   }
 });
 
+test('насрочена статия изисква седмичния крон', async () => {
+  const vercel = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
+  if (!upcoming.length) {
+    // Без бъдещи дати кронът само гори билдове и връща 401 без env — затова го няма.
+    assert.equal(vercel.crons, undefined);
+    return;
+  }
+  assert.deepEqual(vercel.crons, [{ path: '/api/redeploy', schedule: '0 6 * * 2' }]);
+});
+
 test('internal links from articles point to routes that exist', async () => {
   const app = await readFile(new URL('../src/App.tsx', import.meta.url), 'utf8');
   const routes = new Set([...app.matchAll(/path="(\/[^"*:]*)"/g)].map((match) => match[1]));

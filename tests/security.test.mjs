@@ -111,7 +111,8 @@ test('published blog wiring is consistent, drafts stay local', async () => {
   assert.match(packageJson.scripts.dev, /generate-blog\.mjs/);
   // A redirect here would shadow the prerendered article pages.
   assert.equal(vercel.redirects.find((redirect) => redirect.source === '/blog/:slug'), undefined);
-  assert.deepEqual(vercel.crons, [{ path: '/api/redeploy', schedule: '0 6 * * 2' }]);
+  // Кронът се връща само когато има статия с бъдеща дата — виж теста в blog.test.mjs.
+  assert.equal(vercel.crons, undefined);
 });
 
 function createResponse() {
