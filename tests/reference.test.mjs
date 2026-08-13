@@ -8,6 +8,12 @@ const reference = JSON.parse(
 const diagnostic = JSON.parse(
   await readFile(new URL('../src/data/reference/diagnostic.json', import.meta.url), 'utf8'),
 );
+const referenceEn = JSON.parse(
+  await readFile(new URL('../src/data/reference/sanctions.en.json', import.meta.url), 'utf8'),
+);
+const diagnosticEn = JSON.parse(
+  await readFile(new URL('../src/data/reference/diagnostic.en.json', import.meta.url), 'utf8'),
+);
 const guides = {
   organic: JSON.parse(await readFile(new URL('../src/data/reference/rules-organic.json', import.meta.url), 'utf8')),
   ads: JSON.parse(await readFile(new URL('../src/data/reference/rules-ads.json', import.meta.url), 'utf8')),
@@ -127,6 +133,45 @@ test('ръководствата са вързани в приложението
   }
   assert.match(prerender, /guideStaticHtml/);
   assert.match(prerender, /guideSitemapEntries/);
+});
+
+test('английската версия на справочника е огледало на българската', () => {
+  assert.deepEqual(
+    referenceEn.sanctions.map((sanction) => sanction.id),
+    reference.sanctions.map((sanction) => sanction.id),
+  );
+  for (const [index, sanction] of referenceEn.sanctions.entries()) {
+    const source = reference.sanctions[index];
+    // Тези стойности управляват логика, а не текст — не се превеждат.
+    for (const field of ['path', 'risk', 'issue', 'article']) {
+      assert.equal(sanction[field], source[field], `${sanction.id}: разминаване в „${field}“`);
+    }
+    assert.equal(sanction.firstSteps.length, source.firstSteps.length, `${sanction.id}: различен брой първи стъпки`);
+    for (const field of ['title', 'summary', 'looksLike', 'whereToSee', 'causes']) {
+      assert.ok(sanction[field]?.length > 10, `${sanction.id}: липсва превод на „${field}“`);
+    }
+  }
+  for (const field of ['statusPlaces', 'reportOutcomes', 'reportSignals', 'reportSop', 'myths', 'strikePaths']) {
+    assert.equal(referenceEn[field].length, reference[field].length, `различен брой елементи в „${field}“`);
+  }
+});
+
+test('английското дърво на диагностиката повтаря структурата на българското', () => {
+  assert.equal(diagnosticEn.root, diagnostic.root);
+  assert.deepEqual(Object.keys(diagnosticEn.nodes).sort(), Object.keys(diagnostic.nodes).sort());
+  for (const [id, node] of Object.entries(diagnosticEn.nodes)) {
+    const source = diagnostic.nodes[id];
+    assert.equal(node.options.length, source.options.length, `${id}: различен брой отговори`);
+    // Разклоненията трябва да водят до същите места, независимо от езика.
+    assert.deepEqual(
+      node.options.map((option) => option.next ?? option.result),
+      source.options.map((option) => option.next ?? option.result),
+      `${id}: отговорите водят другаде`,
+    );
+    for (const option of node.options) {
+      assert.ok(option.label && option.detail, `${id}: непреведен отговор`);
+    }
+  }
 });
 
 test('страницата е вързана в приложението, prerender-а и sitemap-а', async () => {

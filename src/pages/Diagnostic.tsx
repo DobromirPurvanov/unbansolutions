@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, BookOpen, ListChecks, RotateCcw } from 'lucide-r
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import RiskBadge from '@/components/RiskBadge';
-import { diagnosticTree, findSanction, type DiagnosticOption } from '@/data/reference';
+import { diagnosticByLang, findSanction, type DiagnosticOption } from '@/data/reference';
 import { trackEvent } from '@/lib/analytics';
 
 const SITE_URL = 'https://www.unbansolutions.com';
@@ -45,12 +45,13 @@ export default function Diagnostic() {
   const { lang } = useLanguage();
   const isBg = lang === 'bg';
 
-  const [current, setCurrent] = useState(diagnosticTree.root);
+  const tree = diagnosticByLang[lang];
+  const [current, setCurrent] = useState(tree.root);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [resultId, setResultId] = useState<string | null>(null);
 
-  const node = diagnosticTree.nodes[current];
-  const result = resultId ? findSanction(resultId) : undefined;
+  const node = tree.nodes[current];
+  const result = resultId ? findSanction(resultId, lang) : undefined;
 
   const choose = (option: DiagnosticOption) => {
     if (!answers.length) trackEvent('diagnostic_started');
@@ -78,7 +79,7 @@ export default function Diagnostic() {
   const restart = () => {
     setAnswers([]);
     setResultId(null);
-    setCurrent(diagnosticTree.root);
+    setCurrent(tree.root);
   };
 
   return (
@@ -108,11 +109,6 @@ export default function Diagnostic() {
                 ? 'Два-три въпроса по симптомите. Резултатът показва коя мярка стои зад тях, къде се вижда официално и какво има смисъл да направите първо.'
                 : 'Two or three questions about the symptoms. The result names the measure behind them, where it is officially visible and what to do first.'}
             </p>
-            {!isBg && (
-              <p className="mt-4 rounded-xl bg-violet-50 px-4 py-3 text-xs leading-relaxed text-violet-800">
-                The questionnaire is in Bulgarian. An English version is planned.
-              </p>
-            )}
           </div>
         </section>
 

@@ -2,7 +2,9 @@
 // scripts/prerender.mjs (Node не може да импортира TS). Този модул е мястото,
 // където JSON-ът получава типове.
 import sanctionsJson from '@/data/reference/sanctions.json';
+import sanctionsEnJson from '@/data/reference/sanctions.en.json';
 import diagnosticJson from '@/data/reference/diagnostic.json';
+import diagnosticEnJson from '@/data/reference/diagnostic.en.json';
 import organicRulesJson from '@/data/reference/rules-organic.json';
 import adsRulesJson from '@/data/reference/rules-ads.json';
 
@@ -61,7 +63,16 @@ export interface SanctionsReference {
   myths: Myth[];
 }
 
-export const sanctionsReference = sanctionsJson as SanctionsReference;
+/** Езиците на сайта; съвпада с типа в LanguageContext. */
+export type ReferenceLang = 'bg' | 'en';
+
+export const sanctionsByLang: Record<ReferenceLang, SanctionsReference> = {
+  bg: sanctionsJson as SanctionsReference,
+  en: sanctionsEnJson as SanctionsReference,
+};
+
+/** Българската версия е каноничната — prerender-ът и схемите се хранят от нея. */
+export const sanctionsReference = sanctionsByLang.bg;
 
 export interface DiagnosticOption {
   label: string;
@@ -82,10 +93,13 @@ export interface DiagnosticTree {
   nodes: Record<string, DiagnosticNode>;
 }
 
-export const diagnosticTree = diagnosticJson as DiagnosticTree;
+export const diagnosticByLang: Record<ReferenceLang, DiagnosticTree> = {
+  bg: diagnosticJson as DiagnosticTree,
+  en: diagnosticEnJson as DiagnosticTree,
+};
 
-export function findSanction(id: string): Sanction | undefined {
-  return sanctionsReference.sanctions.find((sanction) => sanction.id === id);
+export function findSanction(id: string, lang: ReferenceLang = 'bg'): Sanction | undefined {
+  return sanctionsByLang[lang].sanctions.find((sanction) => sanction.id === id);
 }
 
 export interface RuleTopic {
@@ -123,8 +137,15 @@ export const rulesGuides = {
 
 export type RulesGuideKey = keyof typeof rulesGuides;
 
-export const RISK_LABELS: Record<Sanction['risk'], string> = {
-  1: 'Ограничава растежа',
-  2: 'Ескалира при повторяемост',
-  3: 'Загуба на достъп или приходи',
+export const RISK_LABELS: Record<ReferenceLang, Record<Sanction['risk'], string>> = {
+  bg: {
+    1: 'Ограничава растежа',
+    2: 'Ескалира при повторяемост',
+    3: 'Загуба на достъп или приходи',
+  },
+  en: {
+    1: 'Limits growth',
+    2: 'Escalates if repeated',
+    3: 'Loss of access or revenue',
+  },
 };

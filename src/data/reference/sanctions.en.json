@@ -1,0 +1,324 @@
+{
+  "updated": "2026-08-13",
+  "strikePaths": [
+    {
+      "id": "community",
+      "name": "Community Standards",
+      "scope": "Organic content",
+      "triggers": "Nudity, violence, hateful conduct and harassment, dangerous organizations, self-injury, spam.",
+      "escalation": "Post removal → temporary limits on posting or Live → blocking or deactivation for repeat and severe cases.",
+      "response": "Stop the risk, edit similar posts, appeal, and run a clean 90-day plan."
+    },
+    {
+      "id": "ads",
+      "name": "Ads Policies",
+      "scope": "Advertising",
+      "triggers": "Misleading claims, landing pages that do not match the ad, personal attributes, circumvention attempts.",
+      "escalation": "Disapproved ads → limited delivery → restricted ad account → restricted Business Manager.",
+      "response": "Audit the ads, fix creative, copy, landing page and targeting, then appeal."
+    },
+    {
+      "id": "monetization",
+      "name": "Monetization",
+      "scope": "Content revenue",
+      "triggers": "Brand-safety breaches, missing paid-partnership labels, sensitive topics handled in the wrong tone.",
+      "escalation": "Limited tools → suspension → removal from the program.",
+      "response": "Remove the cause, set internal rules for the team, reapply after the waiting period."
+    },
+    {
+      "id": "ip",
+      "name": "Copyright and trademarks",
+      "scope": "Third-party assets",
+      "triggers": "Unlicensed music, video, photos or logos; improper use of a trademark.",
+      "escalation": "Removal on a rights holder's claim → broader account limits if it repeats.",
+      "response": "License or replace the asset; file a counter-notice only for a clear error."
+    }
+  ],
+  "sanctions": [
+    {
+      "id": "content-removal",
+      "title": "Content removal",
+      "path": "community",
+      "risk": 2,
+      "issue": "other",
+      "summary": "The post is taken down and the violation stays on the account's record.",
+      "looksLike": "A post, story or reel disappears and you get a notice naming the rule you broke.",
+      "whereToSee": "Notifications and Account Quality.",
+      "causes": "A Community Standards violation: nudity, violence, hateful conduct, dangerous organizations, self-injury.",
+      "firstSteps": [
+        "Screenshot the notification and save the link to the post.",
+        "Read the specific rule that is cited, not the general policy.",
+        "Review your similar posts and fix the same problem there.",
+        "Appeal only if you have an argument on the merits, not because you disagree."
+      ],
+      "article": "kakvo-sadarzhanie-e-pozvoleno-prez-2026"
+    },
+    {
+      "id": "demotion",
+      "title": "Demotion (reduced distribution)",
+      "path": "community",
+      "risk": 1,
+      "issue": "shadowban",
+      "summary": "The content stays online, but the platform stops showing it widely.",
+      "looksLike": "A sharp drop in reach and in impressions from Discovery, sometimes with a 'sensitive' or 'missing context' label.",
+      "whereToSee": "Insights and Account Quality.",
+      "causes": "A risky topic, clickbait, thin context, a misleading thumbnail or hashtags.",
+      "firstSteps": [
+        "Add context and sources to the post.",
+        "Replace the thumbnail and headline with neutral ones.",
+        "Pause that content series for one to two weeks.",
+        "Track whether reach recovers before you post on the topic again."
+      ],
+      "article": "shadowban-kakvo-e-kak-da-go-razpoznaete-i-premahnete"
+    },
+    {
+      "id": "labels",
+      "title": "Labels and warnings",
+      "path": "community",
+      "risk": 1,
+      "issue": "other",
+      "summary": "The post gets a label that everyone who sees it sees too.",
+      "looksLike": "'False', 'partly false', 'missing context', 'altered' or 'sensitive' appears on the post.",
+      "whereToSee": "On the post itself and in your notifications.",
+      "causes": "Missing context, unverified claims, a manipulated visual.",
+      "firstSteps": [
+        "Read the fact-checker's analysis, not just the label.",
+        "Add sources and clarifications to the text.",
+        "Edit the visual if that is what triggered the label.",
+        "Appeal if the review got the facts of your case wrong."
+      ]
+    },
+    {
+      "id": "feature-limits",
+      "title": "Feature limits",
+      "path": "community",
+      "risk": 2,
+      "issue": "restricted",
+      "summary": "The account works, but specific actions are switched off for a set period.",
+      "looksLike": "A temporary block on posting, comments, messages, Live, groups or Marketplace.",
+      "whereToSee": "Account, Page or Professional Dashboard.",
+      "causes": "Accumulated violations or a single incident, such as graphic footage during a Live.",
+      "firstSteps": [
+        "Stop the activity that caused the limit — continuing extends it.",
+        "Plan 90 days without risky posts on the same topic.",
+        "Tighten moderation of comments and messages.",
+        "Appeal if the limit came from someone else's post or from an error."
+      ],
+      "article": "ogranicheniya-restriktsii-na-akaunta-vidove-i-reshenia"
+    },
+    {
+      "id": "removed-from-recommendations",
+      "title": "Removed from recommendations",
+      "path": "community",
+      "risk": 1,
+      "issue": "shadowban",
+      "summary": "What people call a shadowban: the profile stops reaching anyone new.",
+      "looksLike": "Content no longer appears in Explore, recommendations, search or hashtags, and reach falls back to your followers.",
+      "whereToSee": "Account or Page Quality — platforms spell it out as 'Removed from recommendations'.",
+      "causes": "Low quality, repeated reports, borderline topics, earlier warnings.",
+      "firstSteps": [
+        "Check Account Quality before assuming it is a shadowban.",
+        "Remove or edit the content flagged as violating.",
+        "Publish consistent quality for 30 to 90 days.",
+        "Cut back on risky topics until the status clears."
+      ],
+      "article": "shadowban-kakvo-e-kak-da-go-razpoznaete-i-premahnete"
+    },
+    {
+      "id": "temporary-block",
+      "title": "Temporary account block",
+      "path": "community",
+      "risk": 2,
+      "issue": "suspended",
+      "summary": "Access is suspended for a set period, but the profile still exists.",
+      "looksLike": "You cannot log in or act; the screen shows a deadline or an identity check.",
+      "whereToSee": "At login and in the email tied to the profile.",
+      "causes": "Systematic violations or a signal of suspicious activity.",
+      "firstSteps": [
+        "Confirm your identity through the official flow, never through a link in a message.",
+        "Change the password and turn on two-factor authentication.",
+        "End active sessions on devices you do not recognize.",
+        "Appeal if the block came without a violation on your side."
+      ],
+      "article": "iztrit-ili-spryan-akaunt-kak-da-go-vazstanovite"
+    },
+    {
+      "id": "account-disabled",
+      "title": "Disabled or deleted account",
+      "path": "community",
+      "risk": 3,
+      "issue": "banned",
+      "summary": "The heaviest measure: full loss of access, with a deadline for appealing.",
+      "looksLike": "The profile or page will not open; login shows a deactivation message.",
+      "whereToSee": "At login and in the platform's email notifications.",
+      "causes": "Severe or repeated violations, or evading measures already imposed.",
+      "firstSteps": [
+        "Act immediately — the appeal window starts running from the notification.",
+        "Collect proof of ownership: documents, old posts, ad invoices.",
+        "File an appeal with a specific argument, not a general plea.",
+        "Check what archive of your content you hold outside the platform."
+      ],
+      "article": "iztrit-ili-spryan-akaunt-kak-da-go-vazstanovite"
+    },
+    {
+      "id": "ad-disapproved",
+      "title": "Disapproved ad",
+      "path": "ads",
+      "risk": 1,
+      "issue": "restricted",
+      "summary": "A single ad is rejected; a series of rejections leads to account-level measures.",
+      "looksLike": "The ad or ad set sits as Disapproved and never starts delivering.",
+      "whereToSee": "Ads Manager → Policy Issues.",
+      "causes": "A broken ads policy, a landing page that does not match the offer, prohibited claims or targeting.",
+      "firstSteps": [
+        "Read which policy is cited and open it in the help center.",
+        "Check all four elements together: creative, copy, landing page and targeting.",
+        "Fix it on the merits — swapping one word counts as circumvention.",
+        "Appeal with a short note on exactly what you changed."
+      ]
+    },
+    {
+      "id": "ad-account-restricted",
+      "title": "Restricted ad account or Business",
+      "path": "ads",
+      "risk": 3,
+      "issue": "restricted",
+      "summary": "Advertising stops completely — the most expensive sanction for a business.",
+      "looksLike": "You cannot run ads; a restriction appears in Business Settings.",
+      "whereToSee": "Account Quality and Business Settings.",
+      "causes": "Circumvention attempts, sensitive categories, a run of rejections, poor Business Manager hygiene.",
+      "firstSteps": [
+        "Stop uploading new ads until the cause is identified.",
+        "Run a full audit: creatives, catalogs, domains, pixels and forms.",
+        "Review roles and access and turn on two-factor authentication.",
+        "Appeal with evidence of the fixes, and apply Special Ad Categories if they apply to you."
+      ],
+      "article": "ogranicheniya-restriktsii-na-akaunta-vidove-i-reshenia"
+    },
+    {
+      "id": "monetization",
+      "title": "Suspended or limited monetization",
+      "path": "monetization",
+      "risk": 2,
+      "issue": "restricted",
+      "summary": "The content stays up, but the revenue from it stops.",
+      "looksLike": "Stars, subscriptions or in-stream ads are suspended or limited.",
+      "whereToSee": "Monetization Manager.",
+      "causes": "Brand-safety breaches, missing paid-partnership labels, sensitive topics in the wrong tone.",
+      "firstSteps": [
+        "Remove the specific content named as the cause.",
+        "Set a team rule on who labels partnerships and how.",
+        "Wait out the stated period before requesting another review.",
+        "Request the review with a description of what changed editorially."
+      ]
+    },
+    {
+      "id": "ip-copyright",
+      "title": "Copyright and trademarks",
+      "path": "ip",
+      "risk": 2,
+      "issue": "other",
+      "summary": "Removal on a rights holder's claim; repetition brings broader limits.",
+      "looksLike": "Content is taken down on a claim, and some systems also record a strike.",
+      "whereToSee": "The rights section or your Support Inbox.",
+      "causes": "Unlicensed music, video, photos or logos; improper use of a trademark.",
+      "firstSteps": [
+        "Replace the asset or secure a license before re-uploading.",
+        "Gather the proof of your right to use it.",
+        "File a counter-notice only for a clear error, with documents.",
+        "Search your archive for the same asset in older posts."
+      ]
+    },
+    {
+      "id": "deverification",
+      "title": "Verification removed",
+      "path": "community",
+      "risk": 1,
+      "issue": "other",
+      "summary": "The badge is gone, and with it part of your credibility and support access.",
+      "looksLike": "The badge disappears from the profile, usually with a short notice.",
+      "whereToSee": "The profile and your notifications.",
+      "causes": "Violations, suspicious activity, changes in the platform's criteria.",
+      "firstSteps": [
+        "Clear the active violations on the account.",
+        "Keep the content stable for a few months.",
+        "Check whether the profile still meets the current criteria.",
+        "Reapply once the record is clean."
+      ]
+    }
+  ],
+  "statusPlaces": [
+    {
+      "name": "Account, Page or Professional Dashboard",
+      "detail": "The status section lists removed posts, warnings and whether the profile is out of recommendations."
+    },
+    {
+      "name": "Support Inbox and notifications",
+      "detail": "Official messages about measures and the replies to your appeals land here."
+    },
+    {
+      "name": "Ads Manager → Account Quality",
+      "detail": "Rejections, delivery limits and the state of the ad account."
+    },
+    {
+      "name": "Monetization Manager",
+      "detail": "Warnings and eligibility for the revenue tools."
+    },
+    {
+      "name": "The rights section",
+      "detail": "The history of rights-holder claims and the counter-notices you filed."
+    }
+  ],
+  "reportOutcomes": [
+    "No action, if the review finds no violation.",
+    "Soft measures: demotion and temporarily limited recommendations, comments or sharing.",
+    "Temporary removal or a hold on visibility until a moderator reviews it.",
+    "Permanent removal and a strike, if a violation is confirmed."
+  ],
+  "reportSignals": [
+    "A sudden spike in reports and hostile comments in a short window.",
+    "Many new or recently created profiles in the comments.",
+    "Calls to 'report this' in outside groups and channels.",
+    "Near-identical wording across the reports and comments."
+  ],
+  "reportSop": [
+    {
+      "title": "Collect evidence",
+      "detail": "Screenshots of the calls to mass-report, links, date and time. This is the foundation of any later appeal."
+    },
+    {
+      "title": "Tighten safety settings",
+      "detail": "Limit comments to followers, turn on offensive-word filters, restrict tagging where needed."
+    },
+    {
+      "title": "Add context to the post",
+      "detail": "A clarification, a source or a warning on sensitive topics; a more neutral thumbnail and description."
+    },
+    {
+      "title": "Moderate actively",
+      "detail": "Hide the repeat hostile comments and block the profiles that break the rules."
+    },
+    {
+      "title": "Appeal if it comes down",
+      "detail": "Attach the evidence of coordination, the context and the corrections you already made."
+    },
+    {
+      "title": "Watch for 90 days",
+      "detail": "Track repeats and schedule risky topics for calmer periods."
+    }
+  ],
+  "myths": [
+    {
+      "myth": "Enough reports automatically take a post down.",
+      "reality": "Reports trigger a review, not a verdict. In sensitive categories a temporary measure is possible, and it can be appealed."
+    },
+    {
+      "myth": "Nothing can be done about coordinated reporting.",
+      "reality": "There is: protective settings, evidence of the coordination, content fixes, an appeal, and escalation through business support if you have access to it."
+    },
+    {
+      "myth": "A shadowban is a separate sanction.",
+      "reality": "In most cases it is demotion or removal from recommendations. Both are visible in Account Quality instead of being guessed from your reach."
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "root": "area",
+  "nodes": {
+    "area": {
+      "question": "Where did the problem show up?",
+      "hint": "Pick whatever describes your situation most closely right now.",
+      "options": [
+        {
+          "label": "On a specific post",
+          "detail": "A post, story, reel or video.",
+          "next": "content"
+        },
+        {
+          "label": "On the profile: access or features",
+          "detail": "Login, posting, comments, messages, Live.",
+          "next": "account"
+        },
+        {
+          "label": "In advertising",
+          "detail": "Ads Manager, ad account, Business Manager.",
+          "next": "ads"
+        },
+        {
+          "label": "In revenue, rights or verification",
+          "detail": "Monetization, copyright, the badge.",
+          "next": "rights"
+        }
+      ]
+    },
+    "content": {
+      "question": "What happened to the post?",
+      "options": [
+        {
+          "label": "It disappeared and I got a violation notice",
+          "detail": "The platform names the rule that was broken.",
+          "result": "content-removal"
+        },
+        {
+          "label": "It is still up, but almost nobody sees it",
+          "detail": "Reach collapsed without any notice.",
+          "next": "reach"
+        },
+        {
+          "label": "A label appeared on it",
+          "detail": "'False', 'missing context', 'sensitive', 'altered'.",
+          "result": "labels"
+        },
+        {
+          "label": "It came down on a copyright or music claim",
+          "detail": "The claim came from a rights holder, not from moderation.",
+          "result": "ip-copyright"
+        }
+      ]
+    },
+    "reach": {
+      "question": "What does Account Quality say?",
+      "hint": "Open Account Quality or Page Quality before answering — that is where the platform states what it applied.",
+      "options": [
+        {
+          "label": "That the profile is not recommended to new people",
+          "detail": "Wording along the lines of 'Removed from recommendations'.",
+          "result": "removed-from-recommendations"
+        },
+        {
+          "label": "Nothing, but reach has dropped sharply",
+          "detail": "No warning, just a fall in the insights.",
+          "result": "demotion"
+        },
+        {
+          "label": "That my content carries a label",
+          "detail": "A fact check or a sensitive-content marker.",
+          "result": "labels"
+        }
+      ]
+    },
+    "account": {
+      "question": "How exactly is the profile limited?",
+      "options": [
+        {
+          "label": "Specific actions are switched off for a period",
+          "detail": "Posting, comments, messages, Live, groups, Marketplace.",
+          "result": "feature-limits"
+        },
+        {
+          "label": "I cannot log in, or everything is paused",
+          "detail": "There is a deadline or a request to confirm identity.",
+          "result": "temporary-block"
+        },
+        {
+          "label": "The profile or page no longer exists",
+          "detail": "Login says the account has been deactivated.",
+          "result": "account-disabled"
+        },
+        {
+          "label": "The verification badge is gone",
+          "detail": "The profile works, but it is no longer verified.",
+          "result": "deverification"
+        }
+      ]
+    },
+    "ads": {
+      "question": "How far does the advertising limit reach?",
+      "options": [
+        {
+          "label": "Individual ads sit as Disapproved",
+          "detail": "The rest of the campaigns run normally.",
+          "result": "ad-disapproved"
+        },
+        {
+          "label": "The whole ad account or Business is restricted",
+          "detail": "I cannot run ads or add assets.",
+          "result": "ad-account-restricted"
+        },
+        {
+          "label": "Ads run, but delivery is limited",
+          "detail": "There is a warning in Account Quality.",
+          "result": "ad-account-restricted"
+        }
+      ]
+    },
+    "rights": {
+      "question": "Which of the three is affected?",
+      "options": [
+        {
+          "label": "Monetization",
+          "detail": "Stars, subscriptions or in-stream ads are suspended.",
+          "result": "monetization"
+        },
+        {
+          "label": "Copyright or a trademark",
+          "detail": "A takedown on a rights holder's claim.",
+          "result": "ip-copyright"
+        },
+        {
+          "label": "Verification",
+          "detail": "The badge has been removed.",
+          "result": "deverification"
+        }
+      ]
+    }
+  }
+}

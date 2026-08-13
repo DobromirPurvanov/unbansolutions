@@ -4,14 +4,14 @@ import { AlertTriangle, ArrowRight, BookOpen, Eye, Flag, ListChecks, ShieldAlert
 import { useLanguage } from '@/contexts/LanguageContext';
 import SEOMeta from '@/components/SEOMeta';
 import RiskBadge from '@/components/RiskBadge';
-import { rulesGuides, sanctionsReference } from '@/data/reference';
+import { rulesGuides, sanctionsByLang, sanctionsReference } from '@/data/reference';
 
 const SITE_URL = 'https://www.unbansolutions.com';
 const PAGE_URL = `${SITE_URL}/vidove-sanktsii`;
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 
-const { strikePaths, sanctions, statusPlaces, reportOutcomes, reportSignals, reportSop, myths, updated } =
-  sanctionsReference;
+// Схемата и sitemap-ът вървят по каноничната българска версия.
+const { sanctions, updated } = sanctionsReference;
 
 // Отразява схемата, която scripts/prerender.mjs слага в статичния HTML.
 function buildStructuredData() {
@@ -59,6 +59,8 @@ const structuredData = buildStructuredData();
 export default function Sanctions() {
   const { lang } = useLanguage();
   const isBg = lang === 'bg';
+  const { strikePaths, statusPlaces, reportOutcomes, reportSignals, reportSop, myths } = sanctionsByLang[lang];
+  const localSanctions = sanctionsByLang[lang].sanctions;
 
   return (
     <>
@@ -90,11 +92,6 @@ export default function Sanctions() {
                 ? 'Първата задача при всяка мярка е да разберете коя точно е тя. Оттам следват срокът, мястото, където се вижда, и стъпките, които имат смисъл.'
                 : 'The first task in any enforcement case is identifying which measure you are actually facing. The deadline, the place to check it and the steps that matter all follow from that.'}
             </p>
-            {!isBg && (
-              <p className="mt-5 max-w-2xl rounded-xl bg-violet-50 px-4 py-3 text-xs leading-relaxed text-violet-800">
-                This reference is written in Bulgarian. An English version is planned.
-              </p>
-            )}
             <Link
               to="/diagnostika"
               className="group mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition-[filter] hover:brightness-95"
@@ -103,13 +100,21 @@ export default function Sanctions() {
               <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
             <div className="mt-7 flex flex-wrap gap-2">
-              {[
-                { href: '#patheki', label: 'Strike пътеките' },
-                { href: '#sanktsii', label: '12-те санкции' },
-                { href: '#status', label: 'Къде се вижда статусът' },
-                { href: '#reporti', label: 'Вълна от сигнали' },
-                { href: '#mitove', label: 'Митове и реалност' },
-              ].map((item) => (
+              {(isBg
+                ? [
+                    { href: '#patheki', label: 'Strike пътеките' },
+                    { href: '#sanktsii', label: '12-те санкции' },
+                    { href: '#status', label: 'Къде се вижда статусът' },
+                    { href: '#reporti', label: 'Вълна от сигнали' },
+                    { href: '#mitove', label: 'Митове и реалност' },
+                  ]
+                : [
+                    { href: '#patheki', label: 'Strike paths' },
+                    { href: '#sanktsii', label: 'The 12 sanctions' },
+                    { href: '#status', label: 'Where to check status' },
+                    { href: '#reporti', label: 'Report waves' },
+                    { href: '#mitove', label: 'Myths and reality' },
+                  ]).map((item) => (
                 <a
                   key={item.href}
                   href={item.href}
@@ -184,7 +189,7 @@ export default function Sanctions() {
                 : 'For each measure: what it looks like, where it is officially visible, what usually causes it and what makes sense in the first 48 hours.'}
             </p>
             <div className="mt-8 grid gap-5 md:grid-cols-2">
-              {sanctions.map((sanction, index) => (
+              {localSanctions.map((sanction, index) => (
                 <article
                   key={sanction.id}
                   id={sanction.id}
