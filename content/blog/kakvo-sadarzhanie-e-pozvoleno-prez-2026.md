@@ -1,7 +1,7 @@
 ---
 title: "Какво съдържание е позволено в социалните мрежи през 2026 г."
 titleEn: "What Content Is Allowed on Social Media in 2026"
-date: "2026-08-13"
+date: "2026-07-07"
 excerpt: "Кое съдържание платформите премахват, кое само спират да препоръчват и кои са новите правила за AI съдържание и рискови сектори през 2026 г."
 excerptEn: "What platforms remove, what they quietly stop recommending, and the new 2026 rules for AI content and risky niches."
 description: "Правилата за съдържание в Instagram, TikTok и Facebook през 2026 г.: кое се премахва, кое губи препоръки, задълженията за обозначаване на AI съдържание и капаните пред бизнес акаунтите."
